@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <script type="text/javascript">
+    (function(){
+      var win = window;
+      var docElem = document.documentElement;
+      var on = 'addEventListener';
+      var timeoutId;
+      function delaySetRem(){
+          clearTimeout(timeoutId);
+          timeoutId = setTimeout(setRem, 300);
+      }
+      function setRem(){
+          win.rem = docElem.getBoundingClientRect().width / 10;
+          docElem.style.fontSize = win.rem + 'px';
+      }
+
+      setRem();
+      docElem.setAttribute('data-dpr', win.devicePixelRatio);
+      win[on]('resize', delaySetRem);
+      win[on]('pageshow', function(e){
+          if(e.persisted){
+              delaySetRem();
+          }
+      });
+  })();
+  </script>
+  <!-- <script src="https://res.ex.qq.com/open/js/jweixin-1.2.0.js"></script> -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="screen-orientation" content="portrait">
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <title>music-box-maker-spa</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>
