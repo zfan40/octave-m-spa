@@ -7,6 +7,7 @@ const baseWebpackConfig = require('./webpack.base.conf')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const portfinder = require('portfinder')
+const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin')
 
 const devWebpackConfig = merge(baseWebpackConfig, {
   module: {
@@ -47,8 +48,10 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: 'index.html',
-      inject: true
+      inlineSource: '.(js|css)$', // embed all javascript and css inline
+      inject: true,
     }),
+    new HtmlWebpackInlineSourcePlugin()
   ]
 })
 
