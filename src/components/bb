@@ -50,12 +50,10 @@ window.tonepart = [] // store all the music parts. (ummm,that's why it's named p
 let bouncepart = []
 
 let recordStartTime = 0
+let activeOffsetTime = 0 //手动拉条的时间偏移
 
-let isLinger = true //非播放状态中未开始录音
-var replayInterval = undefined //控制progressbar的setinterval
-let playOffset = 0 //播放状态的拉条bar初始时间记录
-let lingerOffset = 0 //未播放状态的拉条bar初始时间记录
-const PROGRESS_INTERVAL_TIME = 0.1 //0.1秒挪一下
+let isRecordPause = true
+var replayInterval = undefined
 export default {
   components: {
     swiper,
@@ -65,9 +63,11 @@ export default {
   data() {
     return {
       activeNote: {},
+      timerToStartRecord: 0,
       recordPart: [], //current record part
       recordParts: [], //each new record goes in here.
-      playing: false,
+      recording: true, //false
+      replaying: false,
       generalControllerShow: false,
       activeSwiperIndex: 3,
       lastActiveSwiperIndex: 3 - 1,
@@ -93,7 +93,7 @@ export default {
         },
         class: 'star-slider',
         direction: 'vertical',
-        speed: PROGRESS_INTERVAL_TIME,
+        speed: 0.5,
         bgStyle: {
           backgroundColor: 'rgb(110,113,158)',
           boxShadow: 'inset 0.5px 0.5px 3px 1px rgba(0,0,0,.36)'
@@ -116,27 +116,6 @@ export default {
       },
     }
   },
-  watch: {
-    playing: function(val) {
-      console.log('playing status', val)
-      if (val) {
-        //start progress bar
-        replayInterval = setInterval(() => {
-
-          this.vuetimeline += 1
-          if (this.vuetimeline >= 200) {
-            this.toggleReplay()
-            this.vuetimeline = 0
-
-          }
-        }, PROGRESS_INTERVAL_TIME * 1000)
-
-      } else {
-        //stop progress bar
-        clearInterval(replayInterval)
-      }
-    },
-  },
   computed: {
     swiper() {
       return this.$refs.pianoRoll.swiper
@@ -150,62 +129,61 @@ export default {
   },
   methods: {
     load() {},
-    toggleReplay() {
-      console.log(1)
-      this.playing = !this.playing
-      if (this.playing) {
-        if (this.vuetimeline >= 200) {
-          this.vuetimeline = 0
+    startRecord() {
+      this.timerToStartRecord = 3
+      let timer = setInterval(() => {
+        this.timerToStartRecord -= 1
+        if (this.timerToStartRecord == 0) {
+          clearInterval(timer)
         }
-        // this.confirmRecordPart(!isLinger)
-        playOffset = performance.now() - this.vuetimeline * 100
-        console.log('播放开始')
-        this.confirmRecordPart(0)
-        console.log('kokokoko')
-        recordStartTime = performance.now();
-        console.log(`activeOffsetTime${this.vuetimeline*100}`)
-        Tone.Transport.start("+0.01", this.vuetimeline * 100 / 1000) // TODO:有问题in case < context.currentTime
-      } else {
-        console.log('播放停了')
-        Tone.Transport.stop(0) // TODO：必须stop才能start。。。有没有自动stop啊..
-        // recordStartTime = performance.now()
-      }
+      }, 1000)
+    },
+    touchPianoRollStartHandler(e) {
+      // this.generalControllerShow = true
+      console.log(e)
+    },
+    touchPianoRollEndHandler(e) {
+
+    },
+    touchGControllerStartHandler(e) {
+      this.generalControllerShow = false
+    },
+    touchGControllerEndHandler(e) {
+
     },
     touchNoteStartHandler(e) {
-      let noteTime = 0
-      // console.log('down', e.target.id)
+      console.log('down', e.target.id)
       piano.triggerAttack(e.target.id)
-      // console.log('midi no. :', Tone.Frequency(e.target.id).toMidi())
+      console.log('midi no. :', Tone.Frequency(e.target.id).toMidi())
       this.$set(this.activeNote, e.target.id, 1)
-      if (!this.playing) {
-        if (isLinger) {
+      if (this.recording) {
+        if (isRecordPause) {
           recordStartTime = performance.now()
-          lingerOffset = this.vuetimeline * 100
-          isLinger = false
+          isRecordPause = false
         }
-        noteTime = performance.now() - recordStartTime + lingerOffset
-      } else {
-        noteTime = performance.now() - playOffset
-        // noteTime = this.vuetimeline * 100
-        // console.log('1', this.vuetimeline * 100)
-        // console.log('2', performance.now() - recordStartTime + this.vuetimeline*100)
+        let noteTime = 0
+        if (!this.replaying) {
+          noteTime = performance.now() + activeOffsetTime - recordStartTime
+        } else {
+          noteTime = this.vuetimeline*100
+        }
+
+        if (noteTime < 20000) {
+          this.vuetimeline = 10 * noteTime / 1000
+          this.recordPart.push({
+            'note': e.target.id,
+            'time': +(noteTime / 1000).toFixed(4)
+          })
+        } else {
+          this.vuetimeline = 20 * 10 // 颗粒度是0.1s => 200份
+          console.log('cannot record more than 20 seconds')
+        }
       }
-      if (noteTime < 20000) {
-        this.vuetimeline = 10 * noteTime / 1000
-        this.recordPart.push({
-          'note': e.target.id,
-          'time': +(noteTime / 1000).toFixed(4)
-        })
-      } else {
-        this.vuetimeline = 20 * 10 // 颗粒度是0.1s => 200份
-        console.log('cannot record more than 20 seconds')
-      }
-    },
-    touchMove(e) {
-      console.log(e.touches[0])
     },
     touchNoteEndHandler(e) {
+      // console.log('up',e.target.id)
       piano.triggerRelease(e.target.id)
+      // plucky.triggerRelease(e.target.id)
       this.$set(this.activeNote, e.target.id, 0)
     },
     confirmRecordPart(shouldClearTime) {
@@ -214,9 +192,6 @@ export default {
         if (this.recordParts[this.lastActivePartIndex] && this.recordParts[this.lastActivePartIndex].length) {
           //已在该track录过,merge both
           this.recordPart = this.recordPart.concat(this.recordParts[this.lastActivePartIndex])
-        }
-        if (tonepart[this.lastActivePartIndex]) {
-          tonepart[this.lastActivePartIndex].dispose() //覆盖之前的需要dispose
         }
         tonepart[this.lastActivePartIndex] = new Tone.Part(function(time, value) { //不能老这new啊，要每次一个数组，每次改动最后一个
           piano.triggerAttackRelease(value.note, "8n", time)
@@ -229,10 +204,13 @@ export default {
       this.lastActiveSwiperIndex = this.activeSwiperIndex
       // reinit time
       if (shouldClearTime) {
-        this.vuetimeline = 0 // this is kind of separate for progress view
+        activeOffsetTime = 0
+        this.vuetimeline = 0
         recordStartTime = 0
       }
-      isLinger = true
+      isRecordPause = true
+
+      // this.gotoNextRecordPart()
     },
     clearRecordPart(trackNum) {
       console.log(`cleaning track ${trackNum}`)
@@ -247,9 +225,31 @@ export default {
         console.log(`track ${trackNum} has no content`)
       }
     },
+    gotoNextRecordPart() {
+      this.recordPart = []
+      //TODO: slide to next page
+      this.recordingPartIndex += 1
+      this.swiper.slideTo(this.recordingPartIndex, 1000, false)
+      console.log('goto next record part')
+    },
+    toggleReplay() {
+      console.log(1)
+      this.replaying = !this.replaying
+      if (this.replaying) {
+        this.confirmRecordPart(!isRecordPause)
+        console.log('kokokoko')
+        recordStartTime = performance.now();
+        console.log(activeOffsetTime)
+        Tone.Transport.start("+0.01", activeOffsetTime / 1000) // in case < context.currentTime
+        replayInterval = setInterval(() => {
+          this.vuetimeline += 1;
+        }, 100)
+      } else {
+        clearInterval(replayInterval)
+        Tone.Transport.stop(0) // TODO：必须stop才能start。。。有没有自动stop啊..
+      }
+    },
     bounceProject() {
-      this.confirmRecordPart(0)
-      console.log(this)
       console.log(tonepart)
       bouncepart = []
       if (tonepart.length) {
@@ -258,19 +258,15 @@ export default {
             bouncepart.push(noteInfo.value)
           })
         })
-        bouncepart.sort((a, b) => (0 + a.time - b.time))
-        this.$store.dispatch('BOUNCE_PROJECT', {
-          project: bouncepart
-        }).then(() => {
-          console.log('successfully bounced')
-          // $router.push('/music-box-viewer')
-        })
         while (tonepart.length) {
           tonepart.pop().dispose() //最后一个被dispose，同时要从数组中删掉
         }
-        tonepart[0] = new Tone.Part(function(time, value) {
+        tonepart[0] = new Tone.Part(function(time, value) { //不能老这new啊，要每次一个数组，每次改动最后一个
           piano.triggerAttackRelease(value.note, "8n", time)
         }, bouncepart).start(0)
+
+        bouncepart.sort((a, b) => (0 + a.time - b.time))
+        console.log(bouncepart)
         Magic.generateJSCadCode(bouncepart)
       } else {
         alert('tm什么都没录')
@@ -283,13 +279,9 @@ export default {
       return Magic.mapNoteMidiToLength(m)
     },
     adjustTimeline(e) {
-      if (this.playing) {
-        console.log('ccccccccc')
-        this.toggleReplay() //现在播放中拉条，直接停，涉及到ref读不到最新值貌似，无法直接继续播放 this is TODO
-      } else {
-        isLinger = true //你拉条了肯定是
-      }
-    },
+      activeOffsetTime = e * 100 // ms 1000, 颗粒度200 20s 所以100
+      isRecordPause = true //你拉条了肯定是
+    }
   },
   created() {
     //check cookie to get serviceToken first
@@ -310,7 +302,9 @@ export default {
         transitionEnd: function(e) {
           console.log('3', this.activeIndex) // THIS!!! within swiper...
           self.activeSwiperIndex = this.activeIndex
-          self.confirmRecordPart(!isLinger)
+          self.confirmRecordPart(!isRecordPause)
+          // recordStartTime = performance.now() //TODO, actually not so...!!!!!!!
+
         }
       }
     }
@@ -353,7 +347,7 @@ export default {
 <template>
 <div id="container">
   <!-- <v-touch @pan="onPan"> -->
-  <div class="keys" @touchstart.stop.prevent="touchNoteStartHandler" @touchend.stop.event="touchNoteEndHandler" @touchmove="touchMove">
+  <div class="keys" @touchstart.stop.prevent="touchNoteStartHandler" @touchend.stop.event="touchNoteEndHandler">
     <!-- using sharp sign => '#' as object key cause syntax error... -->
     <!-- <div :class="['white', 'a', activeNote.A3?'active-note':'']" id="A3"></div>
       <div :class="['black', 'b-minor', activeNote.Bb3?'active-note':'']" id="Bb3"></div>
@@ -385,9 +379,10 @@ export default {
     <div :class="['white', 'c', activeNote.C6?'active-note':'']" id="C6"></div>
   </div>
   <div class="scroll-container">
-    <button type="button" name="button" @touchstart="bounceProject" style="width: 20px;background-color: red;height: 20px;"></button>
+
   </div>
-  <div class="semi-piano-roll" @touchmove.stop.prevent>
+  <!-- <div class="semi-piano-roll" @touchstart.stop.prevent="touchPianoRollStartHandler" @touchend.stop.event="touchPianoRollEndHandler"> -->
+  <div class="semi-piano-roll">
     <swiper :options="pianoRollSwiperOption" ref="pianoRoll">
       <!-- slides -->
       <swiper-slide v-for="n in PARTNUM">
@@ -429,10 +424,17 @@ export default {
       </div>
     </div> -->
     <vue-slider v-model="vuetimeline" v-bind="timelineConfig" @callback="adjustTimeline" @drag-end=""></vue-slider>
-    <div :class="[playing?'pauseBtn':'playBtn', 'rotate']" @click="toggleReplay">
+    <div class="playBtn rotate" @click="toggleReplay">
 
     </div>
   </div>
+  <!-- <transition name="general-controller">
+    <div v-if="generalControllerShow" class="general-controller" @touchstart.stop.prevent="touchGControllerStartHandler" @touchend.stop.event="touchGControllerEndHandler">
+      <div class="funcBtn record" :class="recording?'active':''" @click="toggleRecord">
+        <div class="recordHint"></div>
+      </div>
+    </div>
+  </transition> -->
 
   <!-- </v-touch> -->
 </div>
@@ -480,22 +482,6 @@ export default {
         background-size: getRem(32);
         background-color: rgb(69,106,255);
     }
-    .pauseBtn {
-        width: getRem(84);
-        height: getRem(84);
-        margin-top: 0.3rem;
-        border-radius: getRem(42);
-        background: url('../assets/pause.svg') center center no-repeat;
-        background-size: getRem(32);
-        background-color: rgb(69,106,255);
-    }
-}
-.scroll-container {
-    position: fixed;
-    background-color: yellow;
-    width: getRem(100);
-    height: 100%;
-    left: getRem(328);
 }
 .temp {
     width: 0.7rem;

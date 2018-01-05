@@ -2,6 +2,7 @@ import {
   fetchUser,
   fetchItems,
   fetchIdsByType,
+  fetchMbox,
 } from '../_common/js/api';
 /*
   getUserInfo
@@ -10,6 +11,16 @@ import {
   saveWork
 */
 export default {
+  BOUNCE_PROJECT: ({ commit, state }, { project }) => {
+    // 存作品到后台
+    commit('SET_BOUNCE_PROJECT', { project });
+  },
+  FETCH_MBOX: ({ commit, state }, { id }) =>
+    // 获取某id的音乐盒音乐内容
+     fetchMbox(id)
+      .then((project) => {
+        commit('SET_ID_PROJECT', { project });
+      }),
   // ensure data for rendering given list type
   FETCH_LIST_DATA: ({ commit, dispatch, state }, { type }) => {
     commit('SET_ACTIVE_TYPE', { type });

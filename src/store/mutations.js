@@ -16,8 +16,11 @@ export default {
       }
     });
   },
-  SET_RECORD: (state, { type }) => { // 储存录制信息
-    state.activeType = type;
+  SET_BOUNCE_PROJECT: (state, { project }) => { // 储存录制信息
+    state.recordProject = project;
+  },
+  SET_ID_PROJECT: (state, { project }) => { // 储存录制信息
+    state.recordProject = project;
   },
   SET_FINAL_WORK: (state, { type }) => { // 储存成品信息
     state.activeType = type;

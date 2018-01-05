@@ -5,6 +5,7 @@ import MBMaker from '@/components/MBMaker';
 import MBItem from '@/components/MBItem';
 import MBAuthor from '@/components/MBAuthor';
 import NMBMaker from '@/components/NMBMaker';
+import MBViewer from '@/components/MBViewer';
 
 Vue.use(Router);
 
@@ -24,6 +25,11 @@ export default new Router({
       path: '/new-music-box-maker',
       name: 'NMBMaker',
       component: NMBMaker,
+    },
+    {
+      path: '/music-box-viewer',
+      name: 'MBViewer',
+      component: MBViewer,
     },
     {
       path: '/music-box-item',
