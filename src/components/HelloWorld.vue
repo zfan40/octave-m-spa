@@ -1,22 +1,46 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank">Twitter</a></li>
-      <br>
-      <li><a href="http://vuejs-templates.github.io/webpack/" target="_blank">Docs for This Template</a></li>
-    </ul>
-    <h2>Ecosystem</h2>
-    <ul>
-      <li><a href="http://router.vuejs.org/" target="_blank">vue-router</a></li>
-      <li><a href="http://vuex.vuejs.org/" target="_blank">vuex</a></li>
-      <li><a href="http://vue-loader.vuejs.org/" target="_blank">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
-    </ul>
+    <div class="input-section">
+      <div class="sector">
+        <h3>姓名: </h3>
+        <input type="text" v-model="name">
+      </div>
+      <div class="sector">
+        <h3>公司: </h3>
+        <input type="text" v-model="company">
+      </div>
+      <div class="sector">
+        <h3>职位: </h3>
+        <input type="text" v-model="title">
+      </div>
+      <div class="sector">
+        <h3>电话: </h3>
+        <input type="num" v-model="tel">
+      </div>
+      <div class="sector">
+        <h3>背景颜色: </h3>
+          <div class="">  </div>
+          <div class="">  </div>
+          <div class="">  </div>
+          <div class="">  </div>
+      </div>
+
+    </div>
+    <div class="b-card">
+      <div class="name">
+        {{name}}
+      </div>
+      <div class="company">
+        {{company}}
+      </div>
+      <div class="title">
+        {{title}}
+      </div>
+      <div class="tel">
+        {{tel}}
+      </div>
+    </div>
   </div>
 </template>
 
@@ -25,26 +49,39 @@ export default {
   name: 'HelloWorld',
   data() {
     return {
-      msg: 'Welcome to Your Vue.js App',
+      msg: '名片制作',
+      name:'',
+      company:'',
+      title:'',
+      tel:'',
     };
   },
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h1, h2 {
-  font-weight: normal;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
+<style lang="scss" scoped>
+* {margin:0;padding:0}
+.hello {
+  position: absolute;
+  width:100%;
+  height:100%;
+  .input-section {
+    width:10rem;
+    background-color:gray;
+    position:absolute;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    h3 {font-size:.47rem;}
+    .sector {
+      display:flex;
+      h3 {padding-right:.4rem;}
+    }
+  }
+  .b-card {
+
+  }
 }
 </style>

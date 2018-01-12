@@ -10,11 +10,8 @@ import {
   swiper,
   swiperSlide
 } from 'vue-awesome-swiper'
-const touchIdKeyMap = {} //touch move can have several threads, each thread only activate one note at most
-// e.g. {0:a4,1:b5}
 
 const MINI_KEY_LENGTH = 200 // px
-
 var piano = new Tone.Sampler({
   'C4': 'C4.[mp3|ogg]',
   'D#4': 'Ds4.[mp3|ogg]',
@@ -210,14 +207,13 @@ export default {
       this.$set(this.activeNote, noteId, 0)
     },
     touchNoteStartHandler(e) {
-      console.log(e)
-      //先存起来，防止在该键位touchmove重复
-      touchIdKeyMap[e.changedTouches[0].identifier] = e.target.id // TODO: 猜测 touchstart只会有一个changetouches///
       this.handleNoteStart(e.target.id)
     },
     touchNoteEndHandler(e) {
       this.handleNoteEnd(e.target.id)
-      this.handleNoteEnd(touchIdKeyMap[e.changedTouches[0].identifier])// TODO: 猜测 touchend只会有一个changetouches,记录的正好是该停的
+    },
+    touchMove(e) {
+      console.log(e)
     },
     confirmRecordPart(shouldClearTime) {
       if (this.recordPart.length) {
@@ -270,21 +266,19 @@ export default {
           })
         })
         bouncepart.sort((a, b) => (0 + a.time - b.time))
-        //TODO, semi done
-        // this.$store.dispatch('BOUNCE_PROJECT', {
-        //   record: bouncepart
-        // }).then(() => {
-        //   console.log('successfully bounced')
-        //   // this.$router.push('/music-box-viewer')
-        // })
+        this.$store.dispatch('BOUNCE_PROJECT', {
+          record: bouncepart
+        }).then(() => {
+          console.log('successfully bounced')
+          // this.$router.push('/music-box-viewer')
+        })
         while (tonepart.length) {
           tonepart.pop().dispose() //最后一个被dispose，同时要从数组中删掉
         }
         tonepart[0] = new Tone.Part(function(time, value) {
           piano.triggerAttackRelease(value.note, "8n", time)
         }, bouncepart).start(0)
-        Magic.RealMagic(bouncepart)
-        // Magic.generateJSCadCode(bouncepart)
+        Magic.generateJSCadCode(bouncepart)
       } else {
         alert('tm什么都没录')
       }
@@ -304,49 +298,17 @@ export default {
       }
     },
     onMiniKeyboardScroll(e) {
+      SCREEN_HEIGHT
       console.log(e.touches[0].clientY)
     },
     onMiniKeyboardStart(e) {
       console.log(e)
     },
-    keng:function(e){
-			// console.log(e)
-			// console.log(document.elementFromPoint(e.touches[0].clientX,e.touches[0].clientY).style.backgroundColor="yellow")
-			console.log(e) //e.touches is array like object
-			for (let i = 0; i<=e.changedTouches.length-1;i++) {
-				const a = document.elementFromPoint(e.changedTouches[i].clientX,e.changedTouches[i].clientY)
-				if (a.classList.contains('white')||a.classList.contains('black')){
-					if (touchIdKeyMap[e.changedTouches[i].identifier]&&touchIdKeyMap[e.changedTouches[i].identifier]!=a.getAttribute('id')) { //这个touch已经触发，且和当前不一致
-            console.log(touchIdKeyMap)
-            this.handleNoteStart(a.getAttribute('id'))
-            this.handleNoteEnd(touchIdKeyMap[e.changedTouches[i].identifier])
-            touchIdKeyMap[e.changedTouches[i].identifier] = a.getAttribute('id')
-					} else if (!touchIdKeyMap[e.changedTouches[i].identifier]){
-            console.log(2)
-						this.handleNoteStart(a.getAttribute('id'))
-						touchIdKeyMap[e.changedTouches[i].identifier] = a.getAttribute('id')
-					} else {
-            console.log(3)
-            //新旧相同什么都不做
-          }
-				} else {
-          console.log('外边')
-					if (touchIdKeyMap[e.changedTouches[i].identifier]) {
-            this.handleNoteEnd(touchIdKeyMap[e.changedTouches[i].identifier])
-          }
-					touchIdKeyMap[e.changedTouches[i].identifier] = undefined
-				}
-			}
-		}
   },
   created() {
     //check cookie to get serviceToken first
     // if stoken not exist, go auth
     const self = this
-    // this is very important
-    var docElem = document.documentElement;
-    window.rem = docElem.getBoundingClientRect().width / 10;
-    docElem.style.fontSize = window.rem + 'px';
     this.PARTNUM = 3
     this.pianoRollSwiperOption = {
       initialSlide: this.PARTNUM,
@@ -402,7 +364,9 @@ export default {
 
   },
   updated() {
-
+    var docElem = document.documentElement;
+    window.rem = docElem.getBoundingClientRect().width / 10;
+    docElem.style.fontSize = window.rem + 'px';
   }
 };
 </script>
@@ -410,7 +374,7 @@ export default {
 <template>
 <div id="container">
   <!-- <v-touch @pan="onPan"> -->
-  <div class="keys" @touchmove="keng" @touchstart.stop.prevent="touchNoteStartHandler" @touchend.stop.event="touchNoteEndHandler">
+  <div class="keys" @touchstart.stop.prevent="touchNoteStartHandler" @touchend.stop.event="touchNoteEndHandler">
     <!-- using sharp sign => '#' as object key cause syntax error... -->
     <!-- <div :class="['white', 'a', activeNote.A3?'active-note':'']" id="A3"></div>
       <div :class="['black', 'b-minor', activeNote.Bb3?'active-note':'']" id="Bb3"></div>
@@ -447,8 +411,8 @@ export default {
     <div :class="['white', 'f', activeNote.F6?'active-note':'']" id="F6"></div>
   </div>
   <div class="scroll-container">
-    <!-- <button type="button" name="button" @touchstart="onMiniKeyboardStart" style="width: 20px;background-color: red;height: 20px;"></button> -->
-    <div class="mini-keyboard" @touchmove="onMiniKeyboardScroll" @touchstart="bounceProject">
+    <!-- <button type="button" name="button" @touchstart="bounceProject" style="width: 20px;background-color: red;height: 20px;"></button> -->
+    <div class="mini-keyboard" @touchmove="onMiniKeyboardScroll" @touchstart="onMiniKeyboardStart">
 
     </div>
   </div>

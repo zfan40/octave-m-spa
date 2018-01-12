@@ -11,6 +11,7 @@ import {
   swiperSlide
 } from 'vue-awesome-swiper'
 
+const MINI_KEY_LENGTH = 200 // px
 var piano = new Tone.Sampler({
   'C4': 'C4.[mp3|ogg]',
   'D#4': 'Ds4.[mp3|ogg]',
@@ -50,10 +51,12 @@ window.tonepart = [] // store all the music parts. (ummm,that's why it's named p
 let bouncepart = []
 
 let recordStartTime = 0
-let activeOffsetTime = 0 //手动拉条的时间偏移
 
-let isRecordPause = true
-var replayInterval = undefined
+let isLinger = true //非播放状态中未开始录音
+var replayInterval = undefined //控制progressbar的setinterval
+let playOffset = 0 //播放状态的拉条bar初始时间记录
+let lingerOffset = 0 //未播放状态的拉条bar初始时间记录
+const PROGRESS_INTERVAL_TIME = 0.1 //0.1秒挪一下
 export default {
   components: {
     swiper,
@@ -63,11 +66,9 @@ export default {
   data() {
     return {
       activeNote: {},
-      timerToStartRecord: 0,
       recordPart: [], //current record part
       recordParts: [], //each new record goes in here.
-      recording: true, //false
-      replaying: false,
+      playing: false,
       generalControllerShow: false,
       activeSwiperIndex: 3,
       lastActiveSwiperIndex: 3 - 1,
@@ -93,7 +94,7 @@ export default {
         },
         class: 'star-slider',
         direction: 'vertical',
-        speed: 0.5,
+        speed: PROGRESS_INTERVAL_TIME,
         bgStyle: {
           backgroundColor: 'rgb(110,113,158)',
           boxShadow: 'inset 0.5px 0.5px 3px 1px rgba(0,0,0,.36)'
@@ -116,6 +117,27 @@ export default {
       },
     }
   },
+  watch: {
+    playing: function(val) {
+      console.log('playing status', val)
+      if (val) {
+        //start progress bar
+        replayInterval = setInterval(() => {
+
+          this.vuetimeline += 1
+          if (this.vuetimeline >= 200) {
+            this.toggleReplay()
+            this.vuetimeline = 0
+
+          }
+        }, PROGRESS_INTERVAL_TIME * 1000)
+
+      } else {
+        //stop progress bar
+        clearInterval(replayInterval)
+      }
+    },
+  },
   computed: {
     swiper() {
       return this.$refs.pianoRoll.swiper
@@ -129,61 +151,62 @@ export default {
   },
   methods: {
     load() {},
-    startRecord() {
-      this.timerToStartRecord = 3
-      let timer = setInterval(() => {
-        this.timerToStartRecord -= 1
-        if (this.timerToStartRecord == 0) {
-          clearInterval(timer)
+    toggleReplay() {
+      console.log(1)
+      this.playing = !this.playing
+      if (this.playing) {
+        if (this.vuetimeline >= 200) {
+          this.vuetimeline = 0
         }
-      }, 1000)
-    },
-    touchPianoRollStartHandler(e) {
-      // this.generalControllerShow = true
-      console.log(e)
-    },
-    touchPianoRollEndHandler(e) {
-
-    },
-    touchGControllerStartHandler(e) {
-      this.generalControllerShow = false
-    },
-    touchGControllerEndHandler(e) {
-
-    },
-    touchNoteStartHandler(e) {
-      console.log('down', e.target.id)
-      piano.triggerAttack(e.target.id)
-      console.log('midi no. :', Tone.Frequency(e.target.id).toMidi())
-      this.$set(this.activeNote, e.target.id, 1)
-      if (this.recording) {
-        if (isRecordPause) {
-          recordStartTime = performance.now()
-          isRecordPause = false
-        }
-        let noteTime = 0
-        if (!this.replaying) {
-          noteTime = performance.now() + activeOffsetTime - recordStartTime
-        } else {
-          noteTime = this.vuetimeline*100
-        }
-
-        if (noteTime < 20000) {
-          this.vuetimeline = 10 * noteTime / 1000
-          this.recordPart.push({
-            'note': e.target.id,
-            'time': +(noteTime / 1000).toFixed(4)
-          })
-        } else {
-          this.vuetimeline = 20 * 10 // 颗粒度是0.1s => 200份
-          console.log('cannot record more than 20 seconds')
-        }
+        // this.confirmRecordPart(!isLinger)
+        playOffset = performance.now() - this.vuetimeline * 100
+        console.log('播放开始')
+        this.confirmRecordPart(0)
+        console.log('kokokoko')
+        recordStartTime = performance.now();
+        console.log(`activeOffsetTime${this.vuetimeline*100}`)
+        Tone.Transport.start("+0.01", this.vuetimeline * 100 / 1000) // TODO:有问题in case < context.currentTime
+      } else {
+        console.log('播放停了')
+        Tone.Transport.stop(0) // TODO：必须stop才能start。。。有没有自动stop啊..
+        // recordStartTime = performance.now()
       }
     },
+    touchNoteStartHandler(e) {
+      let noteTime = 0
+      // console.log('down', e.target.id)
+      piano.triggerAttack(e.target.id)
+      // console.log('midi no. :', Tone.Frequency(e.target.id).toMidi())
+      this.$set(this.activeNote, e.target.id, 1)
+      if (!this.playing) {
+        if (isLinger) {
+          recordStartTime = performance.now()
+          lingerOffset = this.vuetimeline * 100
+          isLinger = false
+        }
+        noteTime = performance.now() - recordStartTime + lingerOffset
+      } else {
+        noteTime = performance.now() - playOffset
+        // noteTime = this.vuetimeline * 100
+        // console.log('1', this.vuetimeline * 100)
+        // console.log('2', performance.now() - recordStartTime + this.vuetimeline*100)
+      }
+      if (noteTime < 20000) {
+        this.vuetimeline = 10 * noteTime / 1000
+        this.recordPart.push({
+          'note': e.target.id,
+          'time': +(noteTime / 1000).toFixed(4)
+        })
+      } else {
+        this.vuetimeline = 20 * 10 // 颗粒度是0.1s => 200份
+        console.log('cannot record more than 20 seconds')
+      }
+    },
+    touchMove(e) {
+      console.log(e)
+    },
     touchNoteEndHandler(e) {
-      // console.log('up',e.target.id)
       piano.triggerRelease(e.target.id)
-      // plucky.triggerRelease(e.target.id)
       this.$set(this.activeNote, e.target.id, 0)
     },
     confirmRecordPart(shouldClearTime) {
@@ -192,6 +215,9 @@ export default {
         if (this.recordParts[this.lastActivePartIndex] && this.recordParts[this.lastActivePartIndex].length) {
           //已在该track录过,merge both
           this.recordPart = this.recordPart.concat(this.recordParts[this.lastActivePartIndex])
+        }
+        if (tonepart[this.lastActivePartIndex]) {
+          tonepart[this.lastActivePartIndex].dispose() //覆盖之前的需要dispose
         }
         tonepart[this.lastActivePartIndex] = new Tone.Part(function(time, value) { //不能老这new啊，要每次一个数组，每次改动最后一个
           piano.triggerAttackRelease(value.note, "8n", time)
@@ -204,13 +230,10 @@ export default {
       this.lastActiveSwiperIndex = this.activeSwiperIndex
       // reinit time
       if (shouldClearTime) {
-        activeOffsetTime = 0
-        this.vuetimeline = 0
+        this.vuetimeline = 0 // this is kind of separate for progress view
         recordStartTime = 0
       }
-      isRecordPause = true
-
-      // this.gotoNextRecordPart()
+      isLinger = true
     },
     clearRecordPart(trackNum) {
       console.log(`cleaning track ${trackNum}`)
@@ -225,31 +248,9 @@ export default {
         console.log(`track ${trackNum} has no content`)
       }
     },
-    gotoNextRecordPart() {
-      this.recordPart = []
-      //TODO: slide to next page
-      this.recordingPartIndex += 1
-      this.swiper.slideTo(this.recordingPartIndex, 1000, false)
-      console.log('goto next record part')
-    },
-    toggleReplay() {
-      console.log(1)
-      this.replaying = !this.replaying
-      if (this.replaying) {
-        this.confirmRecordPart(!isRecordPause)
-        console.log('kokokoko')
-        recordStartTime = performance.now();
-        console.log(activeOffsetTime)
-        Tone.Transport.start("+0.01", activeOffsetTime / 1000) // in case < context.currentTime
-        replayInterval = setInterval(() => {
-          this.vuetimeline += 1;
-        }, 100)
-      } else {
-        clearInterval(replayInterval)
-        Tone.Transport.stop(0) // TODO：必须stop才能start。。。有没有自动stop啊..
-      }
-    },
     bounceProject() {
+      this.confirmRecordPart(0)
+      console.log(this)
       console.log(tonepart)
       bouncepart = []
       if (tonepart.length) {
@@ -258,15 +259,19 @@ export default {
             bouncepart.push(noteInfo.value)
           })
         })
+        bouncepart.sort((a, b) => (0 + a.time - b.time))
+        this.$store.dispatch('BOUNCE_PROJECT', {
+          record: bouncepart
+        }).then(() => {
+          console.log('successfully bounced')
+          // this.$router.push('/music-box-viewer')
+        })
         while (tonepart.length) {
           tonepart.pop().dispose() //最后一个被dispose，同时要从数组中删掉
         }
-        tonepart[0] = new Tone.Part(function(time, value) { //不能老这new啊，要每次一个数组，每次改动最后一个
+        tonepart[0] = new Tone.Part(function(time, value) {
           piano.triggerAttackRelease(value.note, "8n", time)
         }, bouncepart).start(0)
-
-        bouncepart.sort((a, b) => (0 + a.time - b.time))
-        console.log(bouncepart)
         Magic.generateJSCadCode(bouncepart)
       } else {
         alert('tm什么都没录')
@@ -279,9 +284,20 @@ export default {
       return Magic.mapNoteMidiToLength(m)
     },
     adjustTimeline(e) {
-      activeOffsetTime = e * 100 // ms 1000, 颗粒度200 20s 所以100
-      isRecordPause = true //你拉条了肯定是
-    }
+      if (this.playing) {
+        console.log('ccccccccc')
+        this.toggleReplay() //现在播放中拉条，直接停，涉及到ref读不到最新值貌似，无法直接继续播放 this is TODO
+      } else {
+        isLinger = true //你拉条了肯定是
+      }
+    },
+    onMiniKeyboardScroll(e) {
+      SCREEN_HEIGHT
+      console.log(e.touches[0].clientY)
+    },
+    onMiniKeyboardStart(e) {
+      console.log(e)
+    },
   },
   created() {
     //check cookie to get serviceToken first
@@ -302,14 +318,11 @@ export default {
         transitionEnd: function(e) {
           console.log('3', this.activeIndex) // THIS!!! within swiper...
           self.activeSwiperIndex = this.activeIndex
-          self.confirmRecordPart(!isRecordPause)
-          // recordStartTime = performance.now() //TODO, actually not so...!!!!!!!
-
+          self.confirmRecordPart(!isLinger)
         }
       }
     }
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase())
-
     if (!inWechat) return
     if (Util.getUrlParam('code') || Cookies.get('serviceToken')) {
       //TODO:ajax call to get info
@@ -319,7 +332,7 @@ export default {
             // 网页内cookie失效，需要重新验证
             Cookies.remove('serviceToken')
             location.replace(
-              'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box-maker&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box-maker&connect_redirect=1#wechat_redirect'
+              'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/new-music-box-maker&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/new-music-box-maker&connect_redirect=1#wechat_redirect'
             )
           }
           alert(`welcome${res.data.data.realname}`)
@@ -328,17 +341,20 @@ export default {
         .catch((err) => {
           Cookies.remove('serviceToken')
           location.replace(
-            'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box-maker&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box-maker&connect_redirect=1#wechat_redirect'
+            'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/new-music-box-maker&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/new-music-box-maker&connect_redirect=1#wechat_redirect'
           )
         })
     } else { //又没有微信给的auth code又没有token存在cookie，只得验证
       location.replace(
-        'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box-maker&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box-maker&connect_redirect=1#wechat_redirect'
+        'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/new-music-box-maker&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/new-music-box-maker&connect_redirect=1#wechat_redirect'
       )
     }
   },
   mounted() {
     // this.startRecord();
+    document.querySelector('#D5').addEventListener( "pointerenter", ()=>{
+      console.log('jinru')
+    })
   },
   updated() {}
 };
@@ -379,10 +395,12 @@ export default {
     <div :class="['white', 'c', activeNote.C6?'active-note':'']" id="C6"></div>
   </div>
   <div class="scroll-container">
+    <!-- <button type="button" name="button" @touchstart="bounceProject" style="width: 20px;background-color: red;height: 20px;"></button> -->
+    <div class="mini-keyboard" @touchmove="onMiniKeyboardScroll" @touchstart="onMiniKeyboardStart">
 
+    </div>
   </div>
-  <!-- <div class="semi-piano-roll" @touchstart.stop.prevent="touchPianoRollStartHandler" @touchend.stop.event="touchPianoRollEndHandler"> -->
-  <div class="semi-piano-roll">
+  <div class="semi-piano-roll" @touchmove.stop.prevent>
     <swiper :options="pianoRollSwiperOption" ref="pianoRoll">
       <!-- slides -->
       <swiper-slide v-for="n in PARTNUM">
@@ -424,17 +442,10 @@ export default {
       </div>
     </div> -->
     <vue-slider v-model="vuetimeline" v-bind="timelineConfig" @callback="adjustTimeline" @drag-end=""></vue-slider>
-    <div class="playBtn rotate" @click="toggleReplay">
+    <div :class="[playing?'pauseBtn':'playBtn', 'rotate']" @click="toggleReplay">
 
     </div>
   </div>
-  <!-- <transition name="general-controller">
-    <div v-if="generalControllerShow" class="general-controller" @touchstart.stop.prevent="touchGControllerStartHandler" @touchend.stop.event="touchGControllerEndHandler">
-      <div class="funcBtn record" :class="recording?'active':''" @click="toggleRecord">
-        <div class="recordHint"></div>
-      </div>
-    </div>
-  </transition> -->
 
   <!-- </v-touch> -->
 </div>
@@ -482,6 +493,30 @@ export default {
         background-size: getRem(32);
         background-color: rgb(69,106,255);
     }
+    .pauseBtn {
+        width: getRem(84);
+        height: getRem(84);
+        margin-top: 0.3rem;
+        border-radius: getRem(42);
+        background: url('../assets/pause.svg') center center no-repeat;
+        background-size: getRem(32);
+        background-color: rgb(69,106,255);
+    }
+}
+.scroll-container {
+    display:flex;
+    justify-content:center;
+    align-items: center;
+    position: fixed;
+    background-color: yellow;
+    width: getRem(138);
+    height: 100%;
+    left: getRem(328);
+    .mini-keyboard {
+      width:getRem(80);
+      height:200px;
+      background-color:pink;
+    }
 }
 .temp {
     width: 0.7rem;
@@ -517,8 +552,8 @@ h2 {
 
 .keys {
     /* position: absolute;  make whole keys appear */
-    /* height: 100%; */
-    position: relative;
+    height: 100%;
+    position: fixed;
     display: flex;
     flex-direction: column;
     align-items: flex-end;

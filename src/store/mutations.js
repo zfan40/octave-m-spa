@@ -16,11 +16,12 @@ export default {
       }
     });
   },
-  SET_BOUNCE_PROJECT: (state, { project }) => { // 储存录制信息
-    state.recordProject = project;
+  SET_BOUNCE_PROJECT: (state, { record }) => { // 储存录制信息
+    state.recordProject = record;
   },
-  SET_ID_PROJECT: (state, { project }) => { // 储存录制信息
-    state.recordProject = project;
+  SET_ID_PROJECT: (state, { record, info }) => { // 储存录制信息
+    state.recordProject = record; // this is the music itself
+    state.recordProjectInfo = info; // this includes all the relative info
   },
   SET_FINAL_WORK: (state, { type }) => { // 储存成品信息
     state.activeType = type;

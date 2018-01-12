@@ -3,6 +3,7 @@ import {
   fetchItems,
   fetchIdsByType,
   fetchMbox,
+  uploadRecord,
 } from '../_common/js/api';
 /*
   getUserInfo
@@ -11,15 +12,30 @@ import {
   saveWork
 */
 export default {
-  BOUNCE_PROJECT: ({ commit, state }, { project }) => {
+  BOUNCE_PROJECT: ({ commit, state }, { record, info }) =>
     // 存作品到后台
-    commit('SET_BOUNCE_PROJECT', { project });
-  },
+     uploadRecord(record, info),
+         // uploadRecord(record, info).then(() => {
+    //   // commit('SET_BOUNCE_PROJECT', { record, info });
+    //   // 可以在组建直接跳链接，不commit 存store一道
+    // });
+
   FETCH_MBOX: ({ commit, state }, { id }) =>
     // 获取某id的音乐盒音乐内容
      fetchMbox(id)
       .then((project) => {
-        commit('SET_ID_PROJECT', { project });
+        // console.log('xxi', project.data.data.url);
+        const request = new XMLHttpRequest();
+        request.open('GET', project.data.data.url, true);
+        request.send(null);
+        request.onreadystatechange = function () {
+          if (request.readyState === 4 && request.status === 200) {
+            const type = request.getResponseHeader('Content-Type');
+            if (type.indexOf('text') !== 1) {
+              commit('SET_ID_PROJECT', { record: JSON.parse(request.responseText), info: project.data.data });
+            }
+          }
+        };
       }),
   // ensure data for rendering given list type
   FETCH_LIST_DATA: ({ commit, dispatch, state }, { type }) => {

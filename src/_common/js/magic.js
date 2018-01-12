@@ -1,8 +1,9 @@
 const Tone = require('tone');
 
-let notesObj = {};
-let notesArray = [];
-let FreqsResult = [];
+const SAME_NOTE_INTERVAL = 1; // 同一个音不能相距小于1秒，不然音片打击出问题
+const notesObj = {};
+const notesArray = [];
+const FreqsResult = [];
 
 // notesInfo example
 // let work = [{note: "E4", time: 0.14585000000000037},
@@ -14,46 +15,94 @@ let FreqsResult = [];
 // {note: "G4", time: 2.671395000000004},
 // {note: "A4", time: 3.35932},
 // {note: "B4", time: 4.183044999999998}]
-export function generateFreqs(notesInfo) {
-  notesObj = {};
-  notesArray = [];
-  FreqsResult = [];
-  console.log(notesInfo);
-  notesInfo.forEach((item) => {
-    // console.log(item.note)
-    // console.log(notesObj)
-    if (!(item.note in notesObj)) {
-      console.log('!!');
-      notesObj[item.note] = 1;
-      notesArray.push({
-        note: item.note,
-        freq: Tone.Frequency(item.note).toFrequency(),
-      });
-    }
-  });
-  notesArray.sort((a, b) => (a.freq - b.freq));
-  console.log(`本首作品共有${notesArray.length}种音符`);
-  notesArray.forEach((item, index) => {
-    FreqsResult.push(item.freq * 2);
-    notesObj[item.note] = index + 1;
-  });
-  console.log('它们的频率是', FreqsResult);
-  return FreqsResult;
-}
 
-export function generateJSCadCode(notesInfo) {
-  let musicboxPins = [];
-  // norm timing to 15 second
-  const lastNoteTime = notesInfo[notesInfo.length - 1].time;
-  if (lastNoteTime > 15) {
-    notesInfo.forEach((item) => {
-      item.time = (item.time * 15) / lastNoteTime;
-    });
+export function RealMagic(items) {
+  console.log('== Enter RealMagic ==');
+  console.log(JSON.stringify(items));
+  const tasksObj = {};
+  items.forEach((item) => {
+    //* 2 cuz print mbox need 1 octave higher.
+    const itemNoteFreq = parseInt(Tone.Frequency(item.note).toFrequency() * 2, 10);
+    if (!tasksObj[itemNoteFreq]) { tasksObj[itemNoteFreq] = []; }
+    tasksObj[itemNoteFreq].push(item.time);
+  });
+  // tasksObj is like {784:[1.0295,1.39,2.6713],659:[2.66],...}
+
+  // then we focus on each task
+  const taskTypes = Object.keys(tasksObj); // [659,784,...]  freq array, 排好序的（object.keys）
+  const taskTimeArrays = Object.values(tasksObj); // [[2.66]，[1.0295,1.39,2.6713]] 顺序跟上面对应的
+  const machines = []; // init with existing types, will add more machines
+  const groups = []; // will final be [[1],[1,2,1],...], corespond to taskTimeArrays
+
+  if (taskTypes.length > 18) {
+    console.log('音种类超过18个，这个做不了');
+    return false;
   }
 
-  generateFreqs(notesInfo);
-  musicboxPins = notesInfo.map(item => `generatePin(${item.time},${notesObj[item.note]})`);
+  taskTimeArrays.forEach((timeArray, index) => {
+    const final = [];
+    timeArray.forEach((time, j) => {
+      const test = []; // 校验当前final里不能用的序号， final里序号种类和test种类相同则证明不行
+      let allPreviousOccupied = false;
+      let successFound = false;
+      if (j === 0) {
+        final.push(1); // 给第1组的第一个任务分配第一个机器
+      } else {
+        let counter = j;
+        while (counter >= 1 && !allPreviousOccupied) { // TODO: -1 or 0
+          counter -= 1;
+          if ((time - timeArray[counter] >= SAME_NOTE_INTERVAL) && test.indexOf(final[counter]) === -1) {
+            final.push(final[counter]);
+            successFound = true;
+            break;
+          } else if (test.indexOf(final[counter]) === -1) {
+            test.push(final[counter]);
+            if ([...new Set(final)].length === [...new Set(test)].length) {
+              // final目前已有的都不满足，set可以取unique elements [1,1,2,2,3,1] => [1,2,3]
+              allPreviousOccupied = true;
+              break;
+            }
+          }
+        }
+        if ((counter === 0 && !successFound) || allPreviousOccupied) {
+          final.push(Math.max(...final) + 1);
+        }
+      }
+    });
+    groups.push(final);
+  });
+  console.log(taskTypes);
+  console.log(taskTimeArrays);
+  console.log('hehe', groups); // [[1],[1,2,1],...], corespond to taskTimeArrays
+
+  // now we have groups, let's build machines based on this
+  groups.forEach((group, index) => {
+    let count = 0;
+    while (count <= Math.max(...group) - 1) {
+      machines.push(taskTypes[index]);
+      count += 1;
+    }
+  });
+  if (machines.length < 18) {
+    const lastMachine = machines[machines.length - 1];
+    while (machines.length < 18) {
+      machines.push(lastMachine); // make it length of 18
+    }
+    // machines is like ["1046", "1174", "1318", "1318", "1318", "1396", "1567"] of 18 length
+  } else if (machines.length > 18) {
+    console.log('所需音片儿超过18个');
+    return false;
+  }
+  console.log(machines);
+  // then we merge all the tasks
+
+  // test1: [[1],[1,2,1]] => [1,2,3,2]
+  // test2: [[1,2,1],[1,2,3]] => [1,2,1,3,4,5]
+  const finalBins = groups.reduce((a, b) => a.concat(b.map(item => item + Math.max(...a))));
+  const finalTimings = taskTimeArrays.reduce((a, b) => a.concat(b)); // just flatten it
+  const musicboxPins = finalBins.map((bin, index) => `generatePin(${finalTimings[index]},${bin})`);
   console.log(`
+    //底下低音,上面高音
   const DOT_WIDTH = 0.6
   const RATIO = 0.98
   const OFFSET = 2.2 //1.95 is center
@@ -73,6 +122,66 @@ export function generateJSCadCode(notesInfo) {
     return union(cylinderBody,holes).translate([0, 0, 0]).scale(1);
   }`);
 }
+
+// export function generateFreqs(notesInfo) {
+//   notesObj = {};
+//   notesArray = [];
+//   FreqsResult = [];
+//   console.log(notesInfo);
+//   notesInfo.forEach((item) => {
+//     // console.log(item.note)
+//     // console.log(notesObj)
+//     if (!(item.note in notesObj)) {
+//       console.log('!!');
+//       notesObj[item.note] = 1;
+//       notesArray.push({
+//         note: item.note,
+//         freq: Tone.Frequency(item.note).toFrequency(),
+//       });
+//     }
+//   });
+//   notesArray.sort((a, b) => (a.freq - b.freq));
+//   console.log(`本首作品共有${notesArray.length}种音符`);
+//   notesArray.forEach((item, index) => {
+//     FreqsResult.push(item.freq * 2);
+//     notesObj[item.note] = index + 1; // 这个note占18音的第几个
+//   });
+//   console.log('它们的频率是', FreqsResult);
+//   return FreqsResult;
+// }
+
+// export function generateJSCadCode(notesInfo) {
+//   let musicboxPins = [];
+//   // norm timing to 15 second
+//   const lastNoteTime = notesInfo[notesInfo.length - 1].time;
+//   if (lastNoteTime > 15) {
+//     notesInfo.forEach((item) => {
+//       item.time = (item.time * 15) / lastNoteTime;
+//     });
+//   }
+//   // get note types
+//   const freqs = generateFreqs(notesInfo);
+//   if (freqs.length > 18) { return false; }
+//   musicboxPins = notesInfo.map(item => `generatePin(${item.time},${notesObj[item.note]})`);
+//   console.log(`
+//   const DOT_WIDTH = 0.6
+//   const RATIO = 0.98
+//   const OFFSET = 2.2 //1.95 is center
+//   const OUTER_RADIUS = 6.6
+//   const INNER_RADIUS = 5.9
+//   function generatePin(noteSec, noteNo) {
+//     return rotate(90, [1, 0, 4 * noteSec * RATIO / 15], cylinder({
+//       h: 1,
+//       r: DOT_WIDTH / 2,
+//       center: true
+//     })).translate([sin(360 * noteSec * RATIO / 15) * OUTER_RADIUS, -cos(360 * noteSec * RATIO / 15) * OUTER_RADIUS, -9.95 + OFFSET + 0.4 + (noteNo - 1) * .9])
+//   }
+//   function main() {
+//     let cylinderBody = difference(cylinder({h: 19.9,r: OUTER_RADIUS,center: true}),cylinder({h: 19.9,r: INNER_RADIUS,center: true}))
+//     let holes = union(${musicboxPins})
+//     return union(cylinderBody,holes).translate([0, 0, 0]).scale(1);
+//   }`);
+// }
 
 export function mapNoteTimeToColor(time) {
   // let rgb = [0, 0, 0];

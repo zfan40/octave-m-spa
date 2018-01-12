@@ -10,6 +10,7 @@ import MBViewer from '@/components/MBViewer';
 Vue.use(Router);
 
 export default new Router({
+  // mode: 'history', // avoid hash in url
   routes: [
     {
       path: '/',

@@ -31,7 +31,7 @@ export default {
   },
   computed: {
     project() {
-      return this.$store.recordProject
+      return this.$store.state.recordProject
     },
   },
   methods: {
@@ -47,16 +47,19 @@ export default {
       }, this.project).start(0)
     },
     loadMusicById() {
-      const id = store.state.route.query
+      console.log('hehe', this.$store.state)
+      const {id} = this.$store.state.route.query
+      // const id = 29
       if (!id||!this.project) {
         console.log('搞飞机，没内容')
         return
       }
-      if(id){
+      if(id){ //从id取作品
+        console.log('mmm',id)
         this.$store.dispatch('FETCH_MBOX',{id}).then(() => {
           this.prepareMusic()
         })
-      } else if (this.project) {
+      } else if (this.project) { //store里边的作品，刚录的
         this.prepareMusic()
       }
     },
