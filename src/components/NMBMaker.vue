@@ -458,22 +458,34 @@ export default {
       <swiper-slide v-for="n in PARTNUM">
         <div class="current-piano-roll">
           <svg :style="{height:'90%',padding:timelineConfig.dotSize/2+'px 0'}">
-            <line v-if="activePartIndex===(PARTNUM-n)" v-for="(item,index) in recordPart"
-              x1="0"
-              :x2="mapNoteMidiToLength(item.note)"
-              :y1="100*item.time/20 + '%'"
-              :y2="100*item.time/20 + '%'"
-              :stroke="mapNoteTimeToColor(item.time)"
-              stroke-width="3"
-              stroke-linecap="round"/>
-            <line v-for="(item,index) in recordParts[PARTNUM-n]"
-              x1="0"
-              :x2="mapNoteMidiToLength(item.note)"
-              :y1="100*item.time/20 + '%'"
-              :y2="100*item.time/20 + '%'"
-              :stroke="activePartIndex===(PARTNUM-n)?mapNoteTimeToColor(item.time):'rgb(120,120,120)'"
-              stroke-width="3"
-              stroke-linecap="round"/>
+
+            <defs>
+              <filter id="glowing">
+                  <feGaussianBlur stdDeviation="3.5" result="coloredBlur"/>
+                  <feMerge>
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+              </filter>
+            </defs>
+            <rect v-if="activePartIndex===(PARTNUM-n)" v-for="(item,index) in recordPart"
+              :x="0"
+              :y="100*item.time/20 + '%'"
+              :width="mapNoteMidiToLength(item.note)"
+              height="3"
+              rx="2"
+              ry="2"
+              :fill="mapNoteTimeToColor(item.time)"
+              filter="url(#glowing)" />
+            <rect v-for="(item,index) in recordParts[PARTNUM-n]"
+              :x="0"
+              :y="100*item.time/20 + '%'"
+              :width="mapNoteMidiToLength(item.note)"
+              height="3"
+              rx="2"
+              ry="2"
+              :fill="activePartIndex===(PARTNUM-n)?mapNoteTimeToColor(item.time):'rgb(120,120,120)'"
+              :filter="activePartIndex===(PARTNUM-n)?'url(#glowing)':''" />
           </svg>
           <div class="temp" @click="clearRecordPart(PARTNUM-n)"></div>
         </div>
@@ -495,7 +507,9 @@ export default {
     </div> -->
     <vue-slider v-model="vuetimeline" v-bind="timelineConfig" @callback="adjustTimeline" @drag-end=""></vue-slider>
     <div :class="[playing?'pauseBtn':'playBtn', 'rotate']" @click="toggleReplay">
+      <!-- <div class="extendBtns">
 
+      </div> -->
     </div>
   </div>
 
@@ -553,6 +567,12 @@ export default {
         background: url('../assets/pause.svg') center center no-repeat;
         background-size: getRem(32);
         background-color: rgb(69,106,255);
+    }
+    .extendBtns {
+      // this element is within rotate, everything is opposite
+      width:getRem(84);
+      height:getRem(524);
+      position: absolute;
     }
 }
 .scroll-container {

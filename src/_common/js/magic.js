@@ -99,7 +99,8 @@ export function RealMagic(items) {
   // test1: [[1],[1,2,1]] => [1,2,3,2]
   // test2: [[1,2,1],[1,2,3]] => [1,2,1,3,4,5]
   const finalBins = groups.reduce((a, b) => a.concat(b.map(item => item + Math.max(...a))));
-  const finalTimings = taskTimeArrays.reduce((a, b) => a.concat(b)); // just flatten it
+  let finalTimings = taskTimeArrays.reduce((a, b) => a.concat(b)); // just flatten it
+  finalTimings = finalTimings.map(item => (item * 15) / 20); // normalize from 20s to 15s
   const musicboxPins = finalBins.map((bin, index) => `generatePin(${finalTimings[index]},${bin})`);
   console.log(`
     //底下低音,上面高音
@@ -205,5 +206,7 @@ export function mapNoteTimeToColor(time) {
 }
 export function mapNoteMidiToLength(noteName) {
   // in our context, the midi range would be from 60 - 84
-  return `${(75 * 0.8 * ((Tone.Frequency(noteName).toMidi() - 60) / (84 - 40))) + 0.2}`; // 75 is rem to px
+  // return `${(75 * 0.8 * ((Tone.Frequency(noteName).toMidi() - 60) / (84 - 40))) + 0.2}`; // 75 is rem to px
+  // 50 - 110
+  return `${(75 * 0.8 * ((Tone.Frequency(noteName).toMidi() - 50) / (110 - 40))) + 0.2}`; // 75 is rem to px
 }
