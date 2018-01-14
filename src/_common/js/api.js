@@ -9,13 +9,16 @@ const reqConfig = {
   },
 };
 // TODO:cause 500?????? just cuz this few lines???
-const tokenInCookie = Cookies.get('serviceToken');
+
 
 export function getUserInfo(wxcode) {
+  const tokenInCookie = Cookies.get('serviceToken');
   if (tokenInCookie) {
+    alert('cookie used');
     reqConfig.headers.Authorization = `Bearer ${tokenInCookie}`;
     return axios.post('//api.musixise.com/api/user/getInfo', '', reqConfig);
   } else if (!tokenInCookie && wxcode) {
+    alert('no cookie');
     return new Promise((resolve, reject) => {
       axios.post(`//api.musixise.com/api/user/oauth/wechat/callback?code=${wxcode}`, '', reqConfig)
         .then((res) => {

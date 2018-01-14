@@ -12,9 +12,8 @@ import {
   saveWork
 */
 export default {
-  BOUNCE_PROJECT: ({ commit, state }, { record, info }) =>
+  BOUNCE_PROJECT: ({ commit, state }, { record, info }) => uploadRecord(record, info),
     // 存作品到后台
-     uploadRecord(record, info),
          // uploadRecord(record, info).then(() => {
     //   // commit('SET_BOUNCE_PROJECT', { record, info });
     //   // 可以在组建直接跳链接，不commit 存store一道

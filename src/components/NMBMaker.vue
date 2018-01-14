@@ -14,6 +14,7 @@ const touchIdKeyMap = {} //touch move can have several threads, each thread only
 // e.g. {0:a4,1:b5}
 
 const MINI_KEY_LENGTH = 200 // px
+let extendBtnsTimeout
 
 var piano = new Tone.Sampler({
   'C4': 'C4.[mp3|ogg]',
@@ -76,6 +77,7 @@ export default {
       activeSwiperIndex: 3,
       lastActiveSwiperIndex: 3 - 1,
       vuetimeline: 0,
+      showExtendBtns: 0,
       timelineConfig: {
         value: 0,
         width: 8,
@@ -259,6 +261,7 @@ export default {
       }
     },
     bounceProject() {
+      alert('此步骤确认，需要微信支付')
       this.confirmRecordPart(0)
       console.log(this)
       console.log(tonepart)
@@ -271,12 +274,18 @@ export default {
         })
         bouncepart.sort((a, b) => (0 + a.time - b.time))
         //TODO, semi done
-        // this.$store.dispatch('BOUNCE_PROJECT', {
-        //   record: bouncepart
-        // }).then(() => {
-        //   console.log('successfully bounced')
-        //   // this.$router.push('/music-box-viewer')
-        // })
+        this.$store.dispatch('BOUNCE_PROJECT', {
+          record: bouncepart,
+          info:{
+            title: 'default',
+            content: 'default',
+            cover: 'default'
+          },
+        }).then(() => {
+          console.log('successfully bounced')
+          alert('作品已为您存储')
+          // this.$router.push('/music-box-viewer')
+        })
         while (tonepart.length) {
           tonepart.pop().dispose() //最后一个被dispose，同时要从数组中删掉
         }
@@ -309,7 +318,7 @@ export default {
     onMiniKeyboardStart(e) {
       console.log(e)
     },
-    keng:function(e){
+    keng(e){
 			// console.log(e)
 			// console.log(document.elementFromPoint(e.touches[0].clientX,e.touches[0].clientY).style.backgroundColor="yellow")
 			console.log(e) //e.touches is array like object
@@ -337,7 +346,30 @@ export default {
 					touchIdKeyMap[e.changedTouches[i].identifier] = undefined
 				}
 			}
-		}
+		},
+    btnStart(e) {
+      console.log(e)
+      extendBtnsTimeout = setTimeout(()=>{
+        //show extend buttons
+        this.showExtendBtns = true;
+      },500)
+
+    },
+    btnEnd(e) {
+      // console.log(e)
+      clearTimeout(extendBtnsTimeout)
+      const a = document.elementFromPoint(e.changedTouches[0].clientX,e.changedTouches[0].clientY)
+      console.log(a)
+      if (a && a.classList.contains('bounceBtn')){
+        //导出
+        this.bounceProject()
+      } else if (a && (a.classList.contains('playBtn')||a.classList.contains('pauseBtn'))) {
+        //播放
+        this.toggleReplay()
+      }
+      this.showExtendBtns = false;
+      //hide extend buttons
+    }
   },
   created() {
     //check cookie to get serviceToken first
@@ -368,31 +400,33 @@ export default {
     }
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase())
     if (!inWechat) return
-    // if (Util.getUrlParam('code') || Cookies.get('serviceToken')) {
-    //   //TODO:ajax call to get info
-    //   Api.getUserInfo(Util.getUrlParam('code'))
-    //     .then((res) => {
-    //       if (res.data.errcode >= 20000) {
-    //         // 网页内cookie失效，需要重新验证
-    //         Cookies.remove('serviceToken')
-    //         location.replace(
-    //           'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/new-music-box-maker&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/new-music-box-maker&connect_redirect=1#wechat_redirect'
-    //         )
-    //       }
-    //       alert(`welcome${res.data.data.realname}`)
-    //       console.log('get user info success', res.data.data)
-    //     })
-    //     .catch((err) => {
-    //       Cookies.remove('serviceToken')
-    //       location.replace(
-    //         'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/new-music-box-maker&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/new-music-box-maker&connect_redirect=1#wechat_redirect'
-    //       )
-    //     })
-    // } else { //又没有微信给的auth code又没有token存在cookie，只得验证
-    //   location.replace(
-    //     'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/new-music-box-maker&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/new-music-box-maker&connect_redirect=1#wechat_redirect'
-    //   )
-    // }
+    alert(Cookies.get('serviceToken'))
+    if (Util.getUrlParam('code') || Cookies.get('serviceToken')) {
+      //TODO:ajax call to get info
+      Api.getUserInfo(Util.getUrlParam('code'))
+        .then((res) => {
+          if (res.data.errcode >= 20000) {
+            // 网页内cookie失效，需要重新验证
+            Cookies.remove('serviceToken')
+            location.replace(
+              // will publish to node project m-musixise, under '/music-box' path
+              'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect'
+            )
+          }
+          alert(`welcome${res.data.data.realname}`)
+          console.log('get user info success', res.data.data)
+        })
+        .catch((err) => {
+          Cookies.remove('serviceToken')
+          location.replace(
+            'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect'
+          )
+        })
+    } else { //又没有微信给的auth code又没有token存在cookie，只得验证
+      location.replace(
+        'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect'
+      )
+    }
   },
   mounted() {
     // this.startRecord();
@@ -446,12 +480,10 @@ export default {
     <div :class="['white', 'e', activeNote.E6?'active-note':'']" id="E6"></div>
     <div :class="['white', 'f', activeNote.F6?'active-note':'']" id="F6"></div>
   </div>
-  <div class="scroll-container">
-    <!-- <button type="button" name="button" @touchstart="onMiniKeyboardStart" style="width: 20px;background-color: red;height: 20px;"></button> -->
-    <div class="mini-keyboard" @touchmove="onMiniKeyboardScroll" @touchstart="bounceProject">
-
+  <!-- <div class="scroll-container">
+    <div class="mini-keyboard" @touchmove="onMiniKeyboardScroll">
     </div>
-  </div>
+  </div> -->
   <div class="semi-piano-roll" @touchmove.stop.prevent>
     <swiper :options="pianoRollSwiperOption" ref="pianoRoll">
       <!-- slides -->
@@ -460,16 +492,29 @@ export default {
           <svg :style="{height:'90%',padding:timelineConfig.dotSize/2+'px 0'}">
 
             <defs>
+              <!-- <filter id="glowing" x="0" y="0" width="200%" height="200%">
+                <feOffset result="offOut" in="SourceGraphic" dx="0" dy="0" />
+                <feGaussianBlur result="blurOut" in="offOut" stdDeviation="2" />
+                <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+              </filter> -->
               <filter id="glowing">
-                  <feGaussianBlur stdDeviation="3.5" result="coloredBlur"/>
+                  <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
                   <feMerge>
                       <feMergeNode in="coloredBlur"/>
                       <feMergeNode in="SourceGraphic"/>
                   </feMerge>
               </filter>
+              <!-- <filter id="glowing">
+                <feGaussianBlur id="blur" in="SourceAlpha" stdDeviation="1.5"/>
+                <feColorMatrix id="recolor"  type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0" result="white-glow"/>
+                <feMerge>
+                  <feMergeNode in="white-glow"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter> -->
             </defs>
             <rect v-if="activePartIndex===(PARTNUM-n)" v-for="(item,index) in recordPart"
-              :x="0"
+              :x="2"
               :y="100*item.time/20 + '%'"
               :width="mapNoteMidiToLength(item.note)"
               height="3"
@@ -478,7 +523,7 @@ export default {
               :fill="mapNoteTimeToColor(item.time)"
               filter="url(#glowing)" />
             <rect v-for="(item,index) in recordParts[PARTNUM-n]"
-              :x="0"
+              :x="2"
               :y="100*item.time/20 + '%'"
               :width="mapNoteMidiToLength(item.note)"
               height="3"
@@ -506,10 +551,15 @@ export default {
       </div>
     </div> -->
     <vue-slider v-model="vuetimeline" v-bind="timelineConfig" @callback="adjustTimeline" @drag-end=""></vue-slider>
-    <div :class="[playing?'pauseBtn':'playBtn', 'rotate']" @click="toggleReplay">
-      <!-- <div class="extendBtns">
+    <div class="btnContainer" @touchstart.stop.prevent="btnStart" @touchend.stop.event="btnEnd">
+      <div :class="[playing?'pauseBtn':'playBtn', 'rotate']" @click="toggleReplay">
 
-      </div> -->
+      </div>
+      <div :class="[showExtendBtns?'extendBtnsShow':'extendBtnsHide','extendBtns']">
+        <div class='bounceBtn rotate'>
+
+        </div>
+      </div>
     </div>
   </div>
 
@@ -530,7 +580,7 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
-    right: 0.3rem;
+    right: 0.5rem;
     .timeline {
         height: 90%;
         width: getRem(16);
@@ -550,29 +600,54 @@ export default {
             right: getRem(13);
         }
     }
-    .playBtn {
-        width: getRem(84);
-        height: getRem(84);
-        margin-top: 0.3rem;
+    .btnContainer {
+      position: relative;
+      width: getRem(84);
+      height: getRem(84);
+      margin-top: 0.3rem;
+      .playBtn {
+        position: absolute;
+        width:100%;
+        height:100%;
         border-radius: getRem(42);
         background: url('../assets/play.svg') center center no-repeat;
         background-size: getRem(32);
         background-color: rgb(69,106,255);
-    }
-    .pauseBtn {
-        width: getRem(84);
-        height: getRem(84);
-        margin-top: 0.3rem;
+      }
+      .pauseBtn {
+        position:absolute;
+        width:100%;
+        height:100%;
         border-radius: getRem(42);
         background: url('../assets/pause.svg') center center no-repeat;
         background-size: getRem(32);
         background-color: rgb(69,106,255);
-    }
-    .extendBtns {
-      // this element is within rotate, everything is opposite
-      width:getRem(84);
-      height:getRem(524);
-      position: absolute;
+      }
+      .bounceBtn {
+        position:absolute;
+        width: getRem(84);
+        height: getRem(84);
+        border-radius: getRem(42);
+        background: url('../assets/check.svg') center center no-repeat;
+        background-size: getRem(32);
+      }
+      .extendBtns {
+        // this element is within rotate, everything is opposite
+        position: absolute;
+        height:getRem(84);
+        border-radius: getRem(42);
+
+        right: 0;
+        z-index:-1;
+        transition: width 2s;
+        background: linear-gradient(to right, rgb(255,61,61),rgb(0,189,255),rgb(69,106,255) 80%);
+      }
+      .extendBtnsShow {
+        width:getRem(300);
+      }
+      .extendBtnsHide {
+        width:getRem(84);
+      }
     }
 }
 .scroll-container {
@@ -604,6 +679,7 @@ export default {
     position: absolute;
     width: 100%;
     height: 100%;
+    background-color:seagreen;
 }
 h2 {
     font-size: 20px;
@@ -637,7 +713,7 @@ h2 {
 .scroll-container {}
 .semi-piano-roll {
     top: 0;
-    width: getRem(284);
+    width: getRem(334);
     position: fixed;
     right: 0;
     height: 100%;
@@ -751,23 +827,23 @@ h2 {
 /* piano keyboard layout css  */
 
 .white {
-    width: getRem(328);
+    width: getRem(358);
     height: getRem(92);
     z-index: 1;
     border-left: 1px solid #bbb;
     border-bottom: 1px solid #bbb;
     border-radius: 0 0 5px 5px;
-    box-shadow: -1px 0 0 rgba(255, 255, 255, 0.8) inset, 0 0 5px #ccc inset, 0 0 3px rgba(0, 0, 0, 0.2);
-    background: linear-gradient(top, #eee 0%, #fff 100%);
+    box-shadow: -1px 0 0 rgba(80, 80, 80, 0.8) inset, 0 0 5px #ccc inset, 0 0 3px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(to left, #666 0%, #eee 30%, #fff 100%);
     &.active-note {
         box-shadow: 2px 0 3px rgba(0, 0, 0, 0.1) inset, -5px 5px 20px rgba(0, 0, 0, 0.2) inset, 0 0 3px rgba(0, 0, 0, 0.2);
-        background: linear-gradient(top, #fff 0%, #e9e9e9 100%);
+        background: linear-gradient(to left, #555 0%, #ddd 40%, #eee 100%);
     }
 }
 
 .black {
     position: relative;
-    width: getRem(170);
+    width: getRem(200);
     height: getRem(54);
     margin-top: getRem(-27);
     top: getRem(27);
@@ -778,7 +854,7 @@ h2 {
     background: linear-gradient(45deg, #222 0%, #555 100%);
     &.active-note {
         box-shadow: -1px -1px 2px rgba(255, 255, 255, 0.2) inset, 0 -2px 2px 3px rgba(0, 0, 0, 0.6) inset, 0 1px 2px rgba(0, 0, 0, 0.5);
-        background: linear-gradient(left, #444 0%, #222 100%);
+        background: linear-gradient(to right, #444 0%, #222 100%);
     }
 }
 
