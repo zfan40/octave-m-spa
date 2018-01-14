@@ -295,7 +295,7 @@ export default {
         Magic.RealMagic(bouncepart)
         // Magic.generateJSCadCode(bouncepart)
       } else {
-        alert('tm什么都没录')
+        alert('什么都没录呢')
       }
     },
     mapNoteTimeToColor(t) {
@@ -400,7 +400,7 @@ export default {
     }
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase())
     if (!inWechat) return
-    alert(Cookies.get('serviceToken'))
+    // alert(Cookies.get('serviceToken'))
     if (Util.getUrlParam('code') || Cookies.get('serviceToken')) {
       //TODO:ajax call to get info
       Api.getUserInfo(Util.getUrlParam('code'))

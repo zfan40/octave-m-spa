@@ -14,11 +14,11 @@ const reqConfig = {
 export function getUserInfo(wxcode) {
   const tokenInCookie = Cookies.get('serviceToken');
   if (tokenInCookie) {
-    alert('cookie used');
+    // alert('cookie used');
     reqConfig.headers.Authorization = `Bearer ${tokenInCookie}`;
     return axios.post('//api.musixise.com/api/user/getInfo', '', reqConfig);
   } else if (!tokenInCookie && wxcode) {
-    alert('no cookie');
+    // alert('no cookie');
     return new Promise((resolve, reject) => {
       axios.post(`//api.musixise.com/api/user/oauth/wechat/callback?code=${wxcode}`, '', reqConfig)
         .then((res) => {
