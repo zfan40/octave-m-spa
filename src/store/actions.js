@@ -20,22 +20,26 @@ export default {
     // });
 
   FETCH_MBOX: ({ commit, state }, { id }) =>
+  new Promise((resolve, reject) => {
     // 获取某id的音乐盒音乐内容
-     fetchMbox(id)
+    fetchMbox(id)
       .then((project) => {
-        // console.log('xxi', project.data.data.url);
+        console.log('xxi', project.data.data.url);
         const request = new XMLHttpRequest();
         request.open('GET', project.data.data.url, true);
         request.send(null);
         request.onreadystatechange = function () {
           if (request.readyState === 4 && request.status === 200) {
             const type = request.getResponseHeader('Content-Type');
-            if (type.indexOf('text') !== 1) {
+            if (type.indexOf('text') !== -1) {
               commit('SET_ID_PROJECT', { record: JSON.parse(request.responseText), info: project.data.data });
+              resolve();
             }
           }
         };
-      }),
+      });
+  }),
+
   // ensure data for rendering given list type
   FETCH_LIST_DATA: ({ commit, dispatch, state }, { type }) => {
     commit('SET_ACTIVE_TYPE', { type });

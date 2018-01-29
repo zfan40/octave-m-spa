@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import HelloWorld from '@/components/HelloWorld';
 import MBMaker from '@/components/MBMaker';
-import MBItem from '@/components/MBItem';
+
 import MBAuthor from '@/components/MBAuthor';
 import NMBMaker from '@/components/NMBMaker';
 import MBViewer from '@/components/MBViewer';
@@ -31,11 +31,6 @@ export default new Router({
       path: '/music-box-viewer',
       name: 'MBViewer',
       component: MBViewer,
-    },
-    {
-      path: '/music-box-item',
-      name: 'MBItem',
-      component: MBItem,
     },
     {
       path: '/music-box-author',

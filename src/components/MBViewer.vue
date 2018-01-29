@@ -33,6 +33,9 @@ export default {
     project() {
       return this.$store.state.recordProject
     },
+    projectInfo() {
+      return this.$store.state.recordProjectInfo
+    },
   },
   methods: {
     load() {},
@@ -46,18 +49,25 @@ export default {
         mbox.triggerAttackRelease(value.note, "8n", time)
       }, this.project).start(0)
     },
+    togglePlayMusic() {
+      if (this.project.length) {
+        Tone.Transport.start("+0.01", 0)
+      }
+    },
     loadMusicById() {
       console.log('hehe', this.$store.state)
       const {id} = this.$store.state.route.query
-      // const id = 29
-      if (!id||!this.project) {
-        console.log('搞飞机，没内容')
-        return
-      }
+      // if (!id||!this.project) {
+      //   console.log('搞飞机，没内容')
+      //   return
+      // }
       if(id){ //从id取作品
         console.log('mmm',id)
         this.$store.dispatch('FETCH_MBOX',{id}).then(() => {
+          console.log('workPart',this.project)
+          console.log('work info',this.projectInfo)
           this.prepareMusic()
+          this.togglePlayMusic()
         })
       } else if (this.project) { //store里边的作品，刚录的
         this.prepareMusic()
@@ -77,9 +87,10 @@ export default {
     //check cookie to get serviceToken first
     // if stoken not exist, go auth
     const self = this
-    const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase())
     self.loadMusicById()
+    const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase())
     if (!inWechat) return
+    // alert(Cookies.get('serviceToken'))
     if (Util.getUrlParam('code') || Cookies.get('serviceToken')) {
       //TODO:ajax call to get info
       Api.getUserInfo(Util.getUrlParam('code'))
@@ -88,21 +99,23 @@ export default {
             // 网页内cookie失效，需要重新验证
             Cookies.remove('serviceToken')
             location.replace(
-              'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box-maker&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box-maker&connect_redirect=1#wechat_redirect'
+              // will publish to node project m-musixise, under '/music-box' path
+              `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
             )
           }
           alert(`welcome${res.data.data.realname}`)
+          // self.loadMusicById()
           console.log('get user info success', res.data.data)
         })
         .catch((err) => {
           Cookies.remove('serviceToken')
           location.replace(
-            'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box-maker&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box-maker&connect_redirect=1#wechat_redirect'
+            `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
           )
         })
     } else { //又没有微信给的auth code又没有token存在cookie，只得验证
       location.replace(
-        'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box-maker&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box-maker&connect_redirect=1#wechat_redirect'
+        `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
       )
     }
   },

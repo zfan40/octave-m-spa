@@ -219,7 +219,7 @@ export default {
     },
     touchNoteEndHandler(e) {
       this.handleNoteEnd(e.target.id)
-      this.handleNoteEnd(touchIdKeyMap[e.changedTouches[0].identifier])// TODO: 猜测 touchend只会有一个changetouches,记录的正好是该停的
+      this.handleNoteEnd(touchIdKeyMap[e.changedTouches[0].identifier]) // TODO: 猜测 touchend只会有一个changetouches,记录的正好是该停的
     },
     confirmRecordPart(shouldClearTime) {
       if (this.recordPart.length) {
@@ -276,15 +276,20 @@ export default {
         //TODO, semi done
         this.$store.dispatch('BOUNCE_PROJECT', {
           record: bouncepart,
-          info:{
+          info: {
             title: 'default',
             content: 'default',
             cover: 'default'
           },
-        }).then(() => {
+        }).then(id => {
           console.log('successfully bounced')
           alert('作品已为您存储')
-          // this.$router.push('/music-box-viewer')
+          this.$router.push({
+            path: '/music-box-viewer',
+            query: {
+              id
+            }
+          })
         })
         while (tonepart.length) {
           tonepart.pop().dispose() //最后一个被dispose，同时要从数组中删掉
@@ -318,52 +323,52 @@ export default {
     onMiniKeyboardStart(e) {
       console.log(e)
     },
-    keng(e){
-			// console.log(e)
-			// console.log(document.elementFromPoint(e.touches[0].clientX,e.touches[0].clientY).style.backgroundColor="yellow")
-			console.log(e) //e.touches is array like object
-			for (let i = 0; i<=e.changedTouches.length-1;i++) {
-				const a = document.elementFromPoint(e.changedTouches[i].clientX,e.changedTouches[i].clientY)
-				if (a.classList.contains('white')||a.classList.contains('black')){
-					if (touchIdKeyMap[e.changedTouches[i].identifier]&&touchIdKeyMap[e.changedTouches[i].identifier]!=a.getAttribute('id')) { //这个touch已经触发，且和当前不一致
+    keng(e) {
+      // console.log(e)
+      // console.log(document.elementFromPoint(e.touches[0].clientX,e.touches[0].clientY).style.backgroundColor="yellow")
+      console.log(e) //e.touches is array like object
+      for (let i = 0; i <= e.changedTouches.length - 1; i++) {
+        const a = document.elementFromPoint(e.changedTouches[i].clientX, e.changedTouches[i].clientY)
+        if (a.classList.contains('white') || a.classList.contains('black')) {
+          if (touchIdKeyMap[e.changedTouches[i].identifier] && touchIdKeyMap[e.changedTouches[i].identifier] != a.getAttribute('id')) { //这个touch已经触发，且和当前不一致
             console.log(touchIdKeyMap)
             this.handleNoteStart(a.getAttribute('id'))
             this.handleNoteEnd(touchIdKeyMap[e.changedTouches[i].identifier])
             touchIdKeyMap[e.changedTouches[i].identifier] = a.getAttribute('id')
-					} else if (!touchIdKeyMap[e.changedTouches[i].identifier]){
+          } else if (!touchIdKeyMap[e.changedTouches[i].identifier]) {
             console.log(2)
-						this.handleNoteStart(a.getAttribute('id'))
-						touchIdKeyMap[e.changedTouches[i].identifier] = a.getAttribute('id')
-					} else {
+            this.handleNoteStart(a.getAttribute('id'))
+            touchIdKeyMap[e.changedTouches[i].identifier] = a.getAttribute('id')
+          } else {
             console.log(3)
             //新旧相同什么都不做
           }
-				} else {
+        } else {
           console.log('外边')
-					if (touchIdKeyMap[e.changedTouches[i].identifier]) {
+          if (touchIdKeyMap[e.changedTouches[i].identifier]) {
             this.handleNoteEnd(touchIdKeyMap[e.changedTouches[i].identifier])
           }
-					touchIdKeyMap[e.changedTouches[i].identifier] = undefined
-				}
-			}
-		},
+          touchIdKeyMap[e.changedTouches[i].identifier] = undefined
+        }
+      }
+    },
     btnStart(e) {
       console.log(e)
-      extendBtnsTimeout = setTimeout(()=>{
+      extendBtnsTimeout = setTimeout(() => {
         //show extend buttons
         this.showExtendBtns = true;
-      },500)
+      }, 500)
 
     },
     btnEnd(e) {
       // console.log(e)
       clearTimeout(extendBtnsTimeout)
-      const a = document.elementFromPoint(e.changedTouches[0].clientX,e.changedTouches[0].clientY)
+      const a = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY)
       console.log(a)
-      if (a && a.classList.contains('bounceBtn')){
+      if (a && a.classList.contains('bounceBtn')) {
         //导出
         this.bounceProject()
-      } else if (a && (a.classList.contains('playBtn')||a.classList.contains('pauseBtn'))) {
+      } else if (a && (a.classList.contains('playBtn') || a.classList.contains('pauseBtn'))) {
         //播放
         this.toggleReplay()
       }
@@ -392,7 +397,7 @@ export default {
         //   console.log('2',e)
         // },
         transitionEnd: function(e) {
-          console.log('3', this.activeIndex) // THIS!!! within swiper...
+          console.log('3', this.activeIndex) // THIS!!! within swiper...scope.....
           self.activeSwiperIndex = this.activeIndex
           self.confirmRecordPart(!isLinger)
         }
@@ -480,10 +485,8 @@ export default {
     <div :class="['white', 'e', activeNote.E6?'active-note':'']" id="E6"></div>
     <div :class="['white', 'f', activeNote.F6?'active-note':'']" id="F6"></div>
   </div>
-  <!-- <div class="scroll-container">
-    <div class="mini-keyboard" @touchmove="onMiniKeyboardScroll">
-    </div>
-  </div> -->
+  <div class="keyshadow"></div>
+  <div class="scroll-container"></div>
   <div class="semi-piano-roll" @touchmove.stop.prevent>
     <swiper :options="pianoRollSwiperOption" ref="pianoRoll">
       <!-- slides -->
@@ -492,18 +495,41 @@ export default {
           <svg :style="{height:'90%',padding:timelineConfig.dotSize/2+'px 0'}">
 
             <defs>
+
+
+              	<filter id="glowing" height="400%" width="130%" x="-10%" y="-130%">
+              		<!-- Thicken out the original shape -->
+              		<feMorphology operator="dilate" radius="1" in="SourceAlpha" result="thicken" />
+
+              		<!-- Use a gaussian blur to create the soft blurriness of the glow -->
+              		<feGaussianBlur in="thicken" stdDeviation="2" result="blurred" />
+
+              		<!-- Change the colour -->
+              		<feFlood flood-color="rgb(200,200,255)" result="glowColor" />
+
+              		<!-- Color in the glows -->
+              		<feComposite in="glowColor" in2="blurred" operator="in" result="softGlow_colored" />
+
+              		<!--	Layer the effects together -->
+              		<feMerge>
+              			<feMergeNode in="softGlow_colored"/>
+              			<feMergeNode in="SourceGraphic"/>
+              		</feMerge>
+
+              	</filter>
+
               <!-- <filter id="glowing" x="0" y="0" width="200%" height="200%">
                 <feOffset result="offOut" in="SourceGraphic" dx="0" dy="0" />
                 <feGaussianBlur result="blurOut" in="offOut" stdDeviation="2" />
                 <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
               </filter> -->
-              <filter id="glowing">
+              <!-- <filter id="glowing">
                   <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
                   <feMerge>
                       <feMergeNode in="coloredBlur"/>
                       <feMergeNode in="SourceGraphic"/>
                   </feMerge>
-              </filter>
+              </filter> -->
               <!-- <filter id="glowing">
                 <feGaussianBlur id="blur" in="SourceAlpha" stdDeviation="1.5"/>
                 <feColorMatrix id="recolor"  type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0" result="white-glow"/>
@@ -601,69 +627,81 @@ export default {
         }
     }
     .btnContainer {
-      position: relative;
-      width: getRem(84);
-      height: getRem(84);
-      margin-top: 0.3rem;
-      .playBtn {
-        position: absolute;
-        width:100%;
-        height:100%;
-        border-radius: getRem(42);
-        background: url('../assets/play.svg') center center no-repeat;
-        background-size: getRem(32);
-        background-color: rgb(69,106,255);
-      }
-      .pauseBtn {
-        position:absolute;
-        width:100%;
-        height:100%;
-        border-radius: getRem(42);
-        background: url('../assets/pause.svg') center center no-repeat;
-        background-size: getRem(32);
-        background-color: rgb(69,106,255);
-      }
-      .bounceBtn {
-        position:absolute;
+        position: relative;
         width: getRem(84);
         height: getRem(84);
-        border-radius: getRem(42);
-        background: url('../assets/check.svg') center center no-repeat;
-        background-size: getRem(32);
-      }
-      .extendBtns {
-        // this element is within rotate, everything is opposite
-        position: absolute;
-        height:getRem(84);
-        border-radius: getRem(42);
+        margin-top: 0.3rem;
+        .playBtn {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: getRem(42);
+            background: url('../assets/play.svg') center center no-repeat;
+            background-size: getRem(32);
+            background-color: rgb(69,106,255);
+        }
+        .pauseBtn {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: getRem(42);
+            background: url('../assets/pause.svg') center center no-repeat;
+            background-size: getRem(32);
+            background-color: rgb(69,106,255);
+        }
+        .bounceBtn {
+            position: absolute;
+            width: getRem(84);
+            height: getRem(84);
+            border-radius: getRem(42);
+            background: url('../assets/check.svg') center center no-repeat;
+            background-size: getRem(32);
+        }
+        .extendBtns {
+            // this element is within rotate, everything is opposite
+            position: absolute;
+            height: getRem(84);
+            border-radius: getRem(42);
 
-        right: 0;
-        z-index:-1;
-        transition: width 2s;
-        background: linear-gradient(to right, rgb(255,61,61),rgb(0,189,255),rgb(69,106,255) 80%);
-      }
-      .extendBtnsShow {
-        width:getRem(300);
-      }
-      .extendBtnsHide {
-        width:getRem(84);
-      }
+            right: 0;
+            z-index: -1;
+            transition: width 2s;
+            background: linear-gradient(to right, rgb(255,61,61),rgb(0,189,255),rgb(69,106,255) 80%);
+        }
+        .extendBtnsShow {
+            width: getRem(300);
+        }
+        .extendBtnsHide {
+            width: getRem(84);
+        }
     }
 }
 .scroll-container {
-    display:flex;
-    justify-content:center;
+    display: flex;
+    justify-content: center;
     align-items: center;
     position: fixed;
-    background-color: yellow;
-    width: getRem(138);
+    background: url('../assets/pianolid.png') no-repeat;
+    background-size:getRem(46) 100%;
+    // background-color:black;
+    // transform: rotate(90deg);
+    width: getRem(46);
     height: 100%;
-    left: getRem(328);
-    .mini-keyboard {
-      width:getRem(80);
-      height:200px;
-      background-color:pink;
-    }
+    left: getRem(380);
+}
+.keyshadow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  // background: url('../assets/pianolid.png') no-repeat;
+  background: linear-gradient(to left, rgba(28,28,28,.92) 0%, rgba(48,48,48,.65) 10%,rgba(118,118,118,.1) 40%,rgba(0,0,0,0) 100%);
+  pointer-events: none;
+  // transform: rotate(90deg);
+  width: getRem(388);
+  height: 100%;
+  width: getRem(388);
+  left: 0;
 }
 .temp {
     width: 0.7rem;
@@ -679,7 +717,7 @@ export default {
     position: absolute;
     width: 100%;
     height: 100%;
-    background-color:seagreen;
+    background-color: white;
 }
 h2 {
     font-size: 20px;
@@ -700,6 +738,7 @@ h2 {
 
 .keys {
     // position: absolute;  //make whole keys appear
+    // 奇葩， adjust white and black heights influence all key layout
     height: 100%;
     position: fixed;
     display: flex;
@@ -710,10 +749,9 @@ h2 {
     /* padding-right:getRem(347); */
     box-sizing: border-box;
 }
-.scroll-container {}
 .semi-piano-roll {
     top: 0;
-    width: getRem(334);
+    width: getRem(328);
     position: fixed;
     right: 0;
     height: 100%;
@@ -827,43 +865,45 @@ h2 {
 /* piano keyboard layout css  */
 
 .white {
-    width: getRem(358);
-    height: getRem(92);
+    width: getRem(388);
+    height: 5.56%;
     z-index: 1;
-    border-left: 1px solid #bbb;
-    border-bottom: 1px solid #bbb;
-    border-radius: 0 0 5px 5px;
-    box-shadow: -1px 0 0 rgba(80, 80, 80, 0.8) inset, 0 0 5px #ccc inset, 0 0 3px rgba(0, 0, 0, 0.2);
-    background: linear-gradient(to left, #666 0%, #eee 30%, #fff 100%);
+    // border-left: 1px solid #bbb;
+    // border-bottom: 1px solid #bbb;
+    // border-radius: 0 0 5px 5px;
+    // box-shadow: 1px 0 0 rgba(80, 80, 80, 0.8) inset, 0 0 5px #ccc inset, 0 0 3px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 1px rgba(65, 65, 65, 0.5) inset, 0 0 2px rgba(211, 211, 211, 0.5) inset;
+    // background: linear-gradient(to left, rgba(28,28,28,.92) 0%, rgba(48,48,48,.65) 10%,rgba(118,118,118,.1) 40%,rgba(0,0,0,0) 100%);
+    background-color:white;
     &.active-note {
         box-shadow: 2px 0 3px rgba(0, 0, 0, 0.1) inset, -5px 5px 20px rgba(0, 0, 0, 0.2) inset, 0 0 3px rgba(0, 0, 0, 0.2);
-        background: linear-gradient(to left, #555 0%, #ddd 40%, #eee 100%);
+        // background: linear-gradient(to left, #555 0%, #ddd 40%, #eee 100%);
+        background:linear-gradient(to left, white,rgb(236,236,236));
     }
 }
 
 .black {
     position: relative;
     width: getRem(200);
-    height: getRem(54);
-    margin-top: getRem(-27);
-    top: getRem(27);
+    height: getRem(50);
+    margin-top: getRem(-50);
+    top: getRem(25);
+    // height: 4.3%; 百分比不好使
+    // margin-top: -4.3%;
+    // top: 2.15%;
     z-index: 2;
-    border: 1px solid #000;
-    border-radius: 0 0 3px 3px;
-    box-shadow: -1px -1px 2px rgba(255, 255, 255, 0.2) inset, 0 -5px 2px 3px rgba(0, 0, 0, 0.6) inset, 0 2px 4px rgba(0, 0, 0, 0.5);
-    background: linear-gradient(45deg, #222 0%, #555 100%);
+    border: 2px solid #000;
+    border-radius: getRem(8) 0px 0px getRem(8);
+    // box-shadow: -1px -1px 2px rgba(255, 255, 255, 0.2) inset, 0 -5px 2px 3px rgba(0, 0, 0, 0.6) inset, 0 2px 4px rgba(0, 0, 0, 0.5);
+    // background: linear-gradient(45deg, #222 0%, #555 100%);
+    background:url('../assets/blackkey.png') center center no-repeat;
+    background-size:cover;
     &.active-note {
-        box-shadow: -1px -1px 2px rgba(255, 255, 255, 0.2) inset, 0 -2px 2px 3px rgba(0, 0, 0, 0.6) inset, 0 1px 2px rgba(0, 0, 0, 0.5);
-        background: linear-gradient(to right, #444 0%, #222 100%);
+        // box-shadow: -1px -1px 2px rgba(255, 255, 255, 0.2) inset, 0 -2px 2px 3px rgba(0, 0, 0, 0.6) inset, 0 1px 2px rgba(0, 0, 0, 0.5);
+        // background: linear-gradient(to right, #444 0%, #222 100%);
+        background:url('../assets/blackkeydown.png') center center no-repeat;
+        background-size:cover;
     }
-}
-
-.a,
-.c,
-.d,
-.f,
-.g {
-    margin-bottom: getRem(-25);
 }
 
 /* mask layout */

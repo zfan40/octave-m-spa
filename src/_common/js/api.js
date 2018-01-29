@@ -56,7 +56,7 @@ export function uploadRecord(record, info) {
       fd.append('fname', 'test.txt');
       fd.append('data', event.target.result);
       const postFix = await axios.post('//api.musixise.com/api/uploadAudio', fd, formReqConfig);
-      const workURL = `http://oiqvdjk3s.bkt.clouddn.com/${postFix}`;
+      const workURL = `http://oiqvdjk3s.bkt.clouddn.com/${postFix.data.data}`;
       const param = {
         ...info,
         url: workURL,
@@ -64,7 +64,7 @@ export function uploadRecord(record, info) {
       console.log(workURL);
       return axios.post('//api.musixise.com/api/work/create', JSON.stringify(param), reqConfig)
                .then((res) => {
-                 resolve(res);
+                 resolve(res.data.data.id);
                })
                .catch((err) => {
                  reject(err);
