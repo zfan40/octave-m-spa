@@ -3,6 +3,7 @@ window.Tone = require('tone')
 import * as Util from '../_common/js/util'
 import * as Api from '../_common/js/api'
 import * as Cookies from "js-cookie"
+import * as Magic from '../_common/js/magic'
 let musicPart = undefined
 
 const mbox = new Tone.Sampler({
@@ -26,7 +27,7 @@ export default {
   },
   data() {
     return {
-      playing: false,
+      // playing: false,
     }
   },
   computed: {
@@ -39,62 +40,37 @@ export default {
   },
   methods: {
     load() {},
-    prepareMusic() {
-      try {
-        musicPart.dispose()
-      } catch (e) {
-        //
-      }
-      musicPart = new Tone.Part(function(time, value) {
-        mbox.triggerAttackRelease(value.note, "8n", time)
-      }, this.project).start(0)
-    },
-    togglePlayMusic() {
-      if (this.project.length) {
-        Tone.Transport.start("+0.01", 0)
-      }
-    },
     loadMusicById() {
       console.log('hehe', this.$store.state)
       const {id} = this.$store.state.route.query
-      // if (!id||!this.project) {
-      //   console.log('搞飞机，没内容')
-      //   return
-      // }
       if(id){ //从id取作品
         console.log('mmm',id)
         this.$store.dispatch('FETCH_MBOX',{id}).then(() => {
           console.log('workPart',this.project)
           console.log('work info',this.projectInfo)
-          this.prepareMusic()
-          this.togglePlayMusic()
+          alert('load complete');
+          this.togglePlay();
         })
-      } else if (this.project.length) { //store里边的作品，刚录的
-        this.prepareMusic()
       } else {
+        // 不会出现这个情况
         this.$store.dispatch('FETCH_MBOX',{id:50}).then(() => {
           console.log('workPart',this.project)
           console.log('work info',this.projectInfo)
-          this.prepareMusic()
-          this.togglePlayMusic()
+          alert('load complete');
+          this.togglePlay();
         })
       }
     },
     togglePlay() {
-      this.playing = !this.playing
-      if (this.playing) {
-        // Tone.Transport.start("+0.01", this.vuetimeline * 100 / 1000)
-        Tone.Transport.start("+0.01", 0)
-      } else {
-        Tone.Transport.stop(0) // TODO：必须stop才能start。。。有没有自动stop啊..
-      }
+      // alert('111')
+      Magic.preview(this.project)
     },
   },
+
   created() {
     //check cookie to get serviceToken first
     // if stoken not exist, go auth
     const self = this
-    alert(1)
     self.loadMusicById()
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase())
     if (!inWechat) return
@@ -112,7 +88,10 @@ export default {
             )
           }
           alert(`welcome${res.data.data.realname}`)
-          // self.loadMusicById()
+          if (!this.project) {
+            self.loadMusicById()
+          }
+
           console.log('get user info success', res.data.data)
         })
         .catch((err) => {
@@ -137,7 +116,7 @@ export default {
 <template>
 <div id="container">
   <div class="mb">
-    <div :class="[playing?'pauseBtn':'playBtn', 'rotate']" @click="togglePlay"></div>
+    <div id="playBtn" @touchstart="togglePlay"></div>
   </div>
   <div class="operate">
     <div class="share">
@@ -155,9 +134,16 @@ export default {
 @import '../_common/style/_variables.scss';
 @import '../_common/style/_mixins.scss';
 @import '../_common/style/_reboot.scss';
-.container {
+#container {
     position: absolute;
     width: 100%;
     height: 100%;
+    display:flex;
+    flex-direction: column;
+    #playBtn {
+      width: 2rem;
+      height: 2rem;
+      background-color:pink;
+    }
 }
 </style>

@@ -285,20 +285,19 @@ export default {
           console.log('successfully bounced')
           alert('作品已为您存储')
           this.$router.push({
-            path: '/music-box-viewer',
+            path: '/new-music-box-viewer',
             query: {
               id
             }
           })
         })
-        while (tonepart.length) {
-          tonepart.pop().dispose() //最后一个被dispose，同时要从数组中删掉
-        }
-        tonepart[0] = new Tone.Part(function(time, value) {
-          piano.triggerAttackRelease(value.note, "8n", time)
-        }, bouncepart).start(0)
-        Magic.RealMagic(bouncepart)
-        // Magic.generateJSCadCode(bouncepart)
+        // while (tonepart.length) {
+        //   tonepart.pop().dispose() //最后一个被dispose，同时要从数组中删掉
+        // }
+        // tonepart[0] = new Tone.Part(function(time, value) {
+        //   piano.triggerAttackRelease(value.note, "8n", time)
+        // }, bouncepart).start(0)
+        // Magic.RealMagic(bouncepart)
       } else {
         alert('什么都没录呢')
       }
