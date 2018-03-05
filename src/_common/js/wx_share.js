@@ -2,9 +2,8 @@ import axios from 'axios';
 import wx from 'weixin-js-sdk';
 
 export const prepareShareConfig = () => new Promise((resolve, reject) => {
-  axios.post('//api.musixise.com/wechat/getTicket', {
-    url: window.location.href.split('#')[0],
-  }).then((res) => {
+  axios.post('//api.musixise.com/wechat/getTicket', JSON.stringify({ url: window.location.href.split('#')[0] }))
+  .then((res) => {
     alert(JSON.stringify(res));
     wx.config({
       debug: true,

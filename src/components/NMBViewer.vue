@@ -5,6 +5,7 @@ import * as Api from '../_common/js/api'
 import * as Cookies from "js-cookie"
 import * as Magic from '../_common/js/magic'
 import countButton from './common/countButton'
+import * as WxShare from '../_common/js/wx_share'
 let musicPart = undefined
 
 const mbox = new Tone.Sampler({
