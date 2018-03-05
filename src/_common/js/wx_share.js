@@ -2,13 +2,12 @@ import axios from 'axios';
 import wx from 'weixin-js-sdk';
 
 export const prepareShareConfig = () => new Promise((resolve, reject) => {
-  axios.get('//api.musixise.com/share/wechat/config', {
-    params: {
-      url: window.location.href.split('#')[0],
-    },
+  axios.post('//api.musixise.com/wechat/getTicket', {
+    url: window.location.href.split('#')[0],
   }).then((res) => {
+    alert(JSON.stringify(res));
     wx.config({
-      debug: false,
+      debug: true,
       appId: res.data.appId,
       timestamp: res.data.timestamp,
       nonceStr: res.data.nonceStr,
@@ -33,9 +32,10 @@ export const prepareShareContent = ({
     fullPath,
     imgUrl,
   }) => {
-  const link = 'http://example.com/static/auth.html' +
-               `?redirect_uri=${encodeURIComponent(window.location.href.split('#')[0])}` +
-               `&full_path=${encodeURIComponent(fullPath)}`;
+  // const link = 'http://example.com/static/auth.html' +
+  //              `?redirect_uri=${encodeURIComponent(window.location.href.split('#')[0])}` +
+  //              `&full_path=${encodeURIComponent(fullPath)}`;
+  const link = fullPath;
   wx.onMenuShareTimeline({
     title,
     link,
