@@ -1,16 +1,30 @@
 <template>
 <div id="app">
-  <router-view/>
+  <transition :name="transitionName">
+    <router-view/>
+  </transition>
 </div>
 </template>
 
 <script>
+// https://router.vuejs.org/en/advanced/transitions.html
 export default {
   name: 'app',
+  data() {
+    return {
+      transitionName:'fade',
+    }
+  },
+  beforeRouteUpdate (to, from, next) {
+    // const toPage = to.indexOf('make')
+    // const fromPage = from.path.split('/').length
+    // this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
+    // next()
+  },
 };
 </script>
 
-<style>
+<style scoped>
 #app {
   position: absolute;
   top: 0;
@@ -22,5 +36,17 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  user-select: none;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+.fade-enter-active {
+  transition: all .3s ease-out;
+}
+.fade-leave-active {
+  transition: all .3s ease-out;
+}
+.fade-enter, .fade-leave-to
+/* .slide-fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 </style>
