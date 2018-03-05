@@ -106,35 +106,36 @@ export function RealMagic(items) {
     console.log('所需音片儿超过18个');
     return false;
   }
-  console.log(machines);
-  // then we merge all the tasks
-
-  // test1: [[1],[1,2,1]] => [1,2,3,2]
-  // test2: [[1,2,1],[1,2,3]] => [1,2,1,3,4,5]
-  const finalBins = groups.reduce((a, b) => a.concat(b.map(item => item + Math.max(...a))));
-  let finalTimings = taskTimeArrays.reduce((a, b) => a.concat(b)); // just flatten it
-  finalTimings = finalTimings.map(item => (item * 15) / 20); // normalize from 20s to 15s
-  const musicboxPins = finalBins.map((bin, index) => `generatePin(${finalTimings[index]},${bin})`);
-  console.log(`
-    //底下低音,上面高音
-  const DOT_WIDTH = 0.6
-  const RATIO = 0.98
-  const OFFSET = 2.2 //1.95 is center
-  const OUTER_RADIUS = 6.6
-  const INNER_RADIUS = 5.9
-  function generatePin(noteSec, noteNo) {
-    return rotate(90, [1, 0, 4 * noteSec * RATIO / 15], cylinder({
-      h: 1,
-      r: DOT_WIDTH / 2,
-      center: true
-    })).translate([sin(360 * noteSec * RATIO / 15) * OUTER_RADIUS, -cos(360 * noteSec * RATIO / 15) * OUTER_RADIUS, -9.95 + OFFSET + 0.4 + (noteNo - 1) * .9])
-  }
-
-  function main() {
-    let cylinderBody = difference(cylinder({h: 19.9,r: OUTER_RADIUS,center: true}),cylinder({h: 19.9,r: INNER_RADIUS,center: true}))
-    let holes = union(${musicboxPins})
-    return union(cylinderBody,holes).translate([0, 0, 0]).scale(1);
-  }`);
+  return true;
+  // console.log(machines);
+  // // then we merge all the tasks
+  //
+  // // test1: [[1],[1,2,1]] => [1,2,3,2]
+  // // test2: [[1,2,1],[1,2,3]] => [1,2,1,3,4,5]
+  // const finalBins = groups.reduce((a, b) => a.concat(b.map(item => item + Math.max(...a))));
+  // let finalTimings = taskTimeArrays.reduce((a, b) => a.concat(b)); // just flatten it
+  // finalTimings = finalTimings.map(item => (item * 15) / 20); // normalize from 20s to 15s
+  // const musicboxPins = finalBins.map((bin, index) => `generatePin(${finalTimings[index]},${bin})`);
+  // console.log(`
+  //   //底下低音,上面高音
+  // const DOT_WIDTH = 0.6
+  // const RATIO = 0.98
+  // const OFFSET = 2.2 //1.95 is center
+  // const OUTER_RADIUS = 6.6
+  // const INNER_RADIUS = 5.9
+  // function generatePin(noteSec, noteNo) {
+  //   return rotate(90, [1, 0, 4 * noteSec * RATIO / 15], cylinder({
+  //     h: 1,
+  //     r: DOT_WIDTH / 2,
+  //     center: true
+  //   })).translate([sin(360 * noteSec * RATIO / 15) * OUTER_RADIUS, -cos(360 * noteSec * RATIO / 15) * OUTER_RADIUS, -9.95 + OFFSET + 0.4 + (noteNo - 1) * .9])
+  // }
+  //
+  // function main() {
+  //   let cylinderBody = difference(cylinder({h: 19.9,r: OUTER_RADIUS,center: true}),cylinder({h: 19.9,r: INNER_RADIUS,center: true}))
+  //   let holes = union(${musicboxPins})
+  //   return union(cylinderBody,holes).translate([0, 0, 0]).scale(1);
+  // }`);
 }
 
 export function mapNoteTimeToColor(time) {
