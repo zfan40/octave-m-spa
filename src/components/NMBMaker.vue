@@ -4,6 +4,7 @@ import * as Util from '../_common/js/util'
 import * as Api from '../_common/js/api'
 import * as Cookies from "js-cookie"
 import * as Magic from '../_common/js/magic'
+import * as WxShare from '../_common/js/wx_share'
 import 'swiper/dist/css/swiper.css'
 import vueSlider from 'vue-slider-component'
 import {
@@ -405,6 +406,14 @@ export default {
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase())
     if (!inWechat) return
     // alert(Cookies.get('serviceToken'))
+    WxShare.prepareShareConfig().then(()=>{
+      WxShare.prepareShareContent({
+        title:'MUSIXISE',
+        desc:'寻找你自己的八音盒',
+        fullPath:location.href.split('#')[0],
+        imgUrl:'http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png',
+      })
+    })
     if (Util.getUrlParam('code') || Cookies.get('serviceToken')) {
       //TODO:ajax call to get info
       Api.getUserInfo(Util.getUrlParam('code'))
