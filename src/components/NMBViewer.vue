@@ -167,6 +167,9 @@ export default {
       <div id="pause-btn" v-show="playing"></div>
     </div>
   </div>
+  <transition name="fade">
+    <div id="music-aurora" v-show="playing"></div>
+  </transition>
   <div id="low-leaf1"></div>
   <div id="low-leaf2"></div>
   <div id="low-leaf3"></div>
@@ -185,6 +188,7 @@ export default {
     <div id="work-intro" v-if="workIntroAppear">
       <div class="title">{{projectInfo.title}}</div>
       <div class="subtitle"><span>by</span> <span><img :src="projectInfo.owner.smallAvatar" alt=""></span><span>{{projectInfo.owner.nickName}}</span></div>
+      <div id="edit-work"></div>
     </div>
   </transition>
   <transition name="bounce">
@@ -245,6 +249,17 @@ export default {
         #pause-btn {position: relative;margin-top:.3rem;margin-left:.05rem;width: getRem(16);height:getRem(14);background: url('../assets/viewer/audio-pause.png') center center no-repeat;background-size:cover;}
       }
     }
+    #music-aurora {
+      position: absolute;
+      bottom: 4.2rem;
+      left:1.5rem;
+      width: getRem(577);
+      height: getRem(577);
+      background: url('../assets/viewer/music_sprite.png'); // background:url('http://c.m.163.com/nc/qa/activity/xijing/img/cover_tit_step2.png');
+      background-size: getRem(577) getRem(4039);
+      animation: music-aurora steps(7) 1.5s infinite;
+      pointer-events: none;
+    }
     #ground {
       will-change: transform;
       transition: transform 4.5s ease-out;
@@ -266,13 +281,17 @@ export default {
     #top-leaf6 {will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(718);height: getRem(566);opacity: .5;transform:rotate(-1deg) scale(1.2);left:-6rem;bottom:getRem(1700);background: url('../assets/viewer/top-leaf5.png') center center no-repeat;background-size:cover;}
     #work-intro {
       position: absolute;bottom:3.4rem;text-align: right;right:1rem;
-      .title{font-size:.6rem;margin-bottom:.3rem;}
+      .title{font-size:.6rem;margin-bottom:.3rem;color:#7d839e;}
       .subtitle {
         display:flex;
         height:getRem(60);
         font-size:.4rem;
         align-items:center;
-        img {width: getRem(60);height:getRem(60);border-radius: 50%;border:none;margin:0 .2rem 0 .3rem;}
+        color:#7d839e;
+        img {width: getRem(60);height:getRem(60);border-radius: 50%;border:none;margin:0 .3rem 0 .3rem;}
+      }
+      #edit-work {
+        position: absolute;width: getRem(40);height: getRem(40);right: getRem(-40);top:0;background: url('../assets/viewer/edit.svg') center center no-repeat;background-size:cover;
       }
     }
     #control-panal {
@@ -323,5 +342,27 @@ export default {
 /* .slide-fade-leave-active below version 2.1.8 */ {
   transform: translateY(3rem);
   opacity: 0;
+}
+.fade-enter-active {
+  transition: all .3s ease-out;
+}
+.fade-leave-active {
+  transition: all .3s ease-out;
+}
+.fade-enter, .fade-leave-to
+/* .slide-fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+@keyframes music-aurora {
+  0% {
+    background-position: 0 0;
+  }
+  // 50% {
+  //   background-position: 0 getRem(-4039); // background-position: 0 -97.7%
+  //   // background-position: 0 getRem(-1590); // background-position: 0 -97.7%
+  // }
+  100% {
+    background-position: 0 getRem(-4039); // background-position: 0 -97.7%
+  }
 }
 </style>

@@ -1,16 +1,24 @@
 import axios from 'axios';
 import wx from 'weixin-js-sdk';
 
+const reqConfig = {
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
+};
 export const prepareShareConfig = () => new Promise((resolve, reject) => {
-  axios.post('//api.musixise.com/wechat/getTicket', JSON.stringify({ url: window.location.href.split('#')[0] }))
+  axios.post(`//api.musixise.com/wechat/getTicket?url=${encodeURIComponent(window.location.href.split('#')[0])}`, '', reqConfig)
   .then((res) => {
-    alert(JSON.stringify(res));
+    alert(`before # url: ${window.location.href.split('#')[0]}`);
+    alert(`full path: ${window.location.href}`);
+    alert(JSON.stringify(res.data.data));
     wx.config({
       debug: true,
-      appId: res.data.appId,
-      timestamp: res.data.timestamp,
-      nonceStr: res.data.nonceStr,
-      signature: res.data.signature,
+      appId: res.data.data.appId,
+      timestamp: res.data.data.timestamp,
+      nonceStr: res.data.data.nonceStr,
+      signature: res.data.data.signature,
       jsApiList: [
         'onMenuShareTimeline',
         'onMenuShareAppMessage',

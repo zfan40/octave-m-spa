@@ -12,22 +12,35 @@ let musicPreview;
 // {note: "G4", time: 2.671395000000004},
 // {note: "A4", time: 3.35932},
 // {note: "B4", time: 4.183044999999998}]
-const mbox = new Tone.MonoSynth({
-  volume: -10,
-  envelope: {
-    attack: 0.1,
-    decay: 0.3,
-    release: 2,
-  },
-  filterEnvelope: {
-    attack: 0.001,
-    decay: 0.01,
-    sustain: 0.5,
-    baseFrequency: 200,
-    octaves: 2.6,
-  },
+// const mbox = new Tone.MonoSynth({
+//   volume: -10,
+//   envelope: {
+//     attack: 0.1,
+//     decay: 0.3,
+//     release: 2,
+//   },
+//   filterEnvelope: {
+//     attack: 0.001,
+//     decay: 0.01,
+//     sustain: 0.5,
+//     baseFrequency: 200,
+//     octaves: 2.6,
+//   },
+// }).toMaster();
+const mbox = new Tone.Sampler({
+  C4: 'C4.[mp3|ogg]',
+  'D#4': 'Ds4.[mp3|ogg]',
+  'F#4': 'Fs4.[mp3|ogg]',
+  A4: 'A4.[mp3|ogg]',
+  C5: 'C5.[mp3|ogg]',
+  'D#5': 'Ds5.[mp3|ogg]',
+  'F#5': 'Fs5.[mp3|ogg]',
+  A5: 'A5.[mp3|ogg]',
+  C6: 'C6.[mp3|ogg]',
+}, {
+  release: 1,
+  baseUrl: 'static/audio/',
 }).toMaster();
-
 export function RealMagic(items) {
   console.log('== Enter RealMagic ==');
   console.log(JSON.stringify(items));
