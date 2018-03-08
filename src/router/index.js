@@ -18,11 +18,11 @@ export default new Router({
       name: 'HelloWorld',
       component: HelloWorld,
     },
-    {
-      path: '/music-box-maker',
-      name: 'MBMaker',
-      component: MBMaker,
-    },
+    // {
+    //   path: '/music-box-maker',
+    //   name: 'MBMaker',
+    //   component: MBMaker,
+    // },
     {
       path: '/new-music-box-maker',
       name: 'NMBMaker',
@@ -33,15 +33,15 @@ export default new Router({
       name: 'NMBViewer',
       component: NMBViewer,
     },
-    {
-      path: '/music-box-viewer',
-      name: 'MBViewer',
-      component: MBViewer,
-    },
-    {
-      path: '/music-box-author',
-      name: 'MBAuthor',
-      component: MBAuthor,
-    },
+    // {
+    //   path: '/music-box-viewer',
+    //   name: 'MBViewer',
+    //   component: MBViewer,
+    // },
+    // {
+    //   path: '/music-box-author',
+    //   name: 'MBAuthor',
+    //   component: MBAuthor,
+    // },
   ],
 });

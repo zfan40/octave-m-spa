@@ -1,5 +1,5 @@
 <script>
-window.Tone = require('tone')
+// window.Tone = require('tone')
 import * as Util from '../_common/js/util'
 import * as Api from '../_common/js/api'
 import * as Cookies from "js-cookie"
@@ -7,21 +7,6 @@ import * as Magic from '../_common/js/magic'
 import countButton from './common/countButton'
 import * as WxShare from '../_common/js/wx_share'
 let musicPart = undefined
-
-const mbox = new Tone.Sampler({
-  'C4': 'C4.[mp3|ogg]',
-  'D#4': 'Ds4.[mp3|ogg]',
-  'F#4': 'Fs4.[mp3|ogg]',
-  'A4': 'A4.[mp3|ogg]',
-  'C5': 'C5.[mp3|ogg]',
-  'D#5': 'Ds5.[mp3|ogg]',
-  'F#5': 'Fs5.[mp3|ogg]',
-  'A5': 'A5.[mp3|ogg]',
-  'C6': 'C6.[mp3|ogg]',
-}, {
-  'release': 1,
-  'baseUrl': 'static/audio/'
-}).toMaster()
 
 export default {
   components: {
@@ -34,6 +19,7 @@ export default {
       workIntroAppear:false,
       controlPanalAppear:false,
       playing:false,
+      userId:0,
     }
   },
   computed: {
@@ -120,6 +106,7 @@ export default {
               `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
             )
           }
+          self.userId = res.data.data.userId
           alert(`welcome${res.data.data.realname}`)
           if (!this.project) {
             self.loadMusicById()
@@ -188,7 +175,7 @@ export default {
     <div id="work-intro" v-if="workIntroAppear">
       <div class="title">{{projectInfo.title}}</div>
       <div class="subtitle"><span>by</span> <span><img :src="projectInfo.owner.smallAvatar" alt=""></span><span>{{projectInfo.owner.nickName}}</span></div>
-      <div id="edit-work"></div>
+      <div v-if="userId === projectInfo.userId" id="edit-work"></div>
     </div>
   </transition>
   <transition name="bounce">
@@ -291,7 +278,7 @@ export default {
         img {width: getRem(60);height:getRem(60);border-radius: 50%;border:none;margin:0 .3rem 0 .3rem;}
       }
       #edit-work {
-        position: absolute;width: getRem(40);height: getRem(40);right: getRem(-40);top:0;background: url('../assets/viewer/edit.svg') center center no-repeat;background-size:cover;
+        position: absolute;width: getRem(28);height: getRem(28);right: getRem(-34);top:getRem(18);background: url('../assets/viewer/edit.svg') center center no-repeat;background-size:cover;
       }
     }
     #control-panal {

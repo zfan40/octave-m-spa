@@ -182,6 +182,9 @@ export function mapNoteMidiToLength(noteName) {
 export function preview(items) {
   console.log('current state', Tone.Transport.state);
   if (Tone.Transport.state === 'stopped') {
+    // TODO: this is weird...but you need to play something to make sure it works
+    // trigger to avoid no sound
+    mbox.triggerAttack('E6', 0, 0);
     if (musicPreview) musicPreview.dispose();
     musicPreview = new Tone.Part(((time, value) => {
       mbox.triggerAttackRelease(value.note, '8n', time);

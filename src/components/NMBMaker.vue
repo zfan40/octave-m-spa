@@ -1,5 +1,5 @@
 <script>
-window.Tone = require('tone')
+const Tone = require('tone')
 import * as Util from '../_common/js/util'
 import * as Api from '../_common/js/api'
 import * as Cookies from "js-cookie"
@@ -32,20 +32,20 @@ var piano = new Tone.Sampler({
   'baseUrl': 'static/audio/'
 }).toMaster()
 
-var mbox = new Tone.Sampler({
-  'C4': 'C4.[mp3|ogg]',
-  'D#4': 'Ds4.[mp3|ogg]',
-  'F#4': 'Fs4.[mp3|ogg]',
-  'A4': 'A4.[mp3|ogg]',
-  'C5': 'C5.[mp3|ogg]',
-  'D#5': 'Ds5.[mp3|ogg]',
-  'F#5': 'Fs5.[mp3|ogg]',
-  'A5': 'A5.[mp3|ogg]',
-  'C6': 'C6.[mp3|ogg]',
-}, {
-  'release': 1,
-  'baseUrl': 'static/audio/'
-}).toMaster()
+// var mbox = new Tone.Sampler({
+//   'C4': 'C4.[mp3|ogg]',
+//   'D#4': 'Ds4.[mp3|ogg]',
+//   'F#4': 'Fs4.[mp3|ogg]',
+//   'A4': 'A4.[mp3|ogg]',
+//   'C5': 'C5.[mp3|ogg]',
+//   'D#5': 'Ds5.[mp3|ogg]',
+//   'F#5': 'Fs5.[mp3|ogg]',
+//   'A5': 'A5.[mp3|ogg]',
+//   'C6': 'C6.[mp3|ogg]',
+// }, {
+//   'release': 1,
+//   'baseUrl': 'static/audio/'
+// }).toMaster()
 
 var plucky = new Tone.PluckSynth().toMaster()
 
