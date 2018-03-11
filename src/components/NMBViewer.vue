@@ -20,6 +20,8 @@ export default {
       controlPanalAppear:false,
       playing:false,
       userId:0,
+      favStatus:false,
+      newWorkTitle:'newtitle',
     }
   },
   computed: {
@@ -40,6 +42,7 @@ export default {
         this.$store.dispatch('FETCH_MBOX',{id}).then(() => {
           console.log('workPart',this.project)
           console.log('work info',this.projectInfo)
+          this.favStatus = this.projectInfo.favStatus
           // alert('load complete');
           // this.togglePlay();
         })
@@ -48,6 +51,7 @@ export default {
         this.$store.dispatch('FETCH_MBOX',{id:50}).then(() => {
           console.log('workPart',this.project)
           console.log('work info',this.projectInfo)
+          this.favStatus = this.projectInfo.favStatus
           // alert('load complete');
           // this.togglePlay();
         })
@@ -59,7 +63,17 @@ export default {
       this.playing = !this.playing;
     },
     toggleFav() {
-      console.log('s')
+      this.favStatus = !this.favStatus;
+      Api.toggleFavSong({
+        workId:this.$store.state.route.query.id,
+        status:this.favStatus,
+      })
+    },
+    updateWorkTitle() {
+      Api.updateWorkTitle({
+        workId:this.$store.state.route.query.id,
+        title:this.newWorkTitle,
+      })
     },
     redirectToMaker() {
       this.$router.push({
@@ -88,8 +102,9 @@ export default {
     WxShare.prepareShareConfig().then(()=>{
       WxShare.prepareShareContent({
         title:'MUSIXISE',
-        desc:'寻找你自己的八音盒',
-        fullPath:location.href.split('#')[0],
+        desc:'分享一个八音盒',
+        // fullPath:location.href.split('#')[0],
+        fullPath: `${location.origin}${location.pathname}#/new-music-box-viewer?id=${self.$store.state.route.query.id}`,
         imgUrl:'http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png',
       })
     })
@@ -175,7 +190,7 @@ export default {
     <div id="work-intro" v-if="workIntroAppear">
       <div class="title">{{projectInfo.title}}</div>
       <div class="subtitle"><span>by</span> <span><img :src="projectInfo.owner.smallAvatar" alt=""></span><span>{{projectInfo.owner.nickName}}</span></div>
-      <div v-if="userId === projectInfo.userId" id="edit-work"></div>
+      <div v-if="userId === projectInfo.userId" id="edit-work" @click="updateWorkTitle"></div>
     </div>
   </transition>
   <transition name="bounce">

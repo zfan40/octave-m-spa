@@ -78,3 +78,13 @@ export function uploadRecord(record, info) {
 export function fetchMbox(id) {
   return axios.post(`//api.musixise.com/api/work/detail/${id}`, '', reqConfig);
 }
+export function toggleFavSong({ workId, status }) {
+  return axios.post('//api.musixise.com/api/favorite/addWork', JSON.stringify({ workId, status }), reqConfig)
+    .then((res) => { console.log(res); })
+    .catch((err) => { console.log(err); });
+}
+export function updateWorkTitle({ workId, title }) {
+  return axios.post(`//api.musixise.com/api/work/updateWork/${workId}`, JSON.stringify({ workId, title }), reqConfig)
+    .then((res) => { console.log(res); })
+    .catch((err) => { console.log(err); });
+}

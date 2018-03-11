@@ -39,7 +39,7 @@ const mbox = new Tone.Sampler({
   C6: 'C6.[mp3|ogg]',
 }, {
   release: 1,
-  baseUrl: 'static/audio/',
+  baseUrl: '/static/audio/',
 }).toMaster();
 export function RealMagic(items) {
   console.log('== Enter RealMagic ==');

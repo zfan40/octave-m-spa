@@ -29,7 +29,7 @@ var piano = new Tone.Sampler({
   'C6': 'C6.[mp3|ogg]',
 }, {
   'release': 1,
-  'baseUrl': 'static/audio/'
+  'baseUrl': '/static/audio/'
 }).toMaster()
 
 // var mbox = new Tone.Sampler({
@@ -273,7 +273,9 @@ export default {
             bouncepart.push(noteInfo.value)
           })
         })
+        alert('1')
         bouncepart.sort((a, b) => (0 + a.time - b.time))
+        alert('2')
         //TODO, semi done
         this.$store.dispatch('BOUNCE_PROJECT', {
           record: bouncepart,
@@ -291,6 +293,8 @@ export default {
               id
             }
           })
+        }).catch((err) => {
+          alert('failed to upload')
         })
         // while (tonepart.length) {
         //   tonepart.pop().dispose() //最后一个被dispose，同时要从数组中删掉
