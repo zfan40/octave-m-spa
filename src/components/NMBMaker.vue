@@ -281,11 +281,11 @@ export default {
       return true;
     },
     bounceProject() {
-      alert('此步骤确认，需要微信支付')
       this.confirmRecordPart(0)
       console.log(this)
       console.log(tonepart)
       bouncepart = []
+      alert('0')
       if (tonepart.length) {
         tonepart.forEach(item => {
           item._events.forEach(noteInfo => {

@@ -10,9 +10,9 @@ const reqConfig = {
 export const prepareShareConfig = () => new Promise((resolve, reject) => {
   axios.post(`//api.musixise.com/wechat/getTicket?url=${encodeURIComponent(window.location.href.split('#')[0])}`, '', reqConfig)
   .then((res) => {
-    alert(`before # url: ${window.location.href.split('#')[0]}`);
-    alert(`full path: ${window.location.href}`);
-    alert(JSON.stringify(res.data.data));
+    // alert(`before # url: ${window.location.href.split('#')[0]}`);
+    // alert(`full path: ${window.location.href}`);
+    // alert(JSON.stringify(res.data.data));
     wx.config({
       debug: true,
       appId: res.data.data.appId,
