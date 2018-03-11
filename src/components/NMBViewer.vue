@@ -18,7 +18,7 @@ export default {
       loading:true,
       workIntroAppear:false,
       controlPanalAppear:false,
-      titleUpdateAppear:true,
+      titleUpdateAppear:false,
       playing:false,
       userId:0,
       favStatus:false,
@@ -100,9 +100,12 @@ export default {
     window.rem = docElem.getBoundingClientRect().width / 10;
     docElem.style.fontSize = window.rem + 'px';
 
-    self.loadMusicById()
+
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase())
-    if (!inWechat) return
+    if (!inWechat) {
+       self.loadMusicById()
+       return
+     }
     WxShare.prepareShareConfig().then(()=>{
       WxShare.prepareShareContent({
         title:'MUSIXISE',
@@ -127,9 +130,9 @@ export default {
           }
           self.userId = res.data.data.userId
           alert(`welcome${res.data.data.realname}`)
-          if (!this.project) {
+          // if (!this.project) {
             self.loadMusicById()
-          }
+          // }
 
           console.log('get user info success', res.data.data)
         })
@@ -218,15 +221,15 @@ export default {
     <div id="title-update-mask" v-show="titleUpdateAppear">
       <div class="mb-dialog">
         <div class="title">
-          更新作品
+          作品名称
         </div>
         <div class="input">
           <input v-model="newWorkTitle" type="text" placeholder="作品新名称">
+          <div class="splitter"></div>
         </div>
         <div class="btns">
-          <span class="btn" @click="updateWorkTitle">确认</span>
-          <span class="split"></span>
-          <span class="btn" @click="titleUpdateAppear=false">取消</span>
+          <span class="btn cancel" @click="titleUpdateAppear=false">取消</span>
+          <span class="btn confirm" @click="updateWorkTitle">确认</span>
         </div>
       </div>
     </div>
@@ -389,19 +392,22 @@ export default {
   }
 }
 #title-update-mask {
-  position: absolute;width:100%;height:100%;background-color:rgba(0,0,0,.6);display: flex;align-items: center;justify-content: center;
+  position: absolute;width:100%;height:100%;background-color:rgba(0,0,0,.3);display: flex;align-items: center;justify-content: center;
   .mb-dialog {
-    position: relative;width: getRem(450);border-radius:.2rem;height:getRem(300);background-color:white;display:flex;flex-direction:column;
-    .title {flex:2;display:flex;align-items:center;justify-content: center;position: relative;width:100%;font-size:.5rem;}
-    .input {flex:3;display:flex;align-items:center;justify-content: center;position: relative;width:100%;text-align: center;font-size:.5rem;}
+    position: relative;width: getRem(570);padding-top:getRem(75); border-radius:getRem(50);height:getRem(344);background-color:rgba(255,255,255,.96);display:flex;flex-direction:column;
+    .title {flex:1;padding:0 getRem(77); display:flex;align-items:flex-end;position: relative;width:100%;font-size:.32rem;}
+    .input {
+      flex:2;flex-direction: column;padding:0 getRem(77);display:flex;align-items:flex-start;justify-content: center;position: relative;width:100%;text-align: center;font-size:.5rem;
+      input {background: transparent;border: none;outline: none;width: 100%; height:1rem;font-size:.54rem;}
+      .splitter {position:relative;width:100%;height:1px;background-color:gray;padding:0 getRem(77);}
+    }
     .btns {
-      flex:2;border-top:1px solid black;display:flex;align-items:center;justify-content: center;position: relative;width:100%;text-align: center;font-size:.5rem;
+      flex:4;display:flex;align-items:center;justify-content: center;position: relative;width:100%;text-align: center;font-size:.5rem;
       span.btn {
-        position: relative;width:100%;height:100%;flex:1;display:flex;align-items:center;justify-content: center;
+        position: relative;width:100%;height:100%;flex:1;display:flex;align-items:center;padding-top:.6rem;
       }
-      span.split {
-        position: relative;width:1px;height:100%;background:black;
-      }
+      .cancel {color:gray;text-align: right;justify-content: flex-start;padding-left:getRem(77);}
+      .confirm { color:blue;text-align: left;justify-content: flex-end;padding-right:getRem(77);}
     }
   }
 }
