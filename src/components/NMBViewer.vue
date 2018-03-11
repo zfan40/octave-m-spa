@@ -18,10 +18,12 @@ export default {
       loading:true,
       workIntroAppear:false,
       controlPanalAppear:false,
+      titleUpdateAppear:true,
       playing:false,
       userId:0,
       favStatus:false,
-      newWorkTitle:'newtitle',
+      newWorkTitle:'',
+      finalNewWorkTitle:'',
     }
   },
   computed: {
@@ -63,7 +65,7 @@ export default {
       this.playing = !this.playing;
     },
     toggleFav() {
-      this.favStatus = !this.favStatus;
+      // this.favStatus = +!this.favStatus;
       Api.toggleFavSong({
         workId:this.$store.state.route.query.id,
         status:this.favStatus,
@@ -74,6 +76,8 @@ export default {
         workId:this.$store.state.route.query.id,
         title:this.newWorkTitle,
       })
+      this.finalNewWorkTitle = this.newWorkTitle
+      setTimeout(()=>{this.titleUpdateAppear=false},300);
     },
     redirectToMaker() {
       this.$router.push({
@@ -188,9 +192,9 @@ export default {
   <div id="top-leaf6"></div>
   <transition name="bounce">
     <div id="work-intro" v-if="workIntroAppear">
-      <div class="title">{{projectInfo.title}}</div>
+      <div class="title">{{finalNewWorkTitle||projectInfo.title}}</div>
       <div class="subtitle"><span>by</span> <span><img :src="projectInfo.owner.smallAvatar" alt=""></span><span>{{projectInfo.owner.nickName}}</span></div>
-      <div v-if="userId === projectInfo.userId" id="edit-work" @click="updateWorkTitle"></div>
+      <div v-if="userId === projectInfo.userId" id="edit-work" @click="titleUpdateAppear=true"></div>
     </div>
   </transition>
   <transition name="bounce">
@@ -208,6 +212,23 @@ export default {
       <count-button :initCount="projectInfo.collectNum?projectInfo.collectNum:0" :initActive="projectInfo.favStatus?true:false" iconImg="" :onClickCall="toggleFav" />
       <div class="purchaseBtn" @click="purchaseItem">购买</div>
       <div class="makeBtn" @click="redirectToMaker">编曲</div>
+    </div>
+  </transition>
+  <transition name="fade">
+    <div id="title-update-mask" v-show="titleUpdateAppear">
+      <div class="mb-dialog">
+        <div class="title">
+          更新作品
+        </div>
+        <div class="input">
+          <input v-model="newWorkTitle" type="text" placeholder="作品新名称">
+        </div>
+        <div class="btns">
+          <span class="btn" @click="updateWorkTitle">确认</span>
+          <span class="split"></span>
+          <span class="btn" @click="titleUpdateAppear=false">取消</span>
+        </div>
+      </div>
     </div>
   </transition>
 </div>
@@ -365,6 +386,23 @@ export default {
   // }
   100% {
     background-position: 0 getRem(-4039); // background-position: 0 -97.7%
+  }
+}
+#title-update-mask {
+  position: absolute;width:100%;height:100%;background-color:rgba(0,0,0,.6);display: flex;align-items: center;justify-content: center;
+  .mb-dialog {
+    position: relative;width: getRem(450);border-radius:.2rem;height:getRem(300);background-color:white;display:flex;flex-direction:column;
+    .title {flex:2;display:flex;align-items:center;justify-content: center;position: relative;width:100%;font-size:.5rem;}
+    .input {flex:3;display:flex;align-items:center;justify-content: center;position: relative;width:100%;text-align: center;font-size:.5rem;}
+    .btns {
+      flex:2;border-top:1px solid black;display:flex;align-items:center;justify-content: center;position: relative;width:100%;text-align: center;font-size:.5rem;
+      span.btn {
+        position: relative;width:100%;height:100%;flex:1;display:flex;align-items:center;justify-content: center;
+      }
+      span.split {
+        position: relative;width:1px;height:100%;background:black;
+      }
+    }
   }
 }
 </style>

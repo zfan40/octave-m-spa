@@ -237,6 +237,11 @@ export default {
         }, this.recordPart).start(0)
         this.recordParts[this.lastActivePartIndex] = this.recordPart
         this.recordPart = []
+        if (this.checkBouncibility()) {
+          alert('cool')
+        } else {
+          alert('not cool')
+        }
       } else {
         console.log('啥也没录')
       }
@@ -260,6 +265,20 @@ export default {
       } else {
         console.log(`track ${trackNum} has no content`)
       }
+    },
+    checkBouncibility() {
+      this.confirmRecordPart(0)
+      bouncepart = []
+      if (tonepart.length) {
+        tonepart.forEach(item => {
+          item._events.forEach(noteInfo => {
+            bouncepart.push(noteInfo.value)
+          })
+        })
+        bouncepart.sort((a, b) => (0 + a.time - b.time))
+        return Magic.RealMagic(bouncepart)
+      }
+      return true;
     },
     bounceProject() {
       alert('此步骤确认，需要微信支付')
