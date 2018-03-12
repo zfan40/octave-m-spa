@@ -182,13 +182,40 @@ export function mapNoteMidiToLength(noteName) {
   return `${(75 * 0.8 * ((Tone.Frequency(noteName).toMidi() - 50) / (110 - 40))) + 0.2}`; // 75 is rem to px
 }
 
+export function clearTone(parts) {
+  // 本方法只为Tone.js不在各页面中全局污染，完全是作者这包操蛋
+  if (parts && parts.length) {
+    // 传进来值 挨个dispose。。。
+    parts.forEach((part) => {
+      try {
+        part.dispose();
+      } catch (e) {
+      //
+      }
+    });
+  }
+  if (musicPreview) {
+    // 清理自己的musicPreview
+    try {
+      musicPreview.dispose();
+    } catch (e) {
+      //
+    }
+  }
+}
 export function preview(items) {
   console.log('current state', Tone.Transport.state);
   if (Tone.Transport.state === 'stopped') {
     // TODO: this is weird...but you need to play something to make sure it works
     // trigger to avoid no sound
     if (!oncePlayed) { mbox.triggerAttack('E6', 0, 0); oncePlayed = true; }
-    if (musicPreview) musicPreview.dispose();
+    if (musicPreview) {
+      try {
+        musicPreview.dispose();
+      } catch (e) {
+        //
+      }
+    }
     musicPreview = new Tone.Part(((time, value) => {
       mbox.triggerAttackRelease(value.note, '8n', time);
     }), items).start(0, 0);

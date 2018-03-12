@@ -91,7 +91,10 @@ export default {
       console.log(`you are about to purchase ${this.projectInfo.id}`)
     }
   },
-
+  beforeRouteLeave (to, from, next) {
+    Magic.clearTone()
+    next()
+  },
   created() {
     //check cookie to get serviceToken first
     // if stoken not exist, go auth

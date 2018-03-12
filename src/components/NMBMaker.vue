@@ -52,7 +52,7 @@ var plucky = new Tone.PluckSynth().toMaster()
 const SCREEN_WIDTH = document.documentElement.getBoundingClientRect().width
 const SCREEN_HEIGHT = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 
-window.tonepart = [] // store all the music parts. (ummm,that's why it's named part...)
+let tonepart = [] // store all the music parts. (ummm,that's why it's named part...)
 let bouncepart = []
 
 let recordStartTime = 0
@@ -230,7 +230,11 @@ export default {
           this.recordPart = this.recordPart.concat(this.recordParts[this.lastActivePartIndex])
         }
         if (tonepart[this.lastActivePartIndex]) {
-          tonepart[this.lastActivePartIndex].dispose() //覆盖之前的需要dispose
+          try {
+            tonepart[this.lastActivePartIndex].dispose() //覆盖之前的需要dispose
+          } catch (e) {
+
+          }
         }
         tonepart[this.lastActivePartIndex] = new Tone.Part(function(time, value) { //不能老这new啊，要每次一个数组，每次改动最后一个
           piano.triggerAttackRelease(value.note, "8n", time)
@@ -260,8 +264,14 @@ export default {
       }
       if (this.recordParts[trackNum] && this.recordParts[trackNum].length) {
         this.$set(this.recordParts, trackNum, [])
-        tonepart[trackNum].dispose() //dispose掉
-        tonepart[trackNum] = undefined //同时要从数组中删掉
+        if (tonepart[trackNum]) {
+          try {
+            tonepart[trackNum].dispose() //dispose掉
+          } catch (e) {
+
+          }
+          tonepart[trackNum] = undefined //同时要从数组中删掉
+        }
       } else {
         console.log(`track ${trackNum} has no content`)
       }
@@ -271,9 +281,11 @@ export default {
       bouncepart = []
       if (tonepart.length) {
         tonepart.forEach(item => {
-          item._events.forEach(noteInfo => {
-            bouncepart.push(noteInfo.value)
-          })
+          if (item && item._events.length && item._events[0].value) {
+            item._events.forEach(noteInfo => {
+              bouncepart.push(noteInfo.value)
+            })
+          }
         })
         bouncepart.sort((a, b) => (0 + a.time - b.time))
         return Magic.RealMagic(bouncepart)
@@ -285,16 +297,15 @@ export default {
       console.log(this)
       console.log(tonepart)
       bouncepart = []
-      alert('0')
       if (tonepart.length) {
         tonepart.forEach(item => {
-          item._events.forEach(noteInfo => {
-            bouncepart.push(noteInfo.value)
-          })
+          if (item && item._events.length && item._events[0].value) {
+            item._events.forEach(noteInfo => {
+              bouncepart.push(noteInfo.value)
+            })
+          }
         })
-        alert('1')
         bouncepart.sort((a, b) => (0 + a.time - b.time))
-        alert('2')
         //TODO, semi done
         this.$store.dispatch('BOUNCE_PROJECT', {
           record: bouncepart,
@@ -470,6 +481,10 @@ export default {
         `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(location.origin+location.pathname+'#/new-music-box-maker')}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
       )
     }
+  },
+  beforeRouteLeave (to, from, next) {
+    Magic.clearTone(tonepart)
+    next()
   },
   mounted() {
     // this.startRecord();

@@ -1,11 +1,11 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import HelloWorld from '@/components/HelloWorld';
-import MBMaker from '@/components/MBMaker';
+// import MBMaker from '@/components/MBMaker';
 
-import MBAuthor from '@/components/MBAuthor';
+// import MBAuthor from '@/components/MBAuthor';
 import NMBMaker from '@/components/NMBMaker';
-import MBViewer from '@/components/MBViewer';
+// import MBViewer from '@/components/MBViewer';
 import NMBViewer from '@/components/NMBViewer';
 
 Vue.use(Router);
