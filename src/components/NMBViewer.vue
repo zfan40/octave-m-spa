@@ -106,12 +106,13 @@ export default {
        self.loadMusicById()
        return
      }
+    const fullPath = `${location.origin}${location.pathname}#/new-music-box-viewer?id=${self.$store.state.route.query.id}`
     WxShare.prepareShareConfig().then(()=>{
       WxShare.prepareShareContent({
         title:'MUSIXISE',
         desc:'分享一个八音盒',
         // fullPath:location.href.split('#')[0],
-        fullPath: `${location.origin}${location.pathname}#/new-music-box-viewer?id=${self.$store.state.route.query.id}`,
+        fullPath,
         imgUrl:'http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png',
       })
     })
@@ -125,7 +126,7 @@ export default {
             Cookies.remove('serviceToken')
             location.replace(
               // will publish to node project m-musixise, under '/music-box' path
-              `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
+              `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(fullPath)}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
             )
           }
           self.userId = res.data.data.userId
@@ -139,12 +140,12 @@ export default {
         .catch((err) => {
           Cookies.remove('serviceToken')
           location.replace(
-            `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
+            `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(fullPath)}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
           )
         })
     } else { //又没有微信给的auth code又没有token存在cookie，只得验证
       location.replace(
-        `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
+        `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(fullPath)}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
       )
     }
   },
