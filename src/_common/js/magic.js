@@ -2,6 +2,8 @@ const Tone = require('tone');
 
 const SAME_NOTE_INTERVAL = 1; // 同一个音不能相距小于1秒，不然音片打击出问题
 let musicPreview;
+
+let oncePlayed = false;
 // notesInfo example
 // let work = [{note: "E4", time: 0.14585000000000037},
 // {note: "G4", time: 1.0295},
@@ -184,7 +186,7 @@ export function preview(items) {
   if (Tone.Transport.state === 'stopped') {
     // TODO: this is weird...but you need to play something to make sure it works
     // trigger to avoid no sound
-    mbox.triggerAttack('E6', 0, 0);
+    if (!oncePlayed) { mbox.triggerAttack('E6', 0, 0); oncePlayed = true; }
     if (musicPreview) musicPreview.dispose();
     musicPreview = new Tone.Part(((time, value) => {
       mbox.triggerAttackRelease(value.note, '8n', time);
