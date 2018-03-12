@@ -1,5 +1,6 @@
 const Tone = require('tone');
 
+Tone.Transport.cancel();
 const SAME_NOTE_INTERVAL = 1; // 同一个音不能相距小于1秒，不然音片打击出问题
 let musicPreview;
 
