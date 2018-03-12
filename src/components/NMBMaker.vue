@@ -415,6 +415,8 @@ export default {
     // if stoken not exist, go auth
     const self = this
     Tone.Transport.cancel()
+    tonepart = []
+    bouncepart = []
     // this is very important
     var docElem = document.documentElement;
     window.rem = docElem.getBoundingClientRect().width / 10;
