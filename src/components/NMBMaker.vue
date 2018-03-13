@@ -465,7 +465,7 @@ export default {
               `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(location.origin+location.pathname+'#/new-music-box-maker')}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
             )
           }
-          alert(`welcome${res.data.data.realname}`)
+          // alert(`welcome${res.data.data.realname}`)
           console.log('get user info success', res.data.data)
         })
         .catch((err) => {

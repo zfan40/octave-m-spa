@@ -133,7 +133,7 @@ export default {
             )
           }
           self.userId = res.data.data.userId
-          alert(`welcome${res.data.data.realname}`)
+          // alert(`welcome${res.data.data.realname}`)
           // if (!this.project) {
             self.loadMusicById()
           // }
@@ -154,9 +154,9 @@ export default {
   },
   mounted() {
     // this.startRecord();
-    setTimeout(()=>{this.loading = false},1500)
-    setTimeout(()=>{this.workIntroAppear = true;},4000)
-    setTimeout(()=>{this.controlPanalAppear = true},5000)
+    setTimeout(()=>{this.loading = false},2000)
+    setTimeout(()=>{this.workIntroAppear = true;},4500)
+    setTimeout(()=>{this.controlPanalAppear = true},5500)
     // setTimeout(()=>{this.playing = true},6000)
   },
   updated() {}

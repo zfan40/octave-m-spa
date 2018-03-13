@@ -14,7 +14,7 @@ export const prepareShareConfig = () => new Promise((resolve, reject) => {
     // alert(`full path: ${window.location.href}`);
     // alert(JSON.stringify(res.data.data));
     wx.config({
-      debug: true,
+      debug: false,
       appId: res.data.data.appId,
       timestamp: res.data.data.timestamp,
       nonceStr: res.data.data.nonceStr,
