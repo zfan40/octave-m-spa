@@ -19,6 +19,7 @@
     "tone": "^0.11.11",
     "vue": "^2.5.2",
     "vue-awesome-swiper": "^3.0.6",
+    "vue-infinite-scroll": "^2.0.2",
     "vue-router": "^3.0.1",
     "vue-slider-component": "^2.4.7",
     "vue-toasted": "^1.1.24",

@@ -8,6 +8,7 @@ const reqConfig = {
     'Content-Type': 'application/json',
   },
 };
+const tokenObj = { access_token: '' };
 // TODO:cause 500?????? just cuz this few lines???
 
 
@@ -15,22 +16,24 @@ export function getUserInfo(wxcode) {
   const tokenInCookie = Cookies.get('serviceToken');
   if (tokenInCookie) {
     // alert('cookie used');
-    reqConfig.headers.Authorization = `Bearer ${tokenInCookie}`;
-    return axios.post('//api.musixise.com/api/user/getInfo', '', reqConfig);
+    // reqConfig.headers.Authorization = `Bearer ${tokenInCookie}`;
+    tokenObj.access_token = tokenInCookie;
+    return axios.get('//api.musixise.com/api/v1/user/getInfo', '', reqConfig);
   } else if (!tokenInCookie && wxcode) {
     // alert('no cookie');
     return new Promise((resolve, reject) => {
-      axios.post(`//api.musixise.com/api/user/oauth/wechat/callback?code=${wxcode}`, '', reqConfig)
+      axios.post(`//api.musixise.com/api/v1/user/oauth/wechat/callback?code=${wxcode}`, '', reqConfig)
         .then((res) => {
           if (res.data.errcode === 20001) {
             reject(20001); // 相当于return了
           }
           const serviceToken = res.data.data.id_token;
-          reqConfig.headers.Authorization = `Bearer ${serviceToken}`;
+          // reqConfig.headers.Authorization = `Bearer ${serviceToken}`;
+          tokenObj.access_token = serviceToken;
           Cookies.set('serviceToken', serviceToken, {
             expires: 7,
           });
-          return axios.post('//api.musixise.com/api/user/getInfo', '', reqConfig);
+          return axios.get('//api.musixise.com/api/v1/user/getInfo', JSON.stringify(tokenObj), reqConfig);
         }, () => {
           reject();
         })
@@ -55,14 +58,15 @@ export function uploadRecord(record, info) {
       const fd = new FormData();
       fd.append('fname', 'test.txt');
       fd.append('data', event.target.result);
-      const postFix = await axios.post('//api.musixise.com/api/uploadAudio', fd, formReqConfig);
+      const postFix = await axios.post('//api.musixise.com/api/v1/uploadAudio', fd, formReqConfig);
       const workURL = `http://oiqvdjk3s.bkt.clouddn.com/${postFix.data.data}`;
       const param = {
+        ...tokenObj,
         ...info,
         url: workURL,
       };
       console.log(workURL);
-      return axios.post('//api.musixise.com/api/work/create', JSON.stringify(param), reqConfig)
+      return axios.post('//api.musixise.com/api/v1/work/create', JSON.stringify(param), reqConfig)
                .then((res) => {
                  resolve(res.data.data.id);
                })
@@ -76,15 +80,24 @@ export function uploadRecord(record, info) {
 }
 
 export function fetchMbox(id) {
-  return axios.post(`//api.musixise.com/api/work/detail/${id}`, '', reqConfig);
+  return axios.get(`//api.musixise.com/api/v1/work/detail/${id}`, JSON.stringify(tokenObj), reqConfig);
+}
+export function fetchMusixiser(id) {
+  return axios.get(`//api.musixise.com/api/v1/user/detail/${id}`, JSON.stringify(tokenObj), reqConfig);
+}
+export function fetchWorksFromMusixiser(id) {
+  return axios.get(`//api.musixise.com/api/v1/work/getListByUid/${id}`, JSON.stringify(tokenObj), reqConfig);
 }
 export function toggleFavSong({ workId, status }) {
-  return axios.post('//api.musixise.com/api/favorite/addWork', JSON.stringify({ workId, status }), reqConfig)
+  return axios.post('//api.musixise.com/api/v1/favorite/addWork', JSON.stringify({ workId, status, ...tokenObj }), reqConfig)
     .then((res) => { console.log(res); })
     .catch((err) => { console.log(err); });
 }
 export function updateWorkTitle({ workId, title }) {
-  return axios.post(`//api.musixise.com/api/work/updateWork/${workId}`, JSON.stringify({ workId, title }), reqConfig)
+  return axios.put(`//api.musixise.com/api/v1/work/updateWork/${workId}`, JSON.stringify({ workId, title, ...tokenObj }), reqConfig)
     .then((res) => { console.log(res); })
     .catch((err) => { console.log(err); });
+}
+export function getRecommendations() {
+  return axios.post('//api.musixise.com/api/v1/home', JSON.stringify(tokenObj), reqConfig);
 }

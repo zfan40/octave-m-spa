@@ -7,6 +7,9 @@ import HelloWorld from '@/components/HelloWorld';
 import NMBMaker from '@/components/NMBMaker';
 // import MBViewer from '@/components/MBViewer';
 import NMBViewer from '@/components/NMBViewer';
+import MusixiserDetail from '@/components/MusixiserDetail';
+import MyFav from '@/components/MyFav';
+import Recommend from '@/components/Recommend';
 
 Vue.use(Router);
 
@@ -18,11 +21,6 @@ export default new Router({
       name: 'HelloWorld',
       component: HelloWorld,
     },
-    // {
-    //   path: '/music-box-maker',
-    //   name: 'MBMaker',
-    //   component: MBMaker,
-    // },
     {
       path: '/new-music-box-maker',
       name: 'NMBMaker',
@@ -33,15 +31,20 @@ export default new Router({
       name: 'NMBViewer',
       component: NMBViewer,
     },
-    // {
-    //   path: '/music-box-viewer',
-    //   name: 'MBViewer',
-    //   component: MBViewer,
-    // },
-    // {
-    //   path: '/music-box-author',
-    //   name: 'MBAuthor',
-    //   component: MBAuthor,
-    // },
+    {
+      path: '/musixiser',
+      name: 'MusixiserDetail',
+      component: MusixiserDetail,
+    },
+    {
+      path: '/myfav',
+      name: 'MyFav',
+      component: MyFav,
+    },
+    {
+      path: '/recommend',
+      name: 'Recommend',
+      component: Recommend,
+    },
   ],
 });

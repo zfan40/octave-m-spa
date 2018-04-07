@@ -23,10 +23,17 @@ export default {
     state.recordProject = record; // this is the music itself
     state.recordProjectInfo = info; // this includes all the relative info
   },
-  SET_FINAL_WORK: (state, { type }) => { // 储存成品信息
-    state.activeType = type;
+  SET_MUSIXISER: (state, { musixiserInfo }) => { // 储存录制信息
+    state.musixiserInfo = musixiserInfo;
   },
-  SET_USER: (state, { id, user }) => {
-    Vue.set(state.users, id, user || false); /* false means user not found */
+  PUSH_MUSIXISER_WORKS: (state, { musixiserWorksObj }) => { // 储存录制信息
+    state.musixiserWorksObj.content = state.musixiserWorksObj.content.concat(musixiserWorksObj.content);
+    state.musixiserWorksObj.page = musixiserWorksObj.page;
   },
+  // SET_FINAL_WORK: (state, { type }) => { // 储存成品信息
+  //   state.activeType = type;
+  // },
+  // SET_USER: (state, { id, user }) => {
+  //   Vue.set(state.users, id, user || false); /* false means user not found */
+  // },
 };
