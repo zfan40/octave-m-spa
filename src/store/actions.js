@@ -51,10 +51,10 @@ export default {
         resolve();
       });
   }),
-  FETCH_WORKS_FROM_MUSIXISER: ({ commit, state }, { id }) =>
+  FETCH_WORKS_FROM_MUSIXISER: ({ commit, state }, { id, page }) =>
   new Promise((resolve, reject) => {
     // 获取某id的音乐盒音乐内容
-    fetchWorksFromMusixiser(id)
+    fetchWorksFromMusixiser(id, page)
       .then((works) => {
         console.log('works list: ', works.data.data);
         commit('PUSH_MUSIXISER_WORKS', { musixiserWorksObj: works.data.data });

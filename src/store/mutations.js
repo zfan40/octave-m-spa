@@ -27,8 +27,15 @@ export default {
     state.musixiserInfo = musixiserInfo;
   },
   PUSH_MUSIXISER_WORKS: (state, { musixiserWorksObj }) => { // 储存录制信息
-    state.musixiserWorksObj.content = state.musixiserWorksObj.content.concat(musixiserWorksObj.content);
-    state.musixiserWorksObj.page = musixiserWorksObj.page;
+    console.log('ccccc', musixiserWorksObj.current);
+    if (musixiserWorksObj.current == 1) {
+      state.musixiserWorksObj.content = musixiserWorksObj.list;
+    } else {
+      state.musixiserWorksObj.content = state.musixiserWorksObj.content.concat(musixiserWorksObj.list);
+    }
+    state.musixiserWorksObj.total = musixiserWorksObj.total;
+    state.musixiserWorksObj.size = musixiserWorksObj.size;
+    state.musixiserWorksObj.current = musixiserWorksObj.current;
   },
   // SET_FINAL_WORK: (state, { type }) => { // 储存成品信息
   //   state.activeType = type;

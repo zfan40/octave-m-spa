@@ -30,7 +30,7 @@ export default {
       favStatus: false,
       newWorkTitle: '',
       finalNewWorkTitle: '',
-      busy:false,
+      busy: false,
     }
   },
   computed: {
@@ -49,16 +49,22 @@ export default {
       this.$store.dispatch('FETCH_MUSIXISER', {
         id
       })
-      this.$store.dispatch('FETCH_WORKS_FROM_MUSIXISER', {
-        id
-      })
+      // this.$store.dispatch('FETCH_WORKS_FROM_MUSIXISER', {
+      //   id,
+      //   page:1
+      // })
     },
-    loadMore() {
+    loadMore() { //will call automatically when enter!
       const id = this.userId
       this.busy = true
-      console.log('1')
+      console.log('1111111')
       this.$store.dispatch('FETCH_WORKS_FROM_MUSIXISER', {
-        id
+        id,
+        page: this.musixiserWorksObj.current ? this.musixiserWorksObj.current + 1 : 1
+      }).then(() => {
+        if (this.musixiserWorksObj.content.length < this.musixiserWorksObj.total) {
+          this.busy = false
+        }
       })
     },
     togglePlay() {
@@ -192,6 +198,5 @@ export default {
 @import '../_common/style/_variables.scss';
 @import '../_common/style/_mixins.scss';
 @import '../_common/style/_reboot.scss';
-.container {
-}
+.container {}
 </style>

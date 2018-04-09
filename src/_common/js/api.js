@@ -18,7 +18,7 @@ export function getUserInfo(wxcode) {
     // alert('cookie used');
     // reqConfig.headers.Authorization = `Bearer ${tokenInCookie}`;
     tokenObj.access_token = tokenInCookie;
-    return axios.get('//api.musixise.com/api/v1/user/getInfo', '', reqConfig);
+    return axios.get('//api.musixise.com/api/v1/user/getInfo', { params: tokenObj }, reqConfig);
   } else if (!tokenInCookie && wxcode) {
     // alert('no cookie');
     return new Promise((resolve, reject) => {
@@ -33,7 +33,7 @@ export function getUserInfo(wxcode) {
           Cookies.set('serviceToken', serviceToken, {
             expires: 7,
           });
-          return axios.get('//api.musixise.com/api/v1/user/getInfo', JSON.stringify(tokenObj), reqConfig);
+          return axios.get('//api.musixise.com/api/v1/user/getInfo', { params: tokenObj }, reqConfig);
         }, () => {
           reject();
         })
@@ -80,13 +80,13 @@ export function uploadRecord(record, info) {
 }
 
 export function fetchMbox(id) {
-  return axios.get(`//api.musixise.com/api/v1/work/detail/${id}`, JSON.stringify(tokenObj), reqConfig);
+  return axios.get(`//api.musixise.com/api/v1/work/detail/${id}`, { params: tokenObj }, reqConfig);
 }
 export function fetchMusixiser(id) {
-  return axios.get(`//api.musixise.com/api/v1/user/detail/${id}`, JSON.stringify(tokenObj), reqConfig);
+  return axios.get(`//api.musixise.com/api/v1/user/detail/${id}`, { params: tokenObj }, reqConfig);
 }
-export function fetchWorksFromMusixiser(id) {
-  return axios.get(`//api.musixise.com/api/v1/work/getListByUid/${id}`, JSON.stringify(tokenObj), reqConfig);
+export function fetchWorksFromMusixiser(id, page) {
+  return axios.get(`//api.musixise.com/api/v1/work/getListByUid/${id}`, { params: { ...tokenObj, page, size: 15 } }, reqConfig);
 }
 export function toggleFavSong({ workId, status }) {
   return axios.post('//api.musixise.com/api/v1/favorite/addWork', JSON.stringify({ workId, status, ...tokenObj }), reqConfig)
