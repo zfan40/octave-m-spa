@@ -28,7 +28,7 @@ export default {
   },
   PUSH_MUSIXISER_WORKS: (state, { musixiserWorksObj }) => { // 储存录制信息
     console.log('ccccc', musixiserWorksObj.current);
-    if (musixiserWorksObj.current == 1) {
+    if (+musixiserWorksObj.current === 1) {
       state.musixiserWorksObj.content = musixiserWorksObj.list;
     } else {
       state.musixiserWorksObj.content = state.musixiserWorksObj.content.concat(musixiserWorksObj.list);
@@ -36,6 +36,17 @@ export default {
     state.musixiserWorksObj.total = musixiserWorksObj.total;
     state.musixiserWorksObj.size = musixiserWorksObj.size;
     state.musixiserWorksObj.current = musixiserWorksObj.current;
+  },
+  PUSH_FAV_WORKS: (state, { favWorksObj }) => { // 储存录制信息
+    console.log('ccccc', favWorksObj.current);
+    if (+favWorksObj.current === 1) {
+      state.favWorksObj.content = favWorksObj.list;
+    } else {
+      state.favWorksObj.content = state.favWorksObj.content.concat(favWorksObj.list);
+    }
+    state.favWorksObj.total = favWorksObj.total;
+    state.favWorksObj.size = favWorksObj.size;
+    state.favWorksObj.current = favWorksObj.current;
   },
   // SET_FINAL_WORK: (state, { type }) => { // 储存成品信息
   //   state.activeType = type;

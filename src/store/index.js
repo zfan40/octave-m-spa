@@ -25,6 +25,7 @@ export function createStore() {
       recordProject: [],
       musixiserInfo: {},
       musixiserWorksObj: { content: [] },
+      favWorksObj: { content: [] },
     },
     actions,
     mutations,

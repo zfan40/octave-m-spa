@@ -65,7 +65,7 @@ export default {
       this.playing = !this.playing;
     },
     toggleFav() {
-      // this.favStatus = +!this.favStatus;
+      this.favStatus = +!this.favStatus;
       Api.toggleFavSong({
         workId:this.$store.state.route.query.id,
         status:this.favStatus,
@@ -73,7 +73,7 @@ export default {
     },
     updateWorkTitle() {
       Api.updateWorkTitle({
-        workId:this.$store.state.route.query.id,
+        id:this.$store.state.route.query.id,
         title:this.newWorkTitle,
       })
       this.finalNewWorkTitle = this.newWorkTitle
@@ -85,6 +85,14 @@ export default {
         // query: {
         //   id
         // }
+      })
+    },
+    redirectToMusixiser(id) {
+      this.$router.push({
+        path:'/musixiser',
+        query:{
+          id
+        }
       })
     },
     purchaseItem() {
@@ -200,7 +208,7 @@ export default {
   <transition name="bounce">
     <div id="work-intro" v-if="workIntroAppear">
       <div class="title">{{finalNewWorkTitle||projectInfo.title}}</div>
-      <div class="subtitle"><span>by</span> <span><img :src="projectInfo.owner.smallAvatar" alt=""></span><span>{{projectInfo.owner.nickName}}</span></div>
+      <div class="subtitle"><span>by</span> <span @click="redirectToMusixiser(projectInfo.userVO.userId)"><img :src="projectInfo.userVO.smallAvatar" alt=""></span><span>{{projectInfo.userVO.realname}}</span></div>
       <div v-if="userId === projectInfo.userId" id="edit-work" @click="titleUpdateAppear=true"></div>
     </div>
   </transition>

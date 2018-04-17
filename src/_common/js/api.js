@@ -60,16 +60,16 @@ export function uploadRecord(record, info) {
       fd.append('data', event.target.result);
       // fd.append('access_token', tokenObj.access_token);
       const postFix = await axios.post('//api.musixise.com/api/v1/uploadAudio', fd, formReqConfig);
-      const workURL = `http://oiqvdjk3s.bkt.clouddn.com/${postFix.data.data}`;
+      const workURL = `${postFix.data.data}`;
       const param = {
         // ...tokenObj,
-        ...info,
+        ...info, // title,content.cover
         url: workURL,
       };
       console.log(workURL);
       return axios.post('//api.musixise.com/api/v1/work/create', JSON.stringify(param), reqConfig)
          .then((res) => {
-           resolve(res.data.data.id);
+           resolve(res.data.data);
          })
          .catch((err) => {
            reject(err);
@@ -87,15 +87,18 @@ export function fetchMusixiser(id) {
   return axios.get(`//api.musixise.com/api/v1/user/detail/${id}`, reqConfig);
 }
 export function fetchWorksFromMusixiser(id, page) {
-  return axios.get(`//api.musixise.com/api/v1/work/getListByUid/${id}`, { params: { page, size: 15 }, ...reqConfig });
+  return axios.get(`//api.musixise.com/api/v1/work/getListByUid/${id}?page=${page}&size=15`, reqConfig);
+}
+export function fetchFavWorks(id, page) {
+  return axios.get(`//api.musixise.com/api/v1/favorite/getWorkList/${id}?page=${page}&size=15`, reqConfig);
 }
 export function toggleFavSong({ workId, status }) {
-  return axios.post('//api.musixise.com/api/v1/favorite/addWork', JSON.stringify({ workId, status }), reqConfig)
+  return axios.post('//api.musixise.com/api/v1/favorite/create', JSON.stringify({ workId, status }), reqConfig)
     .then((res) => { console.log(res); })
     .catch((err) => { console.log(err); });
 }
-export function updateWorkTitle({ workId, title }) {
-  return axios.put(`//api.musixise.com/api/v1/work/updateWork/${workId}`, JSON.stringify({ workId, title }), reqConfig)
+export function updateWorkTitle({ id, title }) {
+  return axios.put(`//api.musixise.com/api/v1/work/updateWork/${id}`, JSON.stringify({ title }), reqConfig)
     .then((res) => { console.log(res); })
     .catch((err) => { console.log(err); });
 }
