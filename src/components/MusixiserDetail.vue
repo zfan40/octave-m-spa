@@ -21,16 +21,13 @@ export default {
     return {
       // playing: false,
       loading: true,
-      workIntroAppear: false,
-      controlPanalAppear: false,
-      titleUpdateAppear: false,
       playing: false,
       userId: 0,
       isMe: false,
       favStatus: false,
       newWorkTitle: '',
       finalNewWorkTitle: '',
-      busy: false,
+      busy: true,
     }
   },
   computed: {
@@ -42,13 +39,13 @@ export default {
     }
   },
   methods: {
-    load() {},
     loadMusixiserById() {
       console.log('my id: ', this.userId)
       const id = this.userId
       this.$store.dispatch('FETCH_MUSIXISER', {
         id
       })
+      this.busy = false
       // this.$store.dispatch('FETCH_WORKS_FROM_MUSIXISER', {
       //   id,
       //   page:1
@@ -56,12 +53,14 @@ export default {
     },
     loadMore() { //will call automatically when enter!
       const id = this.userId
+      // alert(id)
       this.busy = true
-      console.log('1111111')
+      console.log('1111111',this.musixiserWorksObj.current)
       this.$store.dispatch('FETCH_WORKS_FROM_MUSIXISER', {
         id,
         page: this.musixiserWorksObj.current ? this.musixiserWorksObj.current + 1 : 1
       }).then(() => {
+        console.log('2222222',this.musixiserWorksObj)
         if (this.musixiserWorksObj.content.length < this.musixiserWorksObj.total) {
           this.busy = false
         }
@@ -79,27 +78,14 @@ export default {
         status: this.favStatus,
       })
     },
-    updateWorkTitle() {
-      Api.updateWorkTitle({
-        workId: this.$store.state.route.query.id,
-        title: this.newWorkTitle,
-      })
-      this.finalNewWorkTitle = this.newWorkTitle
-      setTimeout(() => {
-        this.titleUpdateAppear = false
-      }, 300);
-    },
-    redirectToMaker() {
+    redirectToWork(id) {
       this.$router.push({
-        path: '/new-music-box-maker',
-        // query: {
-        //   id
-        // }
+        path:'/new-music-box-viewer',
+        query:{
+          id
+        }
       })
     },
-    purchaseItem() {
-      console.log(`you are about to purchase ${this.projectInfo.id}`)
-    }
   },
   beforeRouteLeave(to, from, next) {
     Magic.clearTone()
@@ -144,7 +130,7 @@ export default {
             )
           }
           self.userId = this.$store.state.route.query.id || res.data.data.userId
-          self.isMe = self.userId === res.data.data.userId
+          self.isMe = self.userId == res.data.data.userId
           self.loadMusixiserById()
 
           console.log('get user info success', res.data.data)
@@ -166,12 +152,6 @@ export default {
     setTimeout(() => {
       this.loading = false
     }, 2000)
-    setTimeout(() => {
-      this.workIntroAppear = true;
-    }, 4500)
-    setTimeout(() => {
-      this.controlPanalAppear = true
-    }, 5500)
     // setTimeout(()=>{this.playing = true},6000)
   },
   updated() {}
@@ -185,7 +165,7 @@ export default {
   </div>
   <div class="" v-infinite-scroll="loadMore" infinite-scroll-disabled="busy" infinite-scroll-distance="10">
     <ul id="example-1">
-      <li v-for="item in musixiserWorksObj.content">
+      <li v-for="item in musixiserWorksObj.content" @click="redirectToWork(item.id)">
         {{ item.title }}
       </li>
     </ul>
