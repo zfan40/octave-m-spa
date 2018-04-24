@@ -30,20 +30,41 @@ let oncePlayed = false;
 //     octaves: 2.6,
 //   },
 // }).toMaster();
+// const mbox = new Tone.PolySynth(6, Tone.Synth, {
+//   oscillator: {
+//     partials: [0, 2, 3, 4],
+//   },
+// }).toMaster();
+// const mbox = new Tone.Sampler({
+//   C4: 'C4.[mp3|ogg]',
+//   'D#4': 'Ds4.[mp3|ogg]',
+//   'F#4': 'Fs4.[mp3|ogg]',
+//   A4: 'A4.[mp3|ogg]',
+//   C5: 'C5.[mp3|ogg]',
+//   'D#5': 'Ds5.[mp3|ogg]',
+//   'F#5': 'Fs5.[mp3|ogg]',
+//   A5: 'A5.[mp3|ogg]',
+//   C6: 'C6.[mp3|ogg]',
+// }, {
+//   release: 1,
+//   baseUrl: '/static/audio/',
+// }).toMaster();
+
 const mbox = new Tone.Sampler({
-  C4: 'C4.[mp3|ogg]',
-  'D#4': 'Ds4.[mp3|ogg]',
-  'F#4': 'Fs4.[mp3|ogg]',
-  A4: 'A4.[mp3|ogg]',
-  C5: 'C5.[mp3|ogg]',
-  'D#5': 'Ds5.[mp3|ogg]',
-  'F#5': 'Fs5.[mp3|ogg]',
-  A5: 'A5.[mp3|ogg]',
-  C6: 'C6.[mp3|ogg]',
+  B3: 'B3.[mp3|ogg]',
+  E4: 'E4.[mp3|ogg]',
+  G4: 'G4.[mp3|ogg]',
+  B4: 'B4.[mp3|ogg]',
+  'C#5': 'Cs5.[mp3|ogg]',
+  E5: 'E5.[mp3|ogg]',
+  G5: 'G5.[mp3|ogg]',
+  B5: 'B5.[mp3|ogg]',
+  'C#6': 'Cs6.[mp3|ogg]',
 }, {
   release: 1,
-  baseUrl: '/static/audio/',
+  baseUrl: '/static/audio/mbox/',
 }).toMaster();
+
 export function RealMagic(items) {
   console.log('== Enter RealMagic ==');
   console.log(JSON.stringify(items));
@@ -217,7 +238,7 @@ export function preview(items) {
       }
     }
     musicPreview = new Tone.Part(((time, value) => {
-      mbox.triggerAttackRelease(value.note, '8n', time);
+      mbox.triggerAttackRelease(value.note, '4n', time);
     }), items).start(0, 0);
     musicPreview.loop = true;
     musicPreview.loopEnd = 17; // 17s一个循环
