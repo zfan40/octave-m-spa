@@ -24,7 +24,11 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
+.lx-toast {
+  rotate: 90deg;
+  transform-origin: left;
+}
 #app {
   position: absolute;
   top: 0;
