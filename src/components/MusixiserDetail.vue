@@ -159,16 +159,25 @@ export default {
 </script>
 
 <template>
-<div class="">
-  <div class="">
+<div class="container">
+  <!-- <div class="">
     {{musixiserInfo.realname}}
-  </div>
-  <div class="" v-infinite-scroll="loadMore" infinite-scroll-disabled="busy" infinite-scroll-distance="10">
-    <ul id="example-1">
-      <li v-for="item in musixiserWorksObj.content" @click="redirectToWork(item.id)">
-        {{ item.title }}
-      </li>
-    </ul>
+  </div> -->
+  <div class="worklist" v-infinite-scroll="loadMore" infinite-scroll-disabled="busy" infinite-scroll-distance="10">
+    <div class="work" v-for="item in musixiserWorksObj.content" @click="redirectToWork(item.id)">
+      <img class="cover" :src="item.cover=='default'?item.userVO.smallAvatar:item.cover" alt="">
+      <div class="detail">
+        <div class="hairline"></div>
+        <div class="line line1">
+          <p class="title">{{ item.title }}</p>
+          <p class="date">{{ item.createdDate }}</p>
+        </div>
+        <div class="line line2">
+          <p class="creator">{{ item.userVO.realname }}</p>
+          <p class="likes">收藏人数: {{item.collectNum}}</p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 </template>
@@ -178,5 +187,24 @@ export default {
 @import '../_common/style/_variables.scss';
 @import '../_common/style/_mixins.scss';
 @import '../_common/style/_reboot.scss';
-.container {}
+
+.container {background-color:#404249;}
+.worklist {
+  position:relative;padding:getRem(20);
+}
+.hairline {height:1px;background:#979797;transform: scaleY(0.5);}
+.work {
+  position:relative;display:flex;height:getRem(174);margin-bottom:getRem(30);
+  .cover {position:relative;width:getRem(174);height:getRem(174);margin-top:getRem(18);}
+  .detail {
+    width:100%;padding-left:getRem(30);
+    .line {display:flex;justify-content: space-between;}
+    .line1 {padding-top:getRem(20);padding-bottom:getRem(50);}
+    .line2 {padding-bottom:getRem(30);}
+    .title {font-size:getRem(28);color:#8c8c92;}
+    .date {font-size:getRem(20);color:#6D6E75;}
+    .creator {font-size:getRem(24);color:#6D6E75;}
+    .likes {font-size:getRem(20);color:rgba(255,255,255,.3);}
+  }
+}
 </style>
