@@ -109,6 +109,11 @@ export default {
         tooltipStyle: {
           backgroundColor: 'rgb(69, 106, 255)',
           borderColor: 'rgb(69, 106, 255)',
+          rotate: '90deg',
+          transformOrigin: 'right',
+          position:'relative',
+          right: '.5rem',
+          top: '1.1rem'
           // transform: 'rotate(90deg)',
         },
         formatter(value) {
