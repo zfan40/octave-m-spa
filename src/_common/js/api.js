@@ -1,7 +1,14 @@
 import * as Cookies from 'js-cookie';
-
+// import Vue from 'vue';
 const axios = require('axios');
 
+axios.interceptors.response.use((res) => {
+  if (res.data.errcode !== '0') {
+    alert(res.data.resmsg);
+    return Promise.reject(res);
+  }
+  return res;
+});
 const reqConfig = {
   headers: {
     Accept: 'application/json',
@@ -93,14 +100,14 @@ export function fetchFavWorks(id, page) {
   return axios.get(`//api.musixise.com/api/v1/favorite/getWorkList/${id}?page=${page}&size=15`, reqConfig);
 }
 export function toggleFavSong({ workId, status }) {
-  return axios.post('//api.musixise.com/api/v1/favorite/create', JSON.stringify({ workId, status }), reqConfig)
-    .then((res) => { console.log(res); })
-    .catch((err) => { console.log(err); });
+  return axios.post('//api.musixise.com/api/v1/favorite/create', JSON.stringify({ workId, status }), reqConfig);
+    // .then((res) => { console.log(res); })
+    // .catch((err) => { console.log(err); });
 }
 export function updateWorkTitle({ id, title }) {
-  return axios.put(`//api.musixise.com/api/v1/work/updateWork/${id}`, JSON.stringify({ title }), reqConfig)
-    .then((res) => { console.log(res); })
-    .catch((err) => { console.log(err); });
+  return axios.put(`//api.musixise.com/api/v1/work/updateWork/${id}`, JSON.stringify({ title }), reqConfig);
+    // .then((res) => { console.log(res); })
+    // .catch((err) => { console.log(err); });
 }
 export function getRecommendations() {
   return axios.post('//api.musixise.com/api/v1/home', '', reqConfig);

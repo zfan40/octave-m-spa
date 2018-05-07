@@ -69,6 +69,10 @@ export default {
       Api.toggleFavSong({
         workId:this.$store.state.route.query.id,
         status:this.favStatus,
+      }).then(()=>{
+
+      }).catch((err)=>{
+        // alert(JSON.stringify(err))
       })
     },
     updateWorkTitle() {
