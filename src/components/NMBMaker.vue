@@ -79,6 +79,7 @@ export default {
       lastActiveSwiperIndex: 3 - 1,
       vuetimeline: 0,
       showExtendBtns: 0,
+      alertAppear: false,
       timelineConfig: {
         value: 0,
         width: 8,
@@ -241,11 +242,11 @@ export default {
         }, this.recordPart).start(0)
         this.recordParts[this.lastActivePartIndex] = this.recordPart
         this.recordPart = []
-        if (this.checkBouncibility()) {
-          alert('cool')
-        } else {
-          alert('not cool')
-        }
+        // if (this.checkBouncibility()) {
+        //   // this.$toast('cool')
+        // } else {
+        //   this.$toast('已无法生产')
+        // }
       } else {
         console.log('啥也没录')
       }
@@ -310,13 +311,13 @@ export default {
         this.$store.dispatch('BOUNCE_PROJECT', {
           record: bouncepart,
           info: {
-            title: 'default',
+            title: '尚未起名',
             content: 'default',
             cover: 'default'
           },
         }).then(id => {
           console.log('successfully bounced')
-          alert('作品已为您存储')
+          this.$toast('作品已为您存储')
           this.$router.push({
             path: '/new-music-box-viewer',
             query: {
@@ -324,7 +325,7 @@ export default {
             }
           })
         }).catch((err) => {
-          alert('failed to upload')
+          this.$toast('非常抱歉，上传作品失败了')
         })
         // while (tonepart.length) {
         //   tonepart.pop().dispose() //最后一个被dispose，同时要从数组中删掉
@@ -334,7 +335,7 @@ export default {
         // }, bouncepart).start(0)
         // Magic.RealMagic(bouncepart)
       } else {
-        alert('什么都没录呢')
+        this.$toast('什么都没录呢')
       }
     },
     mapNoteTimeToColor(t) {
@@ -401,7 +402,11 @@ export default {
       console.log(a)
       if (a && a.classList.contains('bounceBtn')) {
         //导出
-        this.bounceProject()
+        if (this.checkBouncibility()) {
+          this.bounceProject()
+        } else {
+          this.alertAppear = true;
+        }
       } else if (a && (a.classList.contains('playBtn') || a.classList.contains('pauseBtn'))) {
         //播放
         this.toggleReplay()
@@ -643,7 +648,19 @@ export default {
       </div>
     </div>
   </div>
-
+  <transition name="fade">
+    <div id="alert-mask" v-show="alertAppear">
+      <div class="mb-dialog">
+        <div class="title">
+          这咱做不了，是否继续上传
+        </div>
+        <div class="btns">
+          <span class="btn cancel" @click="alertAppear=false">再调整</span>
+          <span class="btn confirm" @click="bounceProject">确认上传</span>
+        </div>
+      </div>
+    </div>
+  </transition>
   <!-- </v-touch> -->
 </div>
 </template>
@@ -1014,5 +1031,25 @@ h2 {
 
 .rotate {
     transform: rotate(90deg);
+}
+#alert-mask {
+  position: absolute;width:100%;height:100%;background-color:rgba(0,0,0,.3);display: flex;align-items: center;justify-content: center;
+  .mb-dialog {
+    position: relative;rotate:90deg;width: getRem(570);padding-top:getRem(75); border-radius:getRem(50);height:getRem(344);background-color:rgba(255,255,255,.96);display:flex;flex-direction:column;
+    .title {flex:1;padding:0 getRem(77); display:flex;align-items:flex-end;position: relative;width:100%;font-size:.32rem;}
+    .input {
+      flex:2;flex-direction: column;padding:0 getRem(77);display:flex;align-items:flex-start;justify-content: center;position: relative;width:100%;text-align: center;font-size:.5rem;
+      input {background: transparent;border: none;outline: none;width: 100%; height:1rem;font-size:.54rem;}
+      .splitter {position:relative;width:100%;height:1px;background-color:gray;padding:0 getRem(77);}
+    }
+    .btns {
+      flex:4;display:flex;align-items:center;justify-content: center;position: relative;width:100%;text-align: center;font-size:.5rem;
+      span.btn {
+        position: relative;width:100%;height:100%;flex:1;display:flex;align-items:center;padding-top:.6rem;
+      }
+      .cancel {color:gray;text-align: right;justify-content: flex-start;padding-left:getRem(77);}
+      .confirm { color:blue;text-align: left;justify-content: flex-end;padding-right:getRem(77);}
+    }
+  }
 }
 </style>
