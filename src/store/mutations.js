@@ -38,7 +38,7 @@ export default {
     state.musixiserWorksObj.current = musixiserWorksObj.current;
   },
   PUSH_FAV_WORKS: (state, { favWorksObj }) => { // 储存录制信息
-    console.log('ccccc', favWorksObj.current);
+    console.log('xxxxxxx', favWorksObj);
     if (+favWorksObj.current === 1) {
       state.favWorksObj.content = favWorksObj.list;
     } else {

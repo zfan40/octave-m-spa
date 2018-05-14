@@ -31,29 +31,36 @@ export default {
     }
   },
   computed: {
+    musixiserInfo() {
+      return this.$store.state.musixiserInfo
+    },
     favWorksObj() {
       return this.$store.state.favWorksObj
     }
   },
   methods: {
-    loadFavWorks() {
-      // console.log('my id: ', this.userId)
-      // const id = this.userId
-      // this.$store.dispatch('FETCH_FAV_WORKS', {
+    loadMusixiserById() {
+      console.log('my id: ', this.userId)
+      const id = this.userId
+      this.$store.dispatch('FETCH_MUSIXISER', {
+        id
+      })
+      this.busy = false
+      // this.$store.dispatch('FETCH_WORKS_FROM_MUSIXISER', {
       //   id,
       //   page:1
       // })
-      this.busy = false;
     },
     loadMore() { //will call automatically when enter!
       const id = this.userId
+      // alert(id)
       this.busy = true
-      alert('1111111')
+      console.log('1111111',this.favWorksObj.current)
       this.$store.dispatch('FETCH_FAV_WORKS', {
         id,
         page: this.favWorksObj.current ? this.favWorksObj.current + 1 : 1
       }).then(() => {
-        alert(222)
+        console.log('2222222',this.favWorksObj)
         if (this.favWorksObj.content.length < this.favWorksObj.total) {
           this.busy = false
         }
@@ -103,7 +110,7 @@ export default {
     WxShare.prepareShareConfig().then(() => {
       WxShare.prepareShareContent({
         title: 'MUSIXISE',
-        desc: '我的最爱',
+        desc: '我的地盘你就dê听我的',
         // fullPath:location.href.split('#')[0],
         fullPath,
         imgUrl: 'http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png',
@@ -124,7 +131,9 @@ export default {
           }
           self.userId = this.$store.state.route.query.id || res.data.data.userId
           self.isMe = self.userId == res.data.data.userId
-          self.loadFavWorks()
+          self.loadMusixiserById()
+
+          console.log('get user info success', res.data.data)
         })
         .catch((err) => {
           Cookies.remove('serviceToken')
@@ -150,16 +159,25 @@ export default {
 </script>
 
 <template>
-<div class="">
-  <div class="">
-    my fav
-  </div>
-  <div class="" v-infinite-scroll="loadMore" infinite-scroll-disabled="busy" infinite-scroll-distance="10">
-    <ul id="example-1">
-      <li v-for="item in favWorksObj.content" @click="redirectToWork(item.id)">
-        {{ item.title }}
-      </li>
-    </ul>
+<div class="container">
+  <!-- <div class="">
+    {{musixiserInfo.realname}}
+  </div> -->
+  <div class="worklist" v-infinite-scroll="loadMore" infinite-scroll-disabled="busy" infinite-scroll-distance="10">
+    <div class="work" v-for="item in favWorksObj.content" @click="redirectToWork(item.id)">
+      <img class="cover" :src="item.cover=='default'?item.user.smallAvatar:item.cover" alt="">
+      <div class="detail">
+        <div class="hairline"></div>
+        <div class="line line1">
+          <p class="title">{{ item.title }}</p>
+          <p class="date">{{ item.createdDate }}</p>
+        </div>
+        <div class="line line2">
+          <p class="creator">{{ item.user.realname }}</p>
+          <p class="likes">收藏人数: {{item.collectNum}}</p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 </template>
@@ -169,5 +187,24 @@ export default {
 @import '../_common/style/_variables.scss';
 @import '../_common/style/_mixins.scss';
 @import '../_common/style/_reboot.scss';
-.container {}
+
+.container {background-color:#404249;}
+.worklist {
+  position:relative;padding:getRem(20);
+}
+.hairline {height:1px;background:#979797;transform: scaleY(0.5);}
+.work {
+  position:relative;display:flex;height:getRem(174);margin-bottom:getRem(30);
+  .cover {position:relative;width:getRem(174);height:getRem(174);margin-top:getRem(18);}
+  .detail {
+    width:100%;padding-left:getRem(30);
+    .line {display:flex;justify-content: space-between;}
+    .line1 {padding-top:getRem(20);padding-bottom:getRem(50);}
+    .line2 {padding-bottom:getRem(30);}
+    .title {font-size:getRem(28);color:#8c8c92;}
+    .date {font-size:getRem(20);color:#6D6E75;}
+    .creator {font-size:getRem(24);color:#6D6E75;}
+    .likes {font-size:getRem(20);color:rgba(255,255,255,.3);}
+  }
+}
 </style>

@@ -74,7 +74,7 @@ export default {
     fetchFavWorks(id, page)
       .then((works) => {
         console.log('works list: ', works.data.data);
-        commit('PUSH_MUSIXISER_WORKS', { musixiserWorksObj: works.data.data });
+        commit('PUSH_FAV_WORKS', { favWorksObj: works.data.data });
         resolve();
       });
   }),
