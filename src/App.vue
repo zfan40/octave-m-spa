@@ -29,6 +29,9 @@ export default {
   rotate: 90deg;
   transform-origin: left;
 }
+.vue-slider-component .vue-slider-tooltip-wrap.vue-slider-tooltip-left .vue-slider-tooltip:before {
+  border:none !important;
+}
 #app {
   position: absolute;
   top: 0;

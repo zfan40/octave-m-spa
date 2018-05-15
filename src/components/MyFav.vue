@@ -197,10 +197,10 @@ export default {
   position:relative;display:flex;height:getRem(174);margin-bottom:getRem(30);
   .cover {position:relative;width:getRem(174);height:getRem(174);margin-top:getRem(18);}
   .detail {
-    width:100%;padding-left:getRem(30);
+    flex:1;padding-left:getRem(30);
     .line {display:flex;justify-content: space-between;}
-    .line1 {padding-top:getRem(20);padding-bottom:getRem(50);}
-    .line2 {padding-bottom:getRem(30);}
+    .line1 {padding-top:getRem(40);padding-bottom:getRem(60);line-height:getRem(30);}
+    .line2 {padding-bottom:getRem(30);line-height:getRem(30);}
     .title {font-size:getRem(28);color:#8c8c92;}
     .date {font-size:getRem(20);color:#6D6E75;}
     .creator {font-size:getRem(24);color:#6D6E75;}

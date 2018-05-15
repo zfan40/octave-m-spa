@@ -107,16 +107,15 @@ export default {
           backgroundColor: 'rgb(110,113,158)',
           boxShadow: 'inset 0.5px 0.5px 3px 1px rgba(0,0,0,.36)'
         },
-        tooltipDir: 'bottom',
+        tooltipDir: 'left',
         tooltipStyle: {
           backgroundColor: 'rgb(69, 106, 255)',
           borderColor: 'rgb(69, 106, 255)',
           transform: 'rotate(90deg)',
           transformOrigin: 'right',
           position:'relative',
-          right: '1.5rem',
-          top: '0rem'
-          // transform: 'rotate(90deg)',
+          left: '-.2rem',
+          top: '0.9rem'
         },
         formatter(value) {
           if (value) {
