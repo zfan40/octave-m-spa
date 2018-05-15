@@ -29,7 +29,8 @@ var piano = new Tone.Sampler({
   'C6': 'C6.[mp3|ogg]',
 }, {
   'release': 1,
-  'baseUrl': '/static/audio/'
+  // 'baseUrl': '/static/audio/'
+  'baseUrl': '//cnbj1.fds.api.xiaomi.com/mbox/audio/'
 }).toMaster()
 
 // var mbox = new Tone.Sampler({
@@ -106,14 +107,15 @@ export default {
           backgroundColor: 'rgb(110,113,158)',
           boxShadow: 'inset 0.5px 0.5px 3px 1px rgba(0,0,0,.36)'
         },
+        tooltipDir: 'bottom',
         tooltipStyle: {
           backgroundColor: 'rgb(69, 106, 255)',
           borderColor: 'rgb(69, 106, 255)',
-          rotate: '90deg',
+          transform: 'rotate(90deg)',
           transformOrigin: 'right',
           position:'relative',
-          right: '.5rem',
-          top: '1.1rem'
+          right: '1.5rem',
+          top: '0rem'
           // transform: 'rotate(90deg)',
         },
         formatter(value) {
@@ -580,29 +582,7 @@ export default {
               			<feMergeNode in="softGlow_colored"/>
               			<feMergeNode in="SourceGraphic"/>
               		</feMerge>
-
               	</filter>
-
-              <!-- <filter id="glowing" x="0" y="0" width="200%" height="200%">
-                <feOffset result="offOut" in="SourceGraphic" dx="0" dy="0" />
-                <feGaussianBlur result="blurOut" in="offOut" stdDeviation="2" />
-                <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
-              </filter> -->
-              <!-- <filter id="glowing">
-                  <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
-                  <feMerge>
-                      <feMergeNode in="coloredBlur"/>
-                      <feMergeNode in="SourceGraphic"/>
-                  </feMerge>
-              </filter> -->
-              <!-- <filter id="glowing">
-                <feGaussianBlur id="blur" in="SourceAlpha" stdDeviation="1.5"/>
-                <feColorMatrix id="recolor"  type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0" result="white-glow"/>
-                <feMerge>
-                  <feMergeNode in="white-glow"/>
-                  <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-              </filter> -->
             </defs>
             <rect v-if="activePartIndex===(PARTNUM-n)" v-for="(item,index) in recordPart"
               :x="2"
@@ -657,7 +637,7 @@ export default {
     <div id="alert-mask" v-show="alertAppear">
       <div class="mb-dialog">
         <div class="title">
-          这咱做不了，是否继续上传
+          无法做成小礼物，是否继续上传
         </div>
         <div class="btns">
           <span class="btn cancel" @click="alertAppear=false">再调整</span>

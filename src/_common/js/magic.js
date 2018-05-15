@@ -62,7 +62,8 @@ const mbox = new Tone.Sampler({
   'C#6': 'Cs6.[mp3|ogg]',
 }, {
   release: 1,
-  baseUrl: '/static/audio/mbox/',
+  // baseUrl: '/static/audio/mbox/',
+  baseUrl: '//cnbj1.fds.api.xiaomi.com/mbox/audio/mbox/',
 }).toMaster();
 
 export function RealMagic(items) {

@@ -272,8 +272,8 @@ export default {
       position: absolute;bottom:5rem;width: 9.8rem; height: 7.8rem; margin-left: .2rem;
       .spirit-part {position: absolute;}
       #spirit-body {z-index:4;left:getRem(220);top:getRem(136);width: getRem(266);height:getRem(368);background: url('../assets/viewer/spirit-body.png') center center no-repeat;background-size:cover;}
-      #spirit-front-leaf {z-index:5;left:getRem(340);top:getRem(12);width: getRem(398);height:getRem(492);background: url('../assets/viewer/spirit-front-leaf.png') center center no-repeat;background-size:cover;}
-      #spirit-back-leaf {z-index:3;width: getRem(462);height:getRem(472);background: url('../assets/viewer/spirit-back-leaf.png') center center no-repeat;background-size:cover;}
+      #spirit-front-leaf {z-index:5;left:getRem(340);top:getRem(12);width: getRem(398);height:getRem(492);background: url('//cdn.cnbj1.fds.api.mi-img.com/mbox/img/spirit-front-leaf.png') center center no-repeat;background-size:cover;}
+      #spirit-back-leaf {z-index:3;width: getRem(462);height:getRem(472);background: url('//cdn.cnbj1.fds.api.mi-img.com/mbox/img/spirit-back-leaf.png') center center no-repeat;background-size:cover;}
       #spirit-back1 {z-index:1;left:getRem(40);top:getRem(16);opacity:.6;width: getRem(618);height:getRem(526);background: url('../assets/viewer/spirit-back1.png') center center no-repeat;background-size:cover;}
       #spirit-back2 {z-index:2;transform:rotate(-14deg);opacity: .3;width: getRem(754);height:getRem(580);background: url('../assets/viewer/spirit-back2.png') center center no-repeat;background-size:cover;}
     }
@@ -297,7 +297,7 @@ export default {
       left:1.5rem;
       width: getRem(577);
       height: getRem(577);
-      background: url('../assets/viewer/music_sprite.png'); // background:url('http://c.m.163.com/nc/qa/activity/xijing/img/cover_tit_step2.png');
+      background: url('//cdn.cnbj1.fds.api.mi-img.com/mbox/img/music_sprite.png'); // background:url('http://c.m.163.com/nc/qa/activity/xijing/img/cover_tit_step2.png');
       background-size: getRem(577) getRem(4039);
       animation: music-aurora steps(7) 1.5s infinite;
       pointer-events: none;
@@ -305,22 +305,22 @@ export default {
     #ground {
       will-change: transform;
       transition: transform 4.5s ease-out;
-      position: absolute;left:-3rem;bottom:-2.3rem;opacity: .4;width: getRem(1522);height:getRem(852);background: url('../assets/viewer/ground.png') center center no-repeat;background-size:cover;
+      position: absolute;left:-3rem;bottom:-2.3rem;opacity: .4;width: getRem(1522);height:getRem(852);background: url('//cdn.cnbj1.fds.api.mi-img.com/mbox/img/ground.png') center center no-repeat;background-size:cover;
     }
     #low-leaf1 {will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(162);height: getRem(168);opacity: .38;left:getRem(-160);bottom:6.5rem;background: url('../assets/viewer/low-leaf1.png') center center no-repeat;background-size:cover;}
     #low-leaf2 {will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(250);height: getRem(300);left:getRem(-106);bottom:2rem;background: url('../assets/viewer/low-leaf2.png') center center no-repeat;background-size:cover;}
     #low-leaf3 {z-index:-1;will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(162);height: getRem(365);left:4rem;bottom:8.5rem;background: url('../assets/viewer/low-leaf3.png') center center no-repeat;background-size:cover;}
     #low-leaf4 {will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(310);height: getRem(336);transform:rotate(-23deg);right:-3.5rem;bottom:getRem(400);background: url('../assets/viewer/low-leaf4.png') center center no-repeat;background-size:cover;}
-    #mid-leaf1 {will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(557);height: getRem(419);transform:rotate(-10deg);left:-3rem;bottom:getRem(940);background: url('../assets/viewer/mid-leaf1.png') center center no-repeat;background-size:cover;}
-    #mid-leaf2 {will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(359);height: getRem(415);transform:rotate(-21deg);left:-2.8rem;bottom:getRem(840);background: url('../assets/viewer/mid-leaf2.png') center center no-repeat;background-size:cover;}
-    #mid-leaf3 {will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(583);height: getRem(546);right:-4.2rem;transform:rotate(33deg);bottom:getRem(820);background: url('../assets/viewer/mid-leaf3.png') center center no-repeat;background-size:cover;}
-    #mid-leaf4 {will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(384);height: getRem(537);right:-2.6rem;transform:rotate(25deg);bottom:getRem(740);background: url('../assets/viewer/mid-leaf4.png') center center no-repeat;background-size:cover;}
-    #top-leaf1 {will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(1226);height: getRem(1232);transform:rotate(56deg) scale(1);right: -10rem;bottom:getRem(1700);background: url('../assets/viewer/top-leaf1.png') center center no-repeat;background-size:cover;}
-    #top-leaf2 {will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(1430);height: getRem(874);opacity: .9;transform:rotate(-6deg) scale(.7);right: -10rem;bottom:getRem(1200);background: url('../assets/viewer/top-leaf2.png') center center no-repeat;background-size:cover;}
-    #top-leaf3 {will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(1250);height: getRem(986);transform:rotate(-2deg) scale(.7);left:-7rem;bottom:getRem(1870);background: url('../assets/viewer/top-leaf3.png') center center no-repeat;background-size:cover;}
-    #top-leaf4 {will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(918);height: getRem(752);transform:rotate(44deg) scale(.8);left:-9.5rem;bottom:getRem(1270);background: url('../assets/viewer/top-leaf4.png') center center no-repeat;background-size:cover;}
-    #top-leaf5 {will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(1048);height: getRem(1054);opacity: .3;transform:rotate(22deg) scale(.9);right:-12rem;bottom:getRem(1500);background: url('../assets/viewer/top-leaf1.png') center center no-repeat;background-size:cover;}
-    #top-leaf6 {will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(718);height: getRem(566);opacity: .5;transform:rotate(-1deg) scale(1.2);left:-6rem;bottom:getRem(1700);background: url('../assets/viewer/top-leaf5.png') center center no-repeat;background-size:cover;}
+    #mid-leaf1 {will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(557);height: getRem(419);transform:rotate(-10deg);left:-3rem;bottom:getRem(940);background: url('//cdn.cnbj1.fds.api.mi-img.com/mbox/img/mid-leaf1.png') center center no-repeat;background-size:cover;}
+    #mid-leaf2 {will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(359);height: getRem(415);transform:rotate(-21deg);left:-2.8rem;bottom:getRem(840);background: url('//cdn.cnbj1.fds.api.mi-img.com/mbox/img/mid-leaf2.png') center center no-repeat;background-size:cover;}
+    #mid-leaf3 {will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(583);height: getRem(546);right:-4.2rem;transform:rotate(33deg);bottom:getRem(820);background: url('//cdn.cnbj1.fds.api.mi-img.com/mbox/img/mid-leaf3.png') center center no-repeat;background-size:cover;}
+    #mid-leaf4 {will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(384);height: getRem(537);right:-2.6rem;transform:rotate(25deg);bottom:getRem(740);background: url('//cdn.cnbj1.fds.api.mi-img.com/mbox/img/mid-leaf4.png') center center no-repeat;background-size:cover;}
+    #top-leaf1 {will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(1226);height: getRem(1232);transform:rotate(56deg) scale(1);right: -10rem;bottom:getRem(1700);background: url('//cdn.cnbj1.fds.api.mi-img.com/mbox/img/top-leaf1.png') center center no-repeat;background-size:cover;}
+    #top-leaf2 {will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(1430);height: getRem(874);opacity: .9;transform:rotate(-6deg) scale(.7);right: -10rem;bottom:getRem(1200);background: url('//cdn.cnbj1.fds.api.mi-img.com/mbox/img/top-leaf2.png') center center no-repeat;background-size:cover;}
+    #top-leaf3 {will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(1250);height: getRem(986);transform:rotate(-2deg) scale(.7);left:-7rem;bottom:getRem(1870);background: url('//cdn.cnbj1.fds.api.mi-img.com/mbox/img/top-leaf3.png') center center no-repeat;background-size:cover;}
+    #top-leaf4 {will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(918);height: getRem(752);transform:rotate(44deg) scale(.8);left:-9.5rem;bottom:getRem(1270);background: url('//cdn.cnbj1.fds.api.mi-img.com/mbox/img/top-leaf4.png') center center no-repeat;background-size:cover;}
+    #top-leaf5 {will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(1048);height: getRem(1054);opacity: .3;transform:rotate(22deg) scale(.9);right:-12rem;bottom:getRem(1500);background: url('//cdn.cnbj1.fds.api.mi-img.com/mbox/img/top-leaf1.png') center center no-repeat;background-size:cover;}
+    #top-leaf6 {will-change: transform;transition: transform 4.5s ease-out,opacity 4.5s ease-out;position: absolute;width: getRem(718);height: getRem(566);opacity: .5;transform:rotate(-1deg) scale(1.2);left:-6rem;bottom:getRem(1700);background: url('//cdn.cnbj1.fds.api.mi-img.com/mbox/img/top-leaf5.png') center center no-repeat;background-size:cover;}
     #work-intro {
       position: absolute;bottom:3.4rem;text-align: right;right:1rem;
       .title{font-size:.6rem;margin-bottom:.3rem;color:#7d839e;}
