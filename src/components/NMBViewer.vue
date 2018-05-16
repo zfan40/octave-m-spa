@@ -101,6 +101,7 @@ export default {
     },
     purchaseItem() {
       console.log(`you are about to purchase ${this.projectInfo.id}`)
+      this.$toast('尚未开发购买功能')
     }
   },
   beforeRouteLeave (to, from, next) {
@@ -211,7 +212,7 @@ export default {
   <div id="top-leaf6"></div>
   <transition name="bounce">
     <div id="work-intro" v-if="workIntroAppear">
-      <div class="title">{{finalNewWorkTitle||projectInfo.title}}</div>
+      <div class="title" @click="titleUpdateAppear=true">{{finalNewWorkTitle||projectInfo.title}}</div>
       <div class="subtitle"><span>by</span> <span @click="redirectToMusixiser(projectInfo.userVO.userId)"><img :src="projectInfo.userVO.smallAvatar" alt=""></span><span>{{projectInfo.userVO.realname}}</span></div>
       <div v-if="userId === projectInfo.userId" id="edit-work" @click="titleUpdateAppear=true"></div>
     </div>
