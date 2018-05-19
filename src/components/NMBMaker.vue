@@ -48,7 +48,7 @@ var piano = new Tone.Sampler({
 //   'baseUrl': 'static/audio/'
 // }).toMaster()
 
-var plucky = new Tone.PluckSynth().toMaster()
+// var plucky = new Tone.PluckSynth().toMaster()
 
 const SCREEN_WIDTH = document.documentElement.getBoundingClientRect().width
 const SCREEN_HEIGHT = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
@@ -71,6 +71,7 @@ export default {
   },
   data() {
     return {
+      portraitMode: true,
       activeNote: {},
       recordPart: [], //current record part
       recordParts: [], //each new record goes in here.
@@ -268,6 +269,8 @@ export default {
       console.log(`cleaning track ${trackNum}`)
       if (this.activePartIndex === trackNum) {
         this.recordPart = []
+        this.vuetimeline = 0
+        isLinger = true
       }
       if (this.recordParts[trackNum] && this.recordParts[trackNum].length) {
         this.$set(this.recordParts, trackNum, [])
@@ -282,6 +285,7 @@ export default {
       } else {
         console.log(`track ${trackNum} has no content`)
       }
+
     },
     checkBouncibility() {
       this.confirmRecordPart(0)
@@ -432,6 +436,13 @@ export default {
     var docElem = document.documentElement;
     window.rem = docElem.getBoundingClientRect().width / 10;
     docElem.style.fontSize = window.rem + 'px';
+    // window.addEventListener("orientationchange", function() {
+    //   alert("the orientation of the device is now " + screen.orientation.type);
+    //   // self.portraitMode = screen.orientation.type.indexOf('portrait')>=0
+    //   window.rem = docElem.getBoundingClientRect().width / 10;
+    //   docElem.style.fontSize = window.rem + 'px';
+    // });
+
     this.PARTNUM = 3
     this.pianoRollSwiperOption = {
       initialSlide: this.PARTNUM,
@@ -504,10 +515,9 @@ export default {
     // document.querySelector('#D5').addEventListener( "pointerenter", ()=>{
     //   console.log('jinru')
     // })
-
+    this.$toast('请锁住竖屏')
   },
   updated() {
-
   }
 };
 </script>
@@ -612,14 +622,6 @@ export default {
   </div>
 
   <div class="g-controller">
-    <!-- <div class="timeline">
-      <div class="progress">
-
-      </div>
-      <div class="indicator">
-
-      </div>
-    </div> -->
     <vue-slider v-model="vuetimeline" v-bind="timelineConfig" @callback="adjustTimeline" @drag-end=""></vue-slider>
     <div class="btnContainer" @touchstart.stop.prevent="btnStart" @touchend.stop.event="btnEnd">
       <div :class="[playing?'pauseBtn':'playBtn', 'rotate']" @click="toggleReplay">
@@ -655,7 +657,7 @@ export default {
 @import '../_common/style/_mixins.scss';
 @import '../_common/style/_reboot.scss';
 .g-controller {
-    position: fixed;
+    position: absolute;
     width: getRem(42);
     height: 100%;
     padding-top: getRem(44);
@@ -663,25 +665,25 @@ export default {
     flex-direction: column;
     align-items: center;
     right: 0.5rem;
-    .timeline {
-        height: 90%;
-        width: getRem(16);
-        background-color: rgb(110,113,158);
-        .progress {
-            height: 5%;
-            background-color: rgb(69,106,255);
-        }
-        .indicator {
-            position: relative;
-            width: getRem(42);
-            height: getRem(42);
-            border-radius: getRem(21);
-            border: 4px;
-            border-color: yellow;
-            background-color: #fff;
-            right: getRem(13);
-        }
-    }
+    // .timeline {
+    //     height: 90%;
+    //     width: getRem(16);
+    //     background-color: rgb(110,113,158);
+    //     .progress {
+    //         height: 5%;
+    //         background-color: rgb(69,106,255);
+    //     }
+    //     .indicator {
+    //         position: relative;
+    //         width: getRem(42);
+    //         height: getRem(42);
+    //         border-radius: getRem(21);
+    //         border: 4px;
+    //         border-color: yellow;
+    //         background-color: #fff;
+    //         right: getRem(13);
+    //     }
+    // }
     .btnContainer {
         position: relative;
         width: getRem(84);

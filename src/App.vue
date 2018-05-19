@@ -25,6 +25,7 @@ export default {
 </script>
 
 <style>
+
 .lx-toast {
   rotate: 90deg;
   transform-origin: left;
