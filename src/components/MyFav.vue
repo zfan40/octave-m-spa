@@ -179,6 +179,12 @@ export default {
       </div>
     </div>
   </div>
+  <div class="emptysection" v-show="!loading && favWorksObj.content.length==0">
+    <div>
+      <p class="emptytitle">暂无作品</p>
+      <img src="../assets/oops.png" style="width:6rem;"alt="">
+    </div>
+  </div>
 </div>
 </template>
 
@@ -188,7 +194,7 @@ export default {
 @import '../_common/style/_mixins.scss';
 @import '../_common/style/_reboot.scss';
 
-.container {background-color:#404249;}
+.container {position:absolute;height:100%;width:100%;background-color:#404249;}
 .worklist {
   position:relative;padding:getRem(20);
 }
@@ -206,5 +212,9 @@ export default {
     .creator {font-size:getRem(24);color:#6D6E75;}
     .likes {font-size:getRem(20);color:rgba(255,255,255,.3);}
   }
+}
+.emptysection {
+  position: relative;height:100%;color:white;display:flex;align-items:center;justify-content:center;
+  .emptytitle {font-size:1.4rem;font-weight:200;}
 }
 </style>

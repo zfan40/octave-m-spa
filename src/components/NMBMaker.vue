@@ -628,9 +628,8 @@ export default {
 
       </div>
       <div :class="[showExtendBtns?'extendBtnsShow':'extendBtnsHide','extendBtns']">
-        <div class='bounceBtn rotate'>
-
-        </div>
+        <div class='bounceBtn rotate'></div>
+        <div class='cancelBtn'></div>
       </div>
     </div>
   </div>
@@ -657,7 +656,7 @@ export default {
 @import '../_common/style/_mixins.scss';
 @import '../_common/style/_reboot.scss';
 .g-controller {
-    position: absolute;
+    position: fixed;
     width: getRem(42);
     height: 100%;
     padding-top: getRem(44);
@@ -712,19 +711,28 @@ export default {
             width: getRem(84);
             height: getRem(84);
             border-radius: getRem(42);
+            left:getRem(106);
             background: url('../assets/check.svg') center center no-repeat;
-            background-size: getRem(32);
+            // background-size: getRem(32);
+        }
+        .cancelBtn {
+            position: absolute;
+            width: getRem(84);
+            height: getRem(84);
+            border-radius: getRem(42);
+            background: url('../assets/cancel.svg') center center no-repeat;
+            // background-size: getRem(32);
         }
         .extendBtns {
             // this element is within rotate, everything is opposite
             position: absolute;
             height: getRem(84);
             border-radius: getRem(42);
-
+            overflow: hidden;
             right: 0;
             z-index: -1;
             transition: width 2s;
-            background: linear-gradient(to right, rgb(255,61,61),rgb(0,189,255),rgb(69,106,255) 80%);
+            background: linear-gradient(to right, rgb(254, 64, 64),rgb(142, 122, 239),rgb(69,106,255) 80%);
         }
         .extendBtnsShow {
             width: getRem(300);
