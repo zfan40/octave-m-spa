@@ -196,7 +196,7 @@ export default {
 
 .container {position:absolute;height:100%;width:100%;background-color:#404249;}
 .worklist {
-  position:relative;padding:getRem(20);
+  position:relative;padding:getRem(20);background-color:#404249;
 }
 .hairline {height:1px;background:#979797;transform: scaleY(0.5);}
 .work {
