@@ -82,6 +82,7 @@ export default {
       vuetimeline: 0,
       showExtendBtns: 0,
       alertAppear: false,
+      bouncing: false,
       timelineConfig: {
         value: 0,
         width: 8,
@@ -318,6 +319,7 @@ export default {
         })
         bouncepart.sort((a, b) => (0 + a.time - b.time))
         //TODO, semi done
+        this.bouncing = true;
         this.$store.dispatch('BOUNCE_PROJECT', {
           record: bouncepart,
           info: {
@@ -327,6 +329,7 @@ export default {
           },
         }).then(id => {
           console.log('successfully bounced')
+          this.bouncing = false;
           this.$toast('作品已为您存储')
           this.$router.push({
             path: '/new-music-box-viewer',
@@ -335,6 +338,7 @@ export default {
             }
           })
         }).catch((err) => {
+          this.bouncing = false;
           this.$toast('非常抱歉，上传作品失败了')
         })
         // while (tonepart.length) {
@@ -516,7 +520,7 @@ export default {
     // document.querySelector('#D5').addEventListener( "pointerenter", ()=>{
     //   console.log('jinru')
     // })
-    this.$toast('请锁住竖屏')
+    this.$toast('请锁住竖屏使用,长按播放按钮保存作品')
   },
   updated() {
   }
@@ -638,16 +642,19 @@ export default {
     <div id="alert-mask" v-show="alertAppear">
       <div class="mb-dialog">
         <div class="title">
-          无法做成小礼物，是否继续上传
+          再减少些音符才能做成小礼物，是否继续上传
         </div>
         <div class="btns">
           <span class="btn cancel" @click="alertAppear=false">再调整</span>
-          <span class="btn confirm" @click="bounceProject">确认上传</span>
+          <span class="btn confirm" @click="bounceProject">任性上传</span>
         </div>
       </div>
     </div>
   </transition>
   <!-- </v-touch> -->
+  <div class="mask" v-show="bouncing">
+    <p>存储中...</p>
+  </div>
 </div>
 </template>
 
@@ -712,7 +719,7 @@ export default {
             width: getRem(84);
             height: getRem(84);
             border-radius: getRem(42);
-            left:getRem(106);
+            left:getRem(310);
             background: url('../assets/check.svg') center center no-repeat;
             // background-size: getRem(32);
         }
@@ -984,12 +991,12 @@ h2 {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.mask #timer {
-    color: white;
-    font-size: xx-large;
-    font-style: italic;
+    color:white;
+    p {
+      font-size:.57rem;
+      font-weight:200;
+      transform: rotate(90deg);
+    }
 }
 
 .fadein {
