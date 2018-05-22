@@ -402,7 +402,7 @@ export default {
       extendBtnsTimeout = setTimeout(() => {
         //show extend buttons
         this.showExtendBtns = true;
-      }, 500)
+      }, 200)
 
     },
     btnEnd(e) {
@@ -421,8 +421,9 @@ export default {
         //播放
         this.toggleReplay()
       }
-      this.showExtendBtns = false;
+
       //hide extend buttons
+      this.showExtendBtns = false;
     }
   },
   created() {
@@ -731,11 +732,11 @@ export default {
             overflow: hidden;
             right: 0;
             z-index: -1;
-            transition: width 2s;
+            transition: width 1s;
             background: linear-gradient(to right, rgb(254, 64, 64),rgb(142, 122, 239),rgb(69,106,255) 80%);
         }
         .extendBtnsShow {
-            width: getRem(300);
+            width: getRem(690);
         }
         .extendBtnsHide {
             width: getRem(84);
