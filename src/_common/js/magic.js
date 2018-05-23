@@ -178,9 +178,12 @@ export function RealMagic(items) {
 
 export function mapNoteTimeToColor(time) {
   // let rgb = [0, 0, 0];
+  // const COLOR1 = [151, 255, 241];
+  // const COLOR2 = [98, 166, 223];
+  // const COLOR3 = [154, 124, 255];
   const COLOR1 = [151, 255, 241];
-  const COLOR2 = [98, 166, 223];
-  const COLOR3 = [154, 124, 255];
+  const COLOR2 = [137, 228, 217];
+  const COLOR3 = [143, 123, 242];
   const TIME_MAX = 20;
   let rgb = [0, 0, 0];
   if (time < 0 || time > TIME_MAX) {

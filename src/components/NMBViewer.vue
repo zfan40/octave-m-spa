@@ -191,9 +191,10 @@ export default {
   <div id="mb" @click="togglePlay">
     <div :class="['mb-part', playing?'playing':'']" id="mb-lid"></div>
     <div class="mb-part" id="mb-body">
-      <div id="play-btn" v-show="!playing" :class="[playing?'':'not-playing']"></div>
+      <div id="play-btn" v-show="!playing"></div>
       <div id="pause-btn" v-show="playing"></div>
     </div>
+    <div id="mb-shiner" :class="[playing?'':'not-playing']"></div>
   </div>
   <transition name="fade">
     <div id="music-aurora" v-show="playing"></div>
@@ -294,6 +295,7 @@ export default {
         #play-btn {position: relative;margin-top:.3rem;margin-left:.1rem;width: getRem(12);height:getRem(16);background: url('../assets/viewer/audio-play.png') center center no-repeat;background-size:cover;}
         #pause-btn {position: relative;margin-top:.3rem;margin-left:.05rem;width: getRem(16);height:getRem(14);background: url('../assets/viewer/audio-pause.png') center center no-repeat;background-size:cover;}
       }
+      #mb-shiner {position: absolute;width:.8rem;height:.3rem;background-color:rgba(252,245,141,.56);z-index: 1;bottom: 0.6rem;left: .3rem;border-radius:.4rem/0.2rem;}
     }
     #music-aurora {
       position: absolute;
@@ -412,9 +414,9 @@ export default {
   }
 }
 @keyframes box-shine {
-  0% { box-shadow: 0px -10px 120px 15px rgb(255,243,119); }
-  50% { box-shadow: 0px -10px 20px 3px rgb(255,243,119); }
-  100% { box-shadow: 0px -10px 120px 15px rgb(255,243,119); }
+  0% { box-shadow: 0px -3px 31px 0px rgba(255,201,62,.7); }
+  50% { box-shadow: 0px -3px 7px 0px rgb(255,243,119); }
+  100% { box-shadow: 0px -3px 31px 0px rgba(255,201,62,.7); }
 }
 #title-update-mask {
   position: absolute;width:100%;height:100%;background-color:rgba(0,0,0,.3);display: flex;align-items: center;justify-content: center;
