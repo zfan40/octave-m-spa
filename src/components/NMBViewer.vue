@@ -281,7 +281,7 @@ export default {
       #spirit-back1 {z-index:1;left:getRem(40);top:getRem(16);opacity:.6;width: getRem(618);height:getRem(526);background: url('../assets/viewer/spirit-back1.png') center center no-repeat;background-size:cover;}
       #spirit-back2 {z-index:2;transform:rotate(-14deg);opacity: .3;width: getRem(754);height:getRem(580);background: url('../assets/viewer/spirit-back2.png') center center no-repeat;background-size:cover;}
     }
-    .not-playing {animation: box-shine 1.0s linear infinite;}
+    .not-playing {animation: box-shine 1s linear infinite;}
     #mb {
       will-change: transform;
       transition: transform 4.5s ease-out;
@@ -414,9 +414,9 @@ export default {
   }
 }
 @keyframes box-shine {
-  0% { box-shadow: 0px -3px 31px 0px rgba(255,201,62,.7); }
-  50% { box-shadow: 0px -3px 7px 0px rgb(255,243,119); }
-  100% { box-shadow: 0px -3px 31px 0px rgba(255,201,62,.7); }
+  0% { box-shadow: 0px 0px 0px 0px rgba(252,245,141,1); }
+  50% { box-shadow: 0px 0px 31px 0px rgba(252,247,171,.8); }
+  100% { box-shadow: 0px 0px 0px 0px rgba(252,245,141,1); }
 }
 #title-update-mask {
   position: absolute;width:100%;height:100%;background-color:rgba(0,0,0,.3);display: flex;align-items: center;justify-content: center;
