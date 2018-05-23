@@ -80,7 +80,7 @@ export default {
       activeSwiperIndex: 3,
       lastActiveSwiperIndex: 3 - 1,
       vuetimeline: 0,
-      showExtendBtns: 0,
+      showExtendBtns: false,
       alertAppear: false,
       bouncing: false,
       timelineConfig: {
@@ -272,6 +272,8 @@ export default {
         this.recordPart = []
         this.vuetimeline = 0
         isLinger = true
+        this.playing = false;
+        Tone.Transport.stop(0)
       }
       if (this.recordParts[trackNum] && this.recordParts[trackNum].length) {
         this.$set(this.recordParts, trackNum, [])
@@ -424,10 +426,11 @@ export default {
       } else if (a && (a.classList.contains('playBtn') || a.classList.contains('pauseBtn'))) {
         //播放
         this.toggleReplay()
+        this.showExtendBtns = false;
+      } else if (a && (a.classList.contains('playBtn') || a.classList.contains('cancelBtn'))) {
+        //hide extend buttons
+        this.showExtendBtns = false;
       }
-
-      //hide extend buttons
-      this.showExtendBtns = false;
     }
   },
   created() {

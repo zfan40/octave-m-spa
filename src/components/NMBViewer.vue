@@ -61,7 +61,7 @@ export default {
     },
     togglePlay() {
       // alert('111')
-      Magic.preview(this.project)
+      Magic.preview(this.project,!this.playing)
       this.playing = !this.playing;
     },
     toggleFav() {
@@ -92,12 +92,14 @@ export default {
       })
     },
     redirectToMusixiser(id) {
-      this.$router.push({
-        path:'/musixiser',
-        query:{
-          id
-        }
-      })
+      if (id) {
+        this.$router.push({
+          path:'/musixiser',
+          query:{
+            id
+          }
+        })
+      }
     },
     purchaseItem() {
       console.log(`you are about to purchase ${this.projectInfo.id}`)
@@ -189,7 +191,7 @@ export default {
   <div id="mb" @click="togglePlay">
     <div :class="['mb-part', playing?'playing':'']" id="mb-lid"></div>
     <div class="mb-part" id="mb-body">
-      <div id="play-btn" v-show="!playing"></div>
+      <div id="play-btn" v-show="!playing" :class="[playing?'':'not-playing']"></div>
       <div id="pause-btn" v-show="playing"></div>
     </div>
   </div>
@@ -278,6 +280,7 @@ export default {
       #spirit-back1 {z-index:1;left:getRem(40);top:getRem(16);opacity:.6;width: getRem(618);height:getRem(526);background: url('../assets/viewer/spirit-back1.png') center center no-repeat;background-size:cover;}
       #spirit-back2 {z-index:2;transform:rotate(-14deg);opacity: .3;width: getRem(754);height:getRem(580);background: url('../assets/viewer/spirit-back2.png') center center no-repeat;background-size:cover;}
     }
+    .not-playing {animation: box-shine 1.0s linear infinite;}
     #mb {
       will-change: transform;
       transition: transform 4.5s ease-out;
@@ -407,6 +410,11 @@ export default {
   100% {
     background-position: 0 getRem(-4039); // background-position: 0 -97.7%
   }
+}
+@keyframes box-shine {
+  0% { box-shadow: 0px -10px 120px 15px rgb(255,243,119); }
+  50% { box-shadow: 0px -10px 20px 3px rgb(255,243,119); }
+  100% { box-shadow: 0px -10px 120px 15px rgb(255,243,119); }
 }
 #title-update-mask {
   position: absolute;width:100%;height:100%;background-color:rgba(0,0,0,.3);display: flex;align-items: center;justify-content: center;

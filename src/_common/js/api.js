@@ -66,7 +66,13 @@ export function uploadRecord(record, info) {
       fd.append('fname', 'test.txt');
       fd.append('data', event.target.result);
       // fd.append('access_token', tokenObj.access_token);
-      const postFix = await axios.post('//api.musixise.com/api/v1/uploadAudio', fd, formReqConfig);
+      let postFix = '';
+      try { // important, othereise dispatch won't be stoped here...
+        postFix = await axios.post('//api.musixise.com/api/v1/uploadAudio', fd, formReqConfig);
+      } catch (e) {
+        console.log(e);
+        reject(e);
+      }
       const workURL = `${postFix.data.data}`;
       const param = {
         // ...tokenObj,

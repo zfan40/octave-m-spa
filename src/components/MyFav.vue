@@ -79,12 +79,14 @@ export default {
       })
     },
     redirectToWork(id) {
-      this.$router.push({
-        path:'/new-music-box-viewer',
-        query:{
-          id
-        }
-      })
+      if (id) {
+        this.$router.push({
+          path:'/new-music-box-viewer',
+          query:{
+            id
+          }
+        })
+      }
     },
   },
   beforeRouteLeave(to, from, next) {

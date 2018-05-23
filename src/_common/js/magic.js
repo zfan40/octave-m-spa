@@ -225,9 +225,10 @@ export function clearTone(parts) {
     }
   }
 }
-export function preview(items) {
+export function preview(items, start) {
   console.log('current state', Tone.Transport.state);
-  if (Tone.Transport.state === 'stopped') {
+  // if (Tone.Transport.state === 'stopped') {
+  if (start) {
     // TODO: this is weird...but you need to play something to make sure it works
     // trigger to avoid no sound
     if (!oncePlayed) { mbox.triggerAttack('E6', 0, 0); oncePlayed = true; }
