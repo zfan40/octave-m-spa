@@ -47,6 +47,14 @@ export default {
           this.favStatus = this.projectInfo.favStatus
           // alert('load complete');
           // this.togglePlay();
+          const fullPath = `${location.origin}${location.pathname}#/new-music-box-viewer?id=${self.$store.state.route.query.id}`
+          WxShare.prepareShareContent({
+            title:'MUSIXISE',
+            desc:`来听${this.projectInfo.userVO.realname}的作品-${this.projectInfo.title}`,
+            // fullPath:location.href.split('#')[0],
+            fullPath,
+            imgUrl:'http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png',
+          })
         })
       } else {
         // 不会出现这个情况
@@ -81,6 +89,14 @@ export default {
         title:this.newWorkTitle,
       })
       this.finalNewWorkTitle = this.newWorkTitle
+      const fullPath = `${location.origin}${location.pathname}#/new-music-box-viewer?id=${self.$store.state.route.query.id}`
+      WxShare.prepareShareContent({
+        title:'MUSIXISE',
+        desc:`来听${this.projectInfo.userVO.realname}的作品-${this.newWorkTitle}`,
+        // fullPath:location.href.split('#')[0],
+        fullPath,
+        imgUrl:'http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png',
+      })
       setTimeout(()=>{this.titleUpdateAppear=false},300);
     },
     redirectToMaker() {
@@ -215,7 +231,7 @@ export default {
   <div id="top-leaf6"></div>
   <transition name="bounce">
     <div id="work-intro" v-if="workIntroAppear">
-      <div class="title" @click="titleUpdateAppear=true">{{finalNewWorkTitle||projectInfo.title}}</div>
+      <div class="title" @click="userId === projectInfo.userId?titleUpdateAppear=true:titleUpdateAppear=false">{{finalNewWorkTitle||projectInfo.title}}</div>
       <div class="subtitle"><span>by</span> <span @click="redirectToMusixiser(projectInfo.userVO.userId)"><img :src="projectInfo.userVO.smallAvatar" alt=""></span><span>{{projectInfo.userVO.realname}}</span></div>
       <div v-if="userId === projectInfo.userId" id="edit-work" @click="titleUpdateAppear=true"></div>
     </div>
@@ -415,7 +431,7 @@ export default {
 }
 @keyframes box-shine {
   0% { box-shadow: 0px 0px 0px 0px rgba(252,245,141,1); }
-  50% { box-shadow: 0px 0px 31px 0px rgba(252,247,171,.8); }
+  50% { box-shadow: 0px 0px 31px 0px rgba(252,247,170,.8); }
   100% { box-shadow: 0px 0px 0px 0px rgba(252,245,141,1); }
 }
 #title-update-mask {
