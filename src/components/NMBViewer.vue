@@ -47,7 +47,7 @@ export default {
           this.favStatus = this.projectInfo.favStatus
           // alert('load complete');
           // this.togglePlay();
-          const fullPath = `${location.origin}${location.pathname}#/new-music-box-viewer?id=${self.$store.state.route.query.id}`
+          const fullPath = `${location.origin}${location.pathname}#/new-music-box-viewer?id=${this.$store.state.route.query.id}`
           WxShare.prepareShareContent({
             title:'MUSIXISE',
             desc:`来听${this.projectInfo.userVO.realname}的作品-${this.projectInfo.title}`,
@@ -89,7 +89,7 @@ export default {
         title:this.newWorkTitle,
       })
       this.finalNewWorkTitle = this.newWorkTitle
-      const fullPath = `${location.origin}${location.pathname}#/new-music-box-viewer?id=${self.$store.state.route.query.id}`
+      const fullPath = `${location.origin}${location.pathname}#/new-music-box-viewer?id=${this.$store.state.route.query.id}`
       WxShare.prepareShareContent({
         title:'MUSIXISE',
         desc:`来听${this.projectInfo.userVO.realname}的作品-${this.newWorkTitle}`,
