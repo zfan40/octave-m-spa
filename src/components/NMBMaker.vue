@@ -410,7 +410,7 @@ export default {
     tutorStart() {
       //0未开始，1黑屏,2键盘，3track，4时间线，5播放,
       this.tutorSession = 1
-      this.$toast('请锁住竖屏使用,长按播放按钮保存作品')
+      this.$toast('请锁住竖屏使用')
       tutorOnceEnter = setTimeout(this.tutorProgress,3000)
       // setTimeout(()=>{this.tutorSession=2},3000)
       // setTimeout(()=>{this.tutorSession=3;this.swiper.slidePrev()},5000)
@@ -473,7 +473,8 @@ export default {
             this.tutorClass = 'tutor4start'
             this.showExtendBtns = true;
           },1500))
-          tutorTimeout.push(setTimeout(()=>{this.showExtendBtns=false;this.handClass = 'hidehand'},2500))
+          tutorTimeout.push(setTimeout(()=>{this.handClass = 'hidehand'},2500))
+          tutorTimeout.push(setTimeout(()=>{this.showExtendBtns=false;},3000))
           break;
         case 5:
           this.clearTutorTimeout()
@@ -508,6 +509,7 @@ export default {
       }
     },
     clearTutorTimeout() {
+      this.showExtendBtns=false;
       tutorTimeout.forEach(v=>clearTimeout(v))
       tutorTimeout = []
     }
@@ -712,7 +714,7 @@ export default {
     <div id="alert-mask" v-show="alertAppear">
       <div class="mb-dialog">
         <div class="title">
-          再减少些音符才能做成小礼物，是否继续上传
+          减少些音符才能做成音乐盒，是否继续上传
         </div>
         <div class="btns">
           <span class="btn cancel" @click="alertAppear=false">再调整</span>
@@ -753,15 +755,15 @@ export default {
   z-index:500;
   transition:background 0.05s ease,transform 1s linear;
   &.tutor2start {top:.5rem;right:.8rem;transition:none;}
-  &.tutor2end {top:.5rem;right:.8rem;transform:translateY(10rem);}
-  &.tutor3start {bottom:.5rem;right:.6rem;transition:none;}
-  &.tutor3end {bottom:.5rem;right:.6rem;}
-  &.tutor4start {bottom:.5rem;right:.6rem;transition:none;}
-  &.tutor4end {bottom:.5rem;right:.6rem;}
+  &.tutor2end {top:.5rem;right:.8rem;transform:translateY(5rem);}
+  &.tutor3start {bottom:.1rem;right:.6rem;transition:none;}
+  &.tutor3end {bottom:.1rem;right:.6rem;}
+  &.tutor4start {bottom:.1rem;right:.6rem;transition:none;}
+  &.tutor4end {bottom:.1rem;right:.6rem;}
   &.tutor5start {top:2rem;right:3.5rem;transition:none;}
   &.tutor5end {top:2rem;right:3.5rem;transform:translateX(1rem);}
-  &.tutor6start {bottom:.5rem;right:3.5rem;transition:none;}
-  &.tutor6end {bottom:.5rem;right:3.5rem;}
+  &.tutor6start {bottom:.1rem;right:3.5rem;transition:none;}
+  &.tutor6end {bottom:.1rem;right:3.5rem;}
 }
 // .longclickhand {transform:rotate(90deg) translateY(1rem);background:url('../assets/tutorial/handlongclick.svg') no-repeat;background-size:contain}
 .hand { position:absolute;width:100%;height:100%;transform:rotate(90deg);background:url('../assets/tutorial/hand.svg') no-repeat;background-size:contain;}
@@ -785,6 +787,7 @@ export default {
     flex-direction: column;
     align-items: center;
     right: 0.5rem;
+    // pointer-events: none;
     // .timeline {
     //     height: 90%;
     //     width: getRem(16);
@@ -903,7 +906,7 @@ export default {
 }
 
 #container {
-    position: absolute;
+    position: fixed;
     width: 100%;
     height: 100%;
     background-color: rgb(19,19,21);
