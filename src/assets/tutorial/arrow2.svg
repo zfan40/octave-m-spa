@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="30px" viewBox="0 0 20 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.3 (51167) - http://www.bohemiancoding.com/sketch -->
+    <title>竖向箭头</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="进度条" transform="translate(-141.000000, -36.000000)" fill="#FFFFFF">
+            <path d="M154.723114,43.4516129 L154.723114,41 L166,51 L154.723114,61 L154.723114,58.5483871 C154.723114,56.3392481 152.932253,54.5483871 150.723114,54.5483871 L136,54.5483871 L136,47.4516129 L150.723114,47.4516129 C152.932253,47.4516129 154.723114,45.6607519 154.723114,43.4516129 Z" id="竖向箭头" transform="translate(151.000000, 51.000000) rotate(-270.000000) translate(-151.000000, -51.000000) "></path>
+        </g>
+    </g>
+</svg>

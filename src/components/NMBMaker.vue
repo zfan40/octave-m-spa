@@ -33,21 +33,6 @@ var piano = new Tone.Sampler({
   'baseUrl': '//cnbj1.fds.api.xiaomi.com/mbox/audio/'
 }).toMaster()
 
-// var mbox = new Tone.Sampler({
-//   'C4': 'C4.[mp3|ogg]',
-//   'D#4': 'Ds4.[mp3|ogg]',
-//   'F#4': 'Fs4.[mp3|ogg]',
-//   'A4': 'A4.[mp3|ogg]',
-//   'C5': 'C5.[mp3|ogg]',
-//   'D#5': 'Ds5.[mp3|ogg]',
-//   'F#5': 'Fs5.[mp3|ogg]',
-//   'A5': 'A5.[mp3|ogg]',
-//   'C6': 'C6.[mp3|ogg]',
-// }, {
-//   'release': 1,
-//   'baseUrl': 'static/audio/'
-// }).toMaster()
-
 // var plucky = new Tone.PluckSynth().toMaster()
 
 const SCREEN_WIDTH = document.documentElement.getBoundingClientRect().width
@@ -63,6 +48,8 @@ var replayInterval = undefined //控制progressbar的setinterval
 let playOffset = 0 //播放状态的拉条bar初始时间记录
 let lingerOffset = 0 //未播放状态的拉条bar初始时间记录
 const PROGRESS_INTERVAL_TIME = 0.1 //0.1秒挪一下
+let tutorOnceEnter = false
+let tutorTimeout = []
 export default {
   components: {
     swiper,
@@ -83,6 +70,9 @@ export default {
       showExtendBtns: false,
       alertAppear: false,
       bouncing: false,
+      tutorSession:0,
+      handClass:'', //hand or clickhand
+      tutorClass:'', //hand positioning in different session
       timelineConfig: {
         value: 0,
         width: 8,
@@ -138,15 +128,12 @@ export default {
       if (val) {
         //start progress bar
         replayInterval = setInterval(() => {
-
           this.vuetimeline += 1
           if (this.vuetimeline >= 200) {
             this.toggleReplay()
             this.vuetimeline = 0
-
           }
         }, PROGRESS_INTERVAL_TIME * 1000)
-
       } else {
         //stop progress bar
         clearInterval(replayInterval)
@@ -250,11 +237,6 @@ export default {
         }, this.recordPart).start(0)
         this.recordParts[this.lastActivePartIndex] = this.recordPart
         this.recordPart = []
-        // if (this.checkBouncibility()) {
-        //   // this.$toast('cool')
-        // } else {
-        //   this.$toast('已无法生产')
-        // }
       } else {
         console.log('啥也没录')
       }
@@ -343,13 +325,6 @@ export default {
           this.bouncing = false;
           this.$toast('非常抱歉，上传作品失败了')
         })
-        // while (tonepart.length) {
-        //   tonepart.pop().dispose() //最后一个被dispose，同时要从数组中删掉
-        // }
-        // tonepart[0] = new Tone.Part(function(time, value) {
-        //   piano.triggerAttackRelease(value.note, "8n", time)
-        // }, bouncepart).start(0)
-        // Magic.RealMagic(bouncepart)
       } else {
         this.$toast('什么都没录呢')
       }
@@ -431,11 +406,116 @@ export default {
         //hide extend buttons
         this.showExtendBtns = false;
       }
+    },
+    tutorStart() {
+      //0未开始，1黑屏,2键盘，3track，4时间线，5播放,
+      this.tutorSession = 1
+      this.$toast('请锁住竖屏使用,长按播放按钮保存作品')
+      tutorOnceEnter = setTimeout(this.tutorProgress,3000)
+      // setTimeout(()=>{this.tutorSession=2},3000)
+      // setTimeout(()=>{this.tutorSession=3;this.swiper.slidePrev()},5000)
+      // setTimeout(()=>{this.swiper.slideNext()},7000)
+      // setTimeout(()=>{this.tutorSession=4},8500)
+      // setTimeout(()=>{this.vuetimeline=120},9500)
+      // setTimeout(()=>{this.vuetimeline=0},10500)
+      // setTimeout(()=>{this.tutorSession=5},12000)
+      // setTimeout(()=>{this.showExtendBtns = true},13000)
+      // setTimeout(()=>{this.showExtendBtns=false},15000)
+      // setTimeout(()=>{this.tutorSession=0},16000)
+    },
+    tutorProgress() {
+      clearTimeout(tutorOnceEnter)
+      console.log('??????????')
+      this.tutorSession+=1;
+      console.log(this.tutorSession)
+      switch(this.tutorSession) {
+        case 1:
+          this.clearTutorTimeout()
+          this.$toast('请锁住竖屏使用,长按播放按钮保存作品')
+          break;
+        case 2:
+          this.clearTutorTimeout()
+          this.handClass = 'hand'//clickhand
+          this.tutorClass = 'tutor2start'
+          tutorTimeout.push(setTimeout(()=>{
+            this.handClass = 'clickhand'//clickhand
+            this.tutorClass = 'tutor2end'
+          },500))
+          tutorTimeout.push(setTimeout(()=>{this.vuetimeline=120;this.handClass = 'hand'},1500))
+          tutorTimeout.push(setTimeout(()=>{this.vuetimeline=0;this.handClass = 'hidehand'},2500))
+          break;
+        case 3:
+          this.clearTutorTimeout()
+          this.handClass = 'hand'//clickhand
+          this.tutorClass = 'tutor3start'
+          tutorTimeout.push(setTimeout(()=>{
+            this.handClass = 'clickhand'//clickhand
+            this.tutorClass = 'tutor3end'
+          },500))
+          tutorTimeout.push(setTimeout(()=>{
+            this.handClass = 'hand'//clickhand
+            this.tutorClass = 'tutor3end'
+          },800))
+          tutorTimeout.push(setTimeout(()=>{
+            this.handClass = 'hidehand'
+          },1000))
+          break;
+        case 4:
+          this.clearTutorTimeout()
+          this.handClass = 'hand'//clickhand
+          this.tutorClass = 'tutor4start'
+          tutorTimeout.push(setTimeout(()=>{
+            this.handClass = 'clickhand'//clickhand
+            this.tutorClass = 'tutor4end'
+          },500))
+          tutorTimeout.push(setTimeout(()=>{
+            this.handClass = 'hand'//clickhand
+            this.tutorClass = 'tutor4start'
+            this.showExtendBtns = true;
+          },1500))
+          tutorTimeout.push(setTimeout(()=>{this.showExtendBtns=false;this.handClass = 'hidehand'},2500))
+          break;
+        case 5:
+          this.clearTutorTimeout()
+          this.handClass = 'hand'//clickhand
+          this.tutorClass = 'tutor5start'
+          tutorTimeout.push(setTimeout(()=>{
+            this.handClass = 'clickhand'//clickhand
+            this.tutorClass = 'tutor5end'
+          },1200))
+          tutorTimeout.push(setTimeout(()=>{this.swiper.slidePrev();},1500))
+          tutorTimeout.push(setTimeout(()=>{this.swiper.slideNext();this.handClass = 'hidehand'},2500))
+          break;
+        case 6:
+          this.clearTutorTimeout()
+          this.handClass = 'hand'//clickhand
+          this.tutorClass = 'tutor6start'
+          tutorTimeout.push(setTimeout(()=>{
+            this.handClass = 'clickhand'//clickhand
+            this.tutorClass = 'tutor6end'
+          },500))
+          tutorTimeout.push(setTimeout(()=>{
+            this.handClass = 'hand'//clickhand
+            this.tutorClass = 'tutor6end'
+          },800))
+          tutorTimeout.push(setTimeout(()=>{
+            this.handClass = 'hidehand'
+          },1500))
+          break;
+        default:
+          this.tutorSession = 0;
+          break;
+      }
+    },
+    clearTutorTimeout() {
+      tutorTimeout.forEach(v=>clearTimeout(v))
+      tutorTimeout = []
     }
   },
   created() {
     //check cookie to get serviceToken first
     // if stoken not exist, go auth
+
     const self = this
     Tone.Transport.cancel()
     tonepart = []
@@ -444,12 +524,6 @@ export default {
     var docElem = document.documentElement;
     window.rem = docElem.getBoundingClientRect().width / 10;
     docElem.style.fontSize = window.rem + 'px';
-    // window.addEventListener("orientationchange", function() {
-    //   alert("the orientation of the device is now " + screen.orientation.type);
-    //   // self.portraitMode = screen.orientation.type.indexOf('portrait')>=0
-    //   window.rem = docElem.getBoundingClientRect().width / 10;
-    //   docElem.style.fontSize = window.rem + 'px';
-    // });
 
     this.PARTNUM = 3
     this.pianoRollSwiperOption = {
@@ -520,10 +594,8 @@ export default {
   },
   mounted() {
     // this.startRecord();
-    // document.querySelector('#D5').addEventListener( "pointerenter", ()=>{
-    //   console.log('jinru')
-    // })
-    this.$toast('请锁住竖屏使用,长按播放按钮保存作品')
+    // pointer events以后可以使用
+    this.tutorStart()
   },
   updated() {
   }
@@ -533,7 +605,7 @@ export default {
 <template>
 <div id="container">
   <!-- <v-touch @pan="onPan"> -->
-  <div class="keys" @touchmove="keng" @touchstart.stop.prevent="touchNoteStartHandler" @touchend.stop.event="touchNoteEndHandler">
+  <div :class="['keys',tutorSession===8?'tutorial-highlight':'']" @touchmove="keng" @touchstart.stop.prevent="touchNoteStartHandler" @touchend.stop.event="touchNoteEndHandler">
     <!-- using sharp sign => '#' as object key cause syntax error... -->
     <!-- <div :class="['white', 'a', activeNote.A3?'active-note':'']" id="A3"></div>
       <div :class="['black', 'b-minor', activeNote.Bb3?'active-note':'']" id="Bb3"></div>
@@ -569,18 +641,15 @@ export default {
     <div :class="['white', 'e', activeNote.E6?'active-note':'']" id="E6"></div>
     <div :class="['white', 'f', activeNote.F6?'active-note':'']" id="F6"></div>
   </div>
-  <div class="keyshadow"></div>
+  <div :class="['keyshadow',tutorSession===8?'tutorial-highlight':'']"></div>
   <div class="scroll-container"></div>
-  <div class="semi-piano-roll" @touchmove.stop.prevent>
+  <div class="semi-piano-roll" :class="[(tutorSession===5||tutorSession===6)?'tutorial-highlight':'']" @touchmove.stop.prevent>
     <swiper :options="pianoRollSwiperOption" ref="pianoRoll">
       <!-- slides -->
       <swiper-slide v-for="n in PARTNUM">
         <div class="current-piano-roll">
           <svg :style="{height:'90%',padding:timelineConfig.dotSize/2+'px 0'}">
-
             <defs>
-
-
               	<filter id="glowing" height="400%" width="130%" x="-10%" y="-130%">
               		<!-- Thicken out the original shape -->
               		<feMorphology operator="dilate" radius="1" in="SourceAlpha" result="thicken" />
@@ -630,11 +699,9 @@ export default {
   </div>
 
   <div class="g-controller">
-    <vue-slider v-model="vuetimeline" v-bind="timelineConfig" @callback="adjustTimeline" @drag-end=""></vue-slider>
-    <div class="btnContainer" @touchstart.stop.prevent="btnStart" @touchend.stop.event="btnEnd">
-      <div :class="[playing?'pauseBtn':'playBtn', 'rotate']" @click="toggleReplay">
-
-      </div>
+    <vue-slider :class="[tutorSession===2?'tutorial-highlight':'']" v-model="vuetimeline" v-bind="timelineConfig" @callback="adjustTimeline" @drag-end=""></vue-slider>
+    <div class="btnContainer" :class="[(tutorSession===3||tutorSession===4)?'tutorial-highlight':'']" @touchstart.stop.prevent="btnStart" @touchend.stop.event="btnEnd">
+      <div :class="[playing?'pauseBtn':'playBtn', 'rotate']" @click="toggleReplay"></div>
       <div :class="[showExtendBtns?'extendBtnsShow':'extendBtnsHide','extendBtns']">
         <div class='bounceBtn rotate'></div>
         <div class='cancelBtn'></div>
@@ -658,6 +725,17 @@ export default {
   <div class="mask" v-show="bouncing">
     <p>存储中...</p>
   </div>
+  <div class="hint-mask" id="tutorial-mask" v-show="tutorSession>0" @touchend="tutorProgress">
+    <!-- <transition name="tutor1"><div></div></transition> -->
+    <div v-show="tutorSession===2" class="hint-text" id="timeline-hint"><h3>进度条</h3><p>拖动原点改变时间</p></div>
+    <div v-show="tutorSession===3" class="hint-text" id="play-hint"><h3>功能按钮</h3><p>点击播放/暂停</p></div>
+    <div v-show="tutorSession===4" class="hint-text" id="longpress-hint"><h3>功能按钮</h3><p>长按后点击：保存/取消</p></div>
+    <div v-show="tutorSession===5" class="hint-text" id="swipe-hint"><h3>多轨编曲</h3><p>上下滑动切换轨道编曲</p></div>
+    <div v-show="tutorSession===6" class="hint-text" id="clear-hint"><h3>多轨编曲</h3><p>清空轨道</p></div>
+  </div>
+  <div id="tutorhand" :class="[tutorClass]" v-show="handClass!='hidehand'">
+    <div :class="[handClass]"></div>
+  </div>
 </div>
 </template>
 
@@ -666,8 +744,40 @@ export default {
 @import '../_common/style/_variables.scss';
 @import '../_common/style/_mixins.scss';
 @import '../_common/style/_reboot.scss';
+#tutorhand {
+  position: absolute;
+  width:getRem(96);
+  height:getRem(98);
+  // transform:rotate(90deg);
+  // background-color:white;
+  z-index:500;
+  transition:background 0.05s ease,transform 1s linear;
+  &.tutor2start {top:.5rem;right:.8rem;transition:none;}
+  &.tutor2end {top:.5rem;right:.8rem;transform:translateY(10rem);}
+  &.tutor3start {bottom:.5rem;right:.6rem;transition:none;}
+  &.tutor3end {bottom:.5rem;right:.6rem;}
+  &.tutor4start {bottom:.5rem;right:.6rem;transition:none;}
+  &.tutor4end {bottom:.5rem;right:.6rem;}
+  &.tutor5start {top:2rem;right:3.5rem;transition:none;}
+  &.tutor5end {top:2rem;right:3.5rem;transform:translateX(1rem);}
+  &.tutor6start {bottom:.5rem;right:3.5rem;transition:none;}
+  &.tutor6end {bottom:.5rem;right:3.5rem;}
+}
+// .longclickhand {transform:rotate(90deg) translateY(1rem);background:url('../assets/tutorial/handlongclick.svg') no-repeat;background-size:contain}
+.hand { position:absolute;width:100%;height:100%;transform:rotate(90deg);background:url('../assets/tutorial/hand.svg') no-repeat;background-size:contain;}
+.clickhand { position:absolute;width:100%;height:100%;transform:rotate(90deg);background:url('../assets/tutorial/handclick.svg') no-repeat;background-size:contain}
+#tutorial-mask {
+  .hint-text {
+    color:white;
+    text-align: right;
+  }
+}
+.tutorial-highlight {
+  z-index:200;
+  pointer-events: none;
+}
 .g-controller {
-    position: fixed;
+    position: absolute;
     width: getRem(42);
     height: 100%;
     padding-top: getRem(44);
@@ -700,6 +810,7 @@ export default {
         height: getRem(84);
         margin-top: 0.3rem;
         .playBtn {
+            z-index: 2;
             position: absolute;
             width: 100%;
             height: 100%;
@@ -709,6 +820,7 @@ export default {
             background-color: rgb(69,106,255);
         }
         .pauseBtn {
+            z-index: 2;
             position: absolute;
             width: 100%;
             height: 100%;
@@ -740,8 +852,8 @@ export default {
             height: getRem(84);
             border-radius: getRem(42);
             overflow: hidden;
-            right: 0;
-            z-index: -1;
+            right: -1px;
+            z-index: 1;
             transition: width 1s;
             background: linear-gradient(to right, rgb(254, 64, 64),rgb(142, 122, 239),rgb(69,106,255) 80%);
         }
@@ -794,7 +906,7 @@ export default {
     position: absolute;
     width: 100%;
     height: 100%;
-    background-color: white;
+    background-color: rgb(19,19,21);
 }
 h2 {
     font-size: 20px;
@@ -832,7 +944,7 @@ h2 {
     position: fixed;
     right: 0;
     height: 100%;
-    background-color: rgb(19,19,21);
+    // background-color: rgb(19,19,21);
     .swiper-container {
         height: 100%;
     }
@@ -1001,7 +1113,33 @@ h2 {
       transform: rotate(90deg);
     }
 }
-
+.hint-mask {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color:white;
+  .hint-text {
+    transform:rotate(90deg);text-align: right;
+  }
+  p {
+    font-size:.43rem;
+    font-weight:200;
+  }
+  h3 {
+    font-size:.57rem;
+    font-weight:400;
+  }
+  #timeline-hint {position: absolute;top: 2rem;right: 1rem;}
+  #play-hint {position: absolute;bottom: 2rem;right: 1rem;}
+  #longpress-hint {position: absolute;bottom: 4rem;right: -1rem;}
+  #swipe-hint {position: absolute;top: 2rem;right: 4rem;}
+  #clear-hint {position: absolute;bottom: 2rem;right: 4rem;}
+}
 .fadein {
     animation: fadein 1s;
     animation-fill-mode: forwards;
