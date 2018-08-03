@@ -7,6 +7,7 @@ import HelloWorld from '@/components/HelloWorld';
 import NMBMaker from '@/components/NMBMaker';
 // import MBViewer from '@/components/MBViewer';
 import NMBViewer from '@/components/NMBViewer';
+import MBRoll from '@/components/MBRollMaker';
 import MusixiserDetail from '@/components/MusixiserDetail';
 import MyFav from '@/components/MyFav';
 import Recommend from '@/components/Recommend';
@@ -25,6 +26,11 @@ export default new Router({
       path: '/new-music-box-maker',
       name: 'NMBMaker',
       component: NMBMaker,
+    },
+    {
+      path: '/new-music-box-roll',
+      name: 'MBRoll',
+      component: MBRoll,
     },
     {
       path: '/new-music-box-viewer',
