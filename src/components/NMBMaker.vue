@@ -1179,7 +1179,7 @@ h2 {
     transform: rotate(90deg);
 }
 #alert-mask {
-  position: absolute;width:100%;height:100%;background-color:rgba(0,0,0,.3);display: flex;align-items: center;justify-content: center;
+  position: absolute;top:0;width:100%;height:100%;background-color:rgba(0,0,0,.3);display: flex;align-items: center;justify-content: center;
   .mb-dialog {
     position: relative;rotate:90deg;width: getRem(570);padding-top:getRem(75); border-radius:getRem(50);height:getRem(344);background-color:rgba(255,255,255,.96);display:flex;flex-direction:column;
     .title {flex:1;padding:0 getRem(77); display:flex;align-items:flex-end;position: relative;width:100%;font-size:.32rem;}
