@@ -115,17 +115,17 @@ export default {
     setupRect(i, j, sector) {
       let fill = '';
       // split NOTE_NUM_PER_SECTOR and this.NOTE_NUM_PER_SECTOR for ANIMATION!!!
-      if (j + (sector-2)*NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR == this.activeJ &&
-        this.rectArray[i][j + (sector-2)*NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]) {
+      if (j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR == this.activeJ &&
+        this.rectArray[i][j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]) {
         // active current note: lighter color
         fill = colors[i]
       } else if (
-        j + (sector-2)*NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR == this.activeJ &&
-        !this.rectArray[i][j + (sector-2)*NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]
+        j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR == this.activeJ &&
+        !this.rectArray[i][j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]
       ) {
         // inactive current light blue
         fill = '#f0f8ff'
-      } else if (this.rectArray[i][j + (sector-2)*NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]) {
+      } else if (this.rectArray[i][j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]) {
         // active non-current note
         fill = colors[i]
       } else {
@@ -224,20 +224,26 @@ export default {
     },
     scrolldown() {
       clearInterval(aInterval)
-      this.sector == (FULL_NOTE_NUM / NOTE_NUM_PER_SECTOR - 1) ?this.NOTE_NUM_PER_SECTOR = NOTE_NUM_PER_SECTOR-2:this.NOTE_NUM_PER_SECTOR = 1 // for animation,
+      this.sector == (FULL_NOTE_NUM / NOTE_NUM_PER_SECTOR - 1) ? this.NOTE_NUM_PER_SECTOR = NOTE_NUM_PER_SECTOR - 2 : this.NOTE_NUM_PER_SECTOR = 1 // for animation,
       this.sector <= (FULL_NOTE_NUM / NOTE_NUM_PER_SECTOR - 2) ? this.sector += 1 : '' // this line is real scroll down
       // below is for animation
-      aInterval = setInterval(()=>{this.NOTE_NUM_PER_SECTOR+=1;if(this.NOTE_NUM_PER_SECTOR==10) {
-        clearInterval(aInterval)
-      }},50)
+      aInterval = setInterval(() => {
+        this.NOTE_NUM_PER_SECTOR += 1;
+        if (this.NOTE_NUM_PER_SECTOR == 10) {
+          clearInterval(aInterval)
+        }
+      }, 50)
     },
     scrollup() {
       clearInterval(aInterval)
-      this.sector == 1 ?this.NOTE_NUM_PER_SECTOR = NOTE_NUM_PER_SECTOR+2:this.NOTE_NUM_PER_SECTOR = 20 // for animation,
+      this.sector == 1 ? this.NOTE_NUM_PER_SECTOR = NOTE_NUM_PER_SECTOR + 2 : this.NOTE_NUM_PER_SECTOR = 20 // for animation,
       this.sector >= 2 ? this.sector -= 1 : ''
-      aInterval = setInterval(()=>{this.NOTE_NUM_PER_SECTOR-=1;if(this.NOTE_NUM_PER_SECTOR==10) {
-        clearInterval(aInterval)
-      }},50)
+      aInterval = setInterval(() => {
+        this.NOTE_NUM_PER_SECTOR -= 1;
+        if (this.NOTE_NUM_PER_SECTOR == 10) {
+          clearInterval(aInterval)
+        }
+      }, 50)
     },
     checkBouncibility() {
       const result = []
@@ -309,31 +315,56 @@ export default {
   created() {
     this.setupCanvas()
     schedules = JSON.parse(JSON.stringify(this.rectArray))
-    
+
+    // regular setup
+    const self = this
+    Tone.Transport.cancel()
+    // this is very important
+    var docElem = document.documentElement;
+    window.rem = docElem.getBoundingClientRect().width / 10;
+    docElem.style.fontSize = window.rem + 'px';
+
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase())
     if (!inWechat) return
+    // alert(Cookies.get('serviceToken'))
+    WxShare.prepareShareConfig().then(() => {
+      WxShare.prepareShareContent({
+        title: 'MUSIXISE',
+        desc: '划拉划拉八音盒',
+        fullPath: `${location.origin}${location.pathname}#/new-music-box-roll`,
+        imgUrl: 'http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png',
+      })
+    })
     if (Util.getUrlParam('code') || Cookies.get('serviceToken')) {
+      //TODO:ajax call to get info
       Api.getUserInfo(Util.getUrlParam('code'))
         .then((res) => {
           if (res.data.errcode >= 20000) {
             // 网页内cookie失效，需要重新验证
             Cookies.remove('serviceToken')
             location.replace(
-              'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box-maker&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box-maker&connect_redirect=1#wechat_redirect'
+              // will publish to node project m-musixise, under '/music-box' path
+              // 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect'
+              // `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
+              `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(location.origin+location.pathname+'#/new-music-box-roll')}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
             )
           }
-          alert(`welcome${res.data.data.realname}`)
+          // alert(`welcome${res.data.data.realname}`)
           console.log('get user info success', res.data.data)
         })
         .catch((err) => {
           Cookies.remove('serviceToken')
           location.replace(
-            'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box-maker&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box-maker&connect_redirect=1#wechat_redirect'
+            // 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect'
+            // `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
+            `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(location.origin+location.pathname+'#/new-music-box-roll')}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
           )
         })
     } else { //又没有微信给的auth code又没有token存在cookie，只得验证
       location.replace(
-        'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box-maker&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box-maker&connect_redirect=1#wechat_redirect'
+        // 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect'
+        // `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
+        `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(location.origin+location.pathname+'#/new-music-box-roll')}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
       )
     }
   },
@@ -423,23 +454,91 @@ export default {
     }
 }
 #alert-mask {
-  position: absolute;top:0;width:100%;height:100%;background-color:rgba(0,0,0,.3);display: flex;align-items: center;justify-content: center;
-  .mb-dialog {
-    position: relative;rotate:90deg;width: getRem(570);padding-top:getRem(75); border-radius:getRem(50);height:getRem(344);background-color:rgba(255,255,255,.96);display:flex;flex-direction:column;
-    .title {flex:1;padding:0 getRem(77); display:flex;align-items:flex-end;position: relative;width:100%;font-size:.32rem;}
-    .input {
-      flex:2;flex-direction: column;padding:0 getRem(77);display:flex;align-items:flex-start;justify-content: center;position: relative;width:100%;text-align: center;font-size:.5rem;
-      input {background: transparent;border: none;outline: none;width: 100%; height:1rem;font-size:.54rem;}
-      .splitter {position:relative;width:100%;height:1px;background-color:gray;padding:0 getRem(77);}
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .mb-dialog {
+        position: relative;
+        rotate: 90deg;
+        width: getRem(570);
+        padding-top: getRem(75);
+        border-radius: getRem(50);
+        height: getRem(344);
+        background-color: rgba(255,255,255,.96);
+        display: flex;
+        flex-direction: column;
+        .title {
+            flex: 1;
+            padding: 0 getRem(77);
+            display: flex;
+            align-items: flex-end;
+            position: relative;
+            width: 100%;
+            font-size: 0.32rem;
+        }
+        .input {
+            flex: 2;
+            flex-direction: column;
+            padding: 0 getRem(77);
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            position: relative;
+            width: 100%;
+            text-align: center;
+            font-size: 0.5rem;
+            input {
+                background: transparent;
+                border: none;
+                outline: none;
+                width: 100%;
+                height: 1rem;
+                font-size: 0.54rem;
+            }
+            .splitter {
+                position: relative;
+                width: 100%;
+                height: 1px;
+                background-color: gray;
+                padding: 0 getRem(77);
+            }
+        }
+        .btns {
+            flex: 4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            width: 100%;
+            text-align: center;
+            font-size: 0.5rem;
+            span.btn {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                flex: 1;
+                display: flex;
+                align-items: center;
+                padding-top: 0.6rem;
+            }
+            .cancel {
+                color: gray;
+                text-align: right;
+                justify-content: flex-start;
+                padding-left: getRem(77);
+            }
+            .confirm {
+                color: blue;
+                text-align: left;
+                justify-content: flex-end;
+                padding-right: getRem(77);
+            }
+        }
     }
-    .btns {
-      flex:4;display:flex;align-items:center;justify-content: center;position: relative;width:100%;text-align: center;font-size:.5rem;
-      span.btn {
-        position: relative;width:100%;height:100%;flex:1;display:flex;align-items:center;padding-top:.6rem;
-      }
-      .cancel {color:gray;text-align: right;justify-content: flex-start;padding-left:getRem(77);}
-      .confirm { color:blue;text-align: left;justify-content: flex-end;padding-right:getRem(77);}
-    }
-  }
 }
 </style>
