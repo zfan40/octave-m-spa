@@ -1,55 +1,55 @@
 <script>
-const Tone = require('tone')
-import * as Util from '../_common/js/util'
-import * as Api from '../_common/js/api'
-import * as Cookies from "js-cookie"
-import * as Magic from '../_common/js/magic'
-import * as WxShare from '../_common/js/wx_share'
-import 'swiper/dist/css/swiper.css'
-import vueSlider from 'vue-slider-component'
-import {
-  swiper,
-  swiperSlide
-} from 'vue-awesome-swiper'
-const touchIdKeyMap = {} //touch move can have several threads, each thread only activate one note at most
+const Tone = require('tone');
+import * as Util from '../_common/js/util';
+import * as Api from '../_common/js/api';
+import * as Cookies from 'js-cookie';
+import * as Magic from '../_common/js/magic';
+import * as WxShare from '../_common/js/wx_share';
+import 'swiper/dist/css/swiper.css';
+import vueSlider from 'vue-slider-component';
+import { swiper, swiperSlide } from 'vue-awesome-swiper';
+const touchIdKeyMap = {}; //touch move can have several threads, each thread only activate one note at most
 // e.g. {0:a4,1:b5}
 
-const MINI_KEY_LENGTH = 200 // px
-let extendBtnsTimeout
+const MINI_KEY_LENGTH = 200; // px
+let extendBtnsTimeout;
 
-var piano = new Tone.Sampler({
-  'C4': 'C4.[mp3|ogg]',
-  'D#4': 'Ds4.[mp3|ogg]',
-  'F#4': 'Fs4.[mp3|ogg]',
-  'A4': 'A4.[mp3|ogg]',
-  'C5': 'C5.[mp3|ogg]',
-  'D#5': 'Ds5.[mp3|ogg]',
-  'F#5': 'Fs5.[mp3|ogg]',
-  'A5': 'A5.[mp3|ogg]',
-  'C6': 'C6.[mp3|ogg]',
-}, {
-  'release': 1,
-  // 'baseUrl': '/static/audio/'
-  'baseUrl': '//cnbj1.fds.api.xiaomi.com/mbox/audio/'
-}).toMaster()
+var piano = new Tone.Sampler(
+  {
+    C4: 'C4.[mp3|ogg]',
+    'D#4': 'Ds4.[mp3|ogg]',
+    'F#4': 'Fs4.[mp3|ogg]',
+    A4: 'A4.[mp3|ogg]',
+    C5: 'C5.[mp3|ogg]',
+    'D#5': 'Ds5.[mp3|ogg]',
+    'F#5': 'Fs5.[mp3|ogg]',
+    A5: 'A5.[mp3|ogg]',
+    C6: 'C6.[mp3|ogg]',
+  },
+  {
+    release: 1,
+    // 'baseUrl': '/static/audio/'
+    baseUrl: '//cnbj1.fds.api.xiaomi.com/mbox/audio/',
+  },
+).toMaster();
 
 // var plucky = new Tone.PluckSynth().toMaster()
 
-const SCREEN_WIDTH = document.documentElement.getBoundingClientRect().width
+const SCREEN_WIDTH = document.documentElement.getBoundingClientRect().width;
 const SCREEN_HEIGHT = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 
-let tonepart = [] // store all the music parts. (ummm,that's why it's named part...)
-let bouncepart = []
+let tonepart = []; // store all the music parts. (ummm,that's why it's named part...)
+let bouncepart = [];
 
-let recordStartTime = 0
+let recordStartTime = 0;
 
-let isLinger = true //非播放状态中未开始录音
-var replayInterval = undefined //控制progressbar的setinterval
-let playOffset = 0 //播放状态的拉条bar初始时间记录
-let lingerOffset = 0 //未播放状态的拉条bar初始时间记录
-const PROGRESS_INTERVAL_TIME = 0.1 //0.1秒挪一下
-let tutorOnceEnter = false
-let tutorTimeout = []
+let isLinger = true; //非播放状态中未开始录音
+var replayInterval = undefined; //控制progressbar的setinterval
+let playOffset = 0; //播放状态的拉条bar初始时间记录
+let lingerOffset = 0; //未播放状态的拉条bar初始时间记录
+const PROGRESS_INTERVAL_TIME = 0.1; //0.1秒挪一下
+let tutorOnceEnter = false;
+let tutorTimeout = [];
 export default {
   components: {
     swiper,
@@ -70,9 +70,9 @@ export default {
       showExtendBtns: false,
       alertAppear: false,
       bouncing: false,
-      tutorSession:0,
-      handClass:'', //hand or clickhand
-      tutorClass:'', //hand positioning in different session
+      tutorSession: 0,
+      handClass: '', //hand or clickhand
+      tutorClass: '', //hand positioning in different session
       timelineConfig: {
         value: 0,
         width: 8,
@@ -97,7 +97,7 @@ export default {
         speed: PROGRESS_INTERVAL_TIME,
         bgStyle: {
           backgroundColor: 'rgb(110,113,158)',
-          boxShadow: 'inset 0.5px 0.5px 3px 1px rgba(0,0,0,.36)'
+          boxShadow: 'inset 0.5px 0.5px 3px 1px rgba(0,0,0,.36)',
         },
         tooltipDir: 'left',
         tooltipStyle: {
@@ -105,302 +105,310 @@ export default {
           borderColor: 'rgb(69, 106, 255)',
           transform: 'rotate(90deg)',
           transformOrigin: 'right',
-          position:'relative',
+          position: 'relative',
           left: '-.2rem',
-          top: '0.9rem'
+          top: '0.9rem',
         },
         formatter(value) {
           if (value) {
-            return `${(value/10).toFixed(1)}s/20s`
+            return `${(value / 10).toFixed(1)}s/20s`;
           } else {
-            return `0.0s/20s`
+            return `0.0s/20s`;
           }
         },
         processStyle: {
-          backgroundColor: 'rgb(69,106,255)'
-        }
+          backgroundColor: 'rgb(69,106,255)',
+        },
       },
-    }
+    };
   },
   watch: {
     playing: function(val) {
-      console.log('playing status', val)
+      console.log('playing status', val);
       if (val) {
         //start progress bar
         replayInterval = setInterval(() => {
-          this.vuetimeline += 1
+          this.vuetimeline += 1;
           if (this.vuetimeline >= 200) {
-            this.toggleReplay()
-            this.vuetimeline = 0
+            this.toggleReplay();
+            this.vuetimeline = 0;
           }
-        }, PROGRESS_INTERVAL_TIME * 1000)
+        }, PROGRESS_INTERVAL_TIME * 1000);
       } else {
         //stop progress bar
-        clearInterval(replayInterval)
+        clearInterval(replayInterval);
       }
     },
   },
   computed: {
     swiper() {
-      return this.$refs.pianoRoll.swiper
+      return this.$refs.pianoRoll.swiper;
     },
     activePartIndex() {
-      return this.PARTNUM - this.activeSwiperIndex - 1
+      return this.PARTNUM - this.activeSwiperIndex - 1;
     },
     lastActivePartIndex() {
-      return this.PARTNUM - this.lastActiveSwiperIndex - 1
-    }
+      return this.PARTNUM - this.lastActiveSwiperIndex - 1;
+    },
   },
   methods: {
     load() {},
     toggleReplay() {
-      console.log(1)
-      this.playing = !this.playing
+      console.log(1);
+      this.playing = !this.playing;
       if (this.playing) {
         if (this.vuetimeline >= 200) {
-          this.vuetimeline = 0
+          this.vuetimeline = 0;
         }
         // this.confirmRecordPart(!isLinger)
-        playOffset = performance.now() - this.vuetimeline * 100
-        console.log('播放开始')
-        this.confirmRecordPart(0)
-        console.log('kokokoko')
+        playOffset = performance.now() - this.vuetimeline * 100;
+        console.log('播放开始');
+        this.confirmRecordPart(0);
+        console.log('kokokoko');
         recordStartTime = performance.now();
-        console.log(`activeOffsetTime${this.vuetimeline*100}`)
-        Tone.Transport.start("+0.01", this.vuetimeline * 100 / 1000) // TODO:有问题in case < context.currentTime
+        console.log(`activeOffsetTime${this.vuetimeline * 100}`);
+        Tone.Transport.start('+0.01', this.vuetimeline * 100 / 1000); // TODO:有问题in case < context.currentTime
       } else {
-        console.log('播放停了')
-        Tone.Transport.stop(0) // TODO：必须stop才能start。。。有没有自动stop啊..
+        console.log('播放停了');
+        Tone.Transport.stop(0); // TODO：必须stop才能start。。。有没有自动stop啊..
         // recordStartTime = performance.now()
       }
     },
     handleNoteStart(noteId) {
-      let noteTime = 0
+      let noteTime = 0;
       // console.log('down', e.target.id)
-      piano.triggerAttack(noteId)
+      piano.triggerAttack(noteId);
       // console.log('midi no. :', Tone.Frequency(noteId).toMidi())
-      this.$set(this.activeNote, noteId, 1)
+      this.$set(this.activeNote, noteId, 1);
       if (!this.playing) {
         if (isLinger) {
-          recordStartTime = performance.now()
-          lingerOffset = this.vuetimeline * 100
-          isLinger = false
+          recordStartTime = performance.now();
+          lingerOffset = this.vuetimeline * 100;
+          isLinger = false;
         }
-        noteTime = performance.now() - recordStartTime + lingerOffset
+        noteTime = performance.now() - recordStartTime + lingerOffset;
       } else {
-        noteTime = performance.now() - playOffset
+        noteTime = performance.now() - playOffset;
         // noteTime = this.vuetimeline * 100
         // console.log('1', this.vuetimeline * 100)
         // console.log('2', performance.now() - recordStartTime + this.vuetimeline*100)
       }
       if (noteTime < 20000) {
-        this.vuetimeline = 10 * noteTime / 1000
+        this.vuetimeline = 10 * noteTime / 1000;
         this.recordPart.push({
-          'note': noteId,
-          'time': +(noteTime / 1000).toFixed(4)
-        })
+          note: noteId,
+          time: +(noteTime / 1000).toFixed(4),
+        });
       } else {
-        this.vuetimeline = 20 * 10 // 颗粒度是0.1s => 200份
-        console.log('cannot record more than 20 seconds')
+        this.vuetimeline = 20 * 10; // 颗粒度是0.1s => 200份
+        console.log('cannot record more than 20 seconds');
       }
     },
     handleNoteEnd(noteId) {
-      piano.triggerRelease(noteId)
-      this.$set(this.activeNote, noteId, 0)
+      piano.triggerRelease(noteId);
+      this.$set(this.activeNote, noteId, 0);
     },
     touchNoteStartHandler(e) {
-      console.log(e)
+      console.log(e);
       //先存起来，防止在该键位touchmove重复
-      touchIdKeyMap[e.changedTouches[0].identifier] = e.target.id // TODO: 猜测 touchstart只会有一个changetouches///
-      this.handleNoteStart(e.target.id)
+      touchIdKeyMap[e.changedTouches[0].identifier] = e.target.id; // TODO: 猜测 touchstart只会有一个changetouches///
+      this.handleNoteStart(e.target.id);
     },
     touchNoteEndHandler(e) {
-      this.handleNoteEnd(e.target.id)
-      this.handleNoteEnd(touchIdKeyMap[e.changedTouches[0].identifier]) // TODO: 猜测 touchend只会有一个changetouches,记录的正好是该停的
+      this.handleNoteEnd(e.target.id);
+      this.handleNoteEnd(touchIdKeyMap[e.changedTouches[0].identifier]); // TODO: 猜测 touchend只会有一个changetouches,记录的正好是该停的
     },
     confirmRecordPart(shouldClearTime) {
       if (this.recordPart.length) {
-        console.log('processing track: ', this.lastActivePartIndex)
-        if (this.recordParts[this.lastActivePartIndex] && this.recordParts[this.lastActivePartIndex].length) {
+        console.log('processing track: ', this.lastActivePartIndex);
+        if (
+          this.recordParts[this.lastActivePartIndex] &&
+          this.recordParts[this.lastActivePartIndex].length
+        ) {
           //已在该track录过,merge both
-          this.recordPart = this.recordPart.concat(this.recordParts[this.lastActivePartIndex])
+          this.recordPart = this.recordPart.concat(this.recordParts[this.lastActivePartIndex]);
         }
         if (tonepart[this.lastActivePartIndex]) {
           try {
-            tonepart[this.lastActivePartIndex].dispose() //覆盖之前的需要dispose
-          } catch (e) {
-
-          }
+            tonepart[this.lastActivePartIndex].dispose(); //覆盖之前的需要dispose
+          } catch (e) {}
         }
-        tonepart[this.lastActivePartIndex] = new Tone.Part(function(time, value) { //不能老这new啊，要每次一个数组，每次改动最后一个
-          piano.triggerAttackRelease(value.note, "8n", time)
-        }, this.recordPart).start(0)
-        this.recordParts[this.lastActivePartIndex] = this.recordPart
-        this.recordPart = []
+        tonepart[this.lastActivePartIndex] = new Tone.Part(function(time, value) {
+          //不能老这new啊，要每次一个数组，每次改动最后一个
+          piano.triggerAttackRelease(value.note, '8n', time);
+        }, this.recordPart).start(0);
+        this.recordParts[this.lastActivePartIndex] = this.recordPart;
+        this.recordPart = [];
       } else {
-        console.log('啥也没录')
+        console.log('啥也没录');
       }
-      this.lastActiveSwiperIndex = this.activeSwiperIndex
+      this.lastActiveSwiperIndex = this.activeSwiperIndex;
       // reinit time
       if (shouldClearTime) {
-        this.vuetimeline = 0 // this is kind of separate for progress view
-        recordStartTime = 0
+        this.vuetimeline = 0; // this is kind of separate for progress view
+        recordStartTime = 0;
       }
-      isLinger = true
+      isLinger = true;
     },
     clearRecordPart(trackNum) {
-      console.log(`cleaning track ${trackNum}`)
+      console.log(`cleaning track ${trackNum}`);
       if (this.activePartIndex === trackNum) {
-        this.recordPart = []
-        this.vuetimeline = 0
-        isLinger = true
+        this.recordPart = [];
+        this.vuetimeline = 0;
+        isLinger = true;
         this.playing = false;
-        Tone.Transport.stop(0)
+        Tone.Transport.stop(0);
       }
       if (this.recordParts[trackNum] && this.recordParts[trackNum].length) {
-        this.$set(this.recordParts, trackNum, [])
+        this.$set(this.recordParts, trackNum, []);
         if (tonepart[trackNum]) {
           try {
-            tonepart[trackNum].dispose() //dispose掉
-          } catch (e) {
-
-          }
-          tonepart[trackNum] = undefined //同时要从数组中删掉
+            tonepart[trackNum].dispose(); //dispose掉
+          } catch (e) {}
+          tonepart[trackNum] = undefined; //同时要从数组中删掉
         }
       } else {
-        console.log(`track ${trackNum} has no content`)
+        console.log(`track ${trackNum} has no content`);
       }
-
     },
     checkBouncibility() {
-      this.confirmRecordPart(0)
-      bouncepart = []
+      this.confirmRecordPart(0);
+      bouncepart = [];
       if (tonepart.length) {
         tonepart.forEach(item => {
           if (item && item._events.length && item._events[0].value) {
             item._events.forEach(noteInfo => {
-              bouncepart.push(noteInfo.value)
-            })
+              bouncepart.push(noteInfo.value);
+            });
           }
-        })
-        bouncepart.sort((a, b) => (0 + a.time - b.time))
-        return Magic.RealMagic(bouncepart)
+        });
+        bouncepart.sort((a, b) => 0 + a.time - b.time);
+        return Magic.RealMagic(bouncepart);
       }
       return true;
     },
     bounceProject() {
-      this.confirmRecordPart(0)
-      console.log(this)
-      console.log(tonepart)
-      bouncepart = []
+      this.confirmRecordPart(0);
+      console.log(this);
+      console.log(tonepart);
+      bouncepart = [];
       if (tonepart.length) {
         tonepart.forEach(item => {
           if (item && item._events.length && item._events[0].value) {
             item._events.forEach(noteInfo => {
-              bouncepart.push(noteInfo.value)
-            })
+              bouncepart.push(noteInfo.value);
+            });
           }
-        })
-        bouncepart.sort((a, b) => (0 + a.time - b.time))
+        });
+        bouncepart.sort((a, b) => 0 + a.time - b.time);
         //TODO, semi done
         this.bouncing = true;
-        this.$store.dispatch('BOUNCE_PROJECT', {
-          record: bouncepart,
-          info: {
-            title: '尚未起名',
-            content: 'default',
-            cover: 'default'
-          },
-        }).then(id => {
-          console.log('successfully bounced')
-          this.bouncing = false;
-          this.$toast('作品已为您存储')
-          this.$router.push({
-            path: '/new-music-box-viewer',
-            query: {
-              id
-            }
+        this.$store
+          .dispatch('BOUNCE_PROJECT', {
+            record: bouncepart,
+            info: {
+              title: '尚未起名',
+              content: 'default',
+              cover: 'default',
+            },
           })
-        }).catch((err) => {
-          this.bouncing = false;
-          this.$toast('非常抱歉，上传作品失败了')
-        })
+          .then(id => {
+            console.log('successfully bounced');
+            this.bouncing = false;
+            this.$toast('作品已为您存储');
+            this.$router.push({
+              path: '/new-music-box-viewer',
+              query: {
+                id,
+              },
+            });
+          })
+          .catch(err => {
+            this.bouncing = false;
+            this.$toast('非常抱歉，上传作品失败了');
+          });
       } else {
-        this.$toast('什么都没录呢')
+        this.$toast('什么都没录呢');
       }
     },
     mapNoteTimeToColor(t) {
-      return Magic.mapNoteTimeToColor(t)
+      return Magic.mapNoteTimeToColor(t);
     },
     mapNoteMidiToLength(m) {
-      return Magic.mapNoteMidiToLength(m)
+      return Magic.mapNoteMidiToLength(m);
     },
     adjustTimeline(e) {
       if (this.playing) {
-        console.log('ccccccccc')
-        this.toggleReplay() //现在播放中拉条，直接停，涉及到ref读不到最新值貌似，无法直接继续播放 this is TODO
+        console.log('ccccccccc');
+        this.toggleReplay(); //现在播放中拉条，直接停，涉及到ref读不到最新值貌似，无法直接继续播放 this is TODO
       } else {
-        isLinger = true //你拉条了肯定是
+        isLinger = true; //你拉条了肯定是
       }
     },
     onMiniKeyboardScroll(e) {
-      console.log(e.touches[0].clientY)
+      console.log(e.touches[0].clientY);
     },
     onMiniKeyboardStart(e) {
-      console.log(e)
+      console.log(e);
     },
     keng(e) {
       // console.log(e)
       // console.log(document.elementFromPoint(e.touches[0].clientX,e.touches[0].clientY).style.backgroundColor="yellow")
-      console.log(e) //e.touches is array like object
+      console.log(e); //e.touches is array like object
       for (let i = 0; i <= e.changedTouches.length - 1; i++) {
-        const a = document.elementFromPoint(e.changedTouches[i].clientX, e.changedTouches[i].clientY)
+        const a = document.elementFromPoint(
+          e.changedTouches[i].clientX,
+          e.changedTouches[i].clientY,
+        );
         if (a.classList.contains('white') || a.classList.contains('black')) {
-          if (touchIdKeyMap[e.changedTouches[i].identifier] && touchIdKeyMap[e.changedTouches[i].identifier] != a.getAttribute('id')) { //这个touch已经触发，且和当前不一致
-            console.log(touchIdKeyMap)
-            this.handleNoteStart(a.getAttribute('id'))
-            this.handleNoteEnd(touchIdKeyMap[e.changedTouches[i].identifier])
-            touchIdKeyMap[e.changedTouches[i].identifier] = a.getAttribute('id')
+          if (
+            touchIdKeyMap[e.changedTouches[i].identifier] &&
+            touchIdKeyMap[e.changedTouches[i].identifier] != a.getAttribute('id')
+          ) {
+            //这个touch已经触发，且和当前不一致
+            console.log(touchIdKeyMap);
+            this.handleNoteStart(a.getAttribute('id'));
+            this.handleNoteEnd(touchIdKeyMap[e.changedTouches[i].identifier]);
+            touchIdKeyMap[e.changedTouches[i].identifier] = a.getAttribute('id');
           } else if (!touchIdKeyMap[e.changedTouches[i].identifier]) {
-            console.log(2)
-            this.handleNoteStart(a.getAttribute('id'))
-            touchIdKeyMap[e.changedTouches[i].identifier] = a.getAttribute('id')
+            console.log(2);
+            this.handleNoteStart(a.getAttribute('id'));
+            touchIdKeyMap[e.changedTouches[i].identifier] = a.getAttribute('id');
           } else {
-            console.log(3)
+            console.log(3);
             //新旧相同什么都不做
           }
         } else {
-          console.log('外边')
+          console.log('外边');
           if (touchIdKeyMap[e.changedTouches[i].identifier]) {
-            this.handleNoteEnd(touchIdKeyMap[e.changedTouches[i].identifier])
+            this.handleNoteEnd(touchIdKeyMap[e.changedTouches[i].identifier]);
           }
-          touchIdKeyMap[e.changedTouches[i].identifier] = undefined
+          touchIdKeyMap[e.changedTouches[i].identifier] = undefined;
         }
       }
     },
     btnStart(e) {
-      console.log(e)
+      console.log(e);
       extendBtnsTimeout = setTimeout(() => {
         //show extend buttons
         this.showExtendBtns = true;
-      }, 200)
-
+      }, 200);
     },
     btnEnd(e) {
       // console.log(e)
-      clearTimeout(extendBtnsTimeout)
-      const a = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY)
-      console.log(a)
+      clearTimeout(extendBtnsTimeout);
+      const a = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+      console.log(a);
       if (a && a.classList.contains('bounceBtn')) {
         //导出
         if (this.checkBouncibility()) {
-          this.bounceProject()
+          this.bounceProject();
         } else {
           this.alertAppear = true;
         }
       } else if (a && (a.classList.contains('playBtn') || a.classList.contains('pauseBtn'))) {
         //播放
-        this.toggleReplay()
+        this.toggleReplay();
         this.showExtendBtns = false;
       } else if (a && (a.classList.contains('playBtn') || a.classList.contains('cancelBtn'))) {
         //hide extend buttons
@@ -409,9 +417,9 @@ export default {
     },
     tutorStart() {
       //0未开始，1黑屏,2键盘，3track，4时间线，5播放,
-      this.tutorSession = 1
-      this.$toast('请锁住竖屏使用')
-      tutorOnceEnter = setTimeout(this.tutorProgress,3000)
+      this.tutorSession = 1;
+      this.$toast('请锁住竖屏使用');
+      tutorOnceEnter = setTimeout(this.tutorProgress, 3000);
       // setTimeout(()=>{this.tutorSession=2},3000)
       // setTimeout(()=>{this.tutorSession=3;this.swiper.slidePrev()},5000)
       // setTimeout(()=>{this.swiper.slideNext()},7000)
@@ -424,84 +432,131 @@ export default {
       // setTimeout(()=>{this.tutorSession=0},16000)
     },
     tutorProgress() {
-      clearTimeout(tutorOnceEnter)
-      console.log('??????????')
-      this.tutorSession+=1;
-      console.log(this.tutorSession)
-      switch(this.tutorSession) {
+      clearTimeout(tutorOnceEnter);
+      console.log('??????????');
+      this.tutorSession += 1;
+      console.log(this.tutorSession);
+      switch (this.tutorSession) {
         case 1:
-          this.clearTutorTimeout()
-          this.$toast('请锁住竖屏使用,长按播放按钮保存作品')
+          this.clearTutorTimeout();
+          this.$toast('请锁住竖屏使用,长按播放按钮保存作品');
           break;
         case 2:
-          this.clearTutorTimeout()
-          this.handClass = 'hand'//clickhand
-          this.tutorClass = 'tutor2start'
-          tutorTimeout.push(setTimeout(()=>{
-            this.handClass = 'clickhand'//clickhand
-            this.tutorClass = 'tutor2end'
-          },500))
-          tutorTimeout.push(setTimeout(()=>{this.vuetimeline=120;this.handClass = 'hand'},1500))
-          tutorTimeout.push(setTimeout(()=>{this.vuetimeline=0;this.handClass = 'hidehand'},2500))
+          this.clearTutorTimeout();
+          this.handClass = 'hand'; //clickhand
+          this.tutorClass = 'tutor2start';
+          tutorTimeout.push(
+            setTimeout(() => {
+              this.handClass = 'clickhand'; //clickhand
+              this.tutorClass = 'tutor2end';
+            }, 500),
+          );
+          tutorTimeout.push(
+            setTimeout(() => {
+              this.vuetimeline = 120;
+              this.handClass = 'hand';
+            }, 1500),
+          );
+          tutorTimeout.push(
+            setTimeout(() => {
+              this.vuetimeline = 0;
+              this.handClass = 'hidehand';
+            }, 2500),
+          );
           break;
         case 3:
-          this.clearTutorTimeout()
-          this.handClass = 'hand'//clickhand
-          this.tutorClass = 'tutor3start'
-          tutorTimeout.push(setTimeout(()=>{
-            this.handClass = 'clickhand'//clickhand
-            this.tutorClass = 'tutor3end'
-          },500))
-          tutorTimeout.push(setTimeout(()=>{
-            this.handClass = 'hand'//clickhand
-            this.tutorClass = 'tutor3end'
-          },800))
-          tutorTimeout.push(setTimeout(()=>{
-            this.handClass = 'hidehand'
-          },1000))
+          this.clearTutorTimeout();
+          this.handClass = 'hand'; //clickhand
+          this.tutorClass = 'tutor3start';
+          tutorTimeout.push(
+            setTimeout(() => {
+              this.handClass = 'clickhand'; //clickhand
+              this.tutorClass = 'tutor3end';
+            }, 500),
+          );
+          tutorTimeout.push(
+            setTimeout(() => {
+              this.handClass = 'hand'; //clickhand
+              this.tutorClass = 'tutor3end';
+            }, 800),
+          );
+          tutorTimeout.push(
+            setTimeout(() => {
+              this.handClass = 'hidehand';
+            }, 1000),
+          );
           break;
         case 4:
-          this.clearTutorTimeout()
-          this.handClass = 'hand'//clickhand
-          this.tutorClass = 'tutor4start'
-          tutorTimeout.push(setTimeout(()=>{
-            this.handClass = 'clickhand'//clickhand
-            this.tutorClass = 'tutor4end'
-          },500))
-          tutorTimeout.push(setTimeout(()=>{
-            this.handClass = 'hand'//clickhand
-            this.tutorClass = 'tutor4start'
-            this.showExtendBtns = true;
-          },1500))
-          tutorTimeout.push(setTimeout(()=>{this.handClass = 'hidehand'},2500))
-          tutorTimeout.push(setTimeout(()=>{this.showExtendBtns=false;},3000))
+          this.clearTutorTimeout();
+          this.handClass = 'hand'; //clickhand
+          this.tutorClass = 'tutor4start';
+          tutorTimeout.push(
+            setTimeout(() => {
+              this.handClass = 'clickhand'; //clickhand
+              this.tutorClass = 'tutor4end';
+            }, 500),
+          );
+          tutorTimeout.push(
+            setTimeout(() => {
+              this.handClass = 'hand'; //clickhand
+              this.tutorClass = 'tutor4start';
+              this.showExtendBtns = true;
+            }, 1500),
+          );
+          tutorTimeout.push(
+            setTimeout(() => {
+              this.handClass = 'hidehand';
+            }, 2500),
+          );
+          tutorTimeout.push(
+            setTimeout(() => {
+              this.showExtendBtns = false;
+            }, 3000),
+          );
           break;
         case 5:
-          this.clearTutorTimeout()
-          this.handClass = 'hand'//clickhand
-          this.tutorClass = 'tutor5start'
-          tutorTimeout.push(setTimeout(()=>{
-            this.handClass = 'clickhand'//clickhand
-            this.tutorClass = 'tutor5end'
-          },1200))
-          tutorTimeout.push(setTimeout(()=>{this.swiper.slidePrev();},1500))
-          tutorTimeout.push(setTimeout(()=>{this.swiper.slideNext();this.handClass = 'hidehand'},2500))
+          this.clearTutorTimeout();
+          this.handClass = 'hand'; //clickhand
+          this.tutorClass = 'tutor5start';
+          tutorTimeout.push(
+            setTimeout(() => {
+              this.handClass = 'clickhand'; //clickhand
+              this.tutorClass = 'tutor5end';
+            }, 1200),
+          );
+          tutorTimeout.push(
+            setTimeout(() => {
+              this.swiper.slidePrev();
+            }, 1500),
+          );
+          tutorTimeout.push(
+            setTimeout(() => {
+              this.swiper.slideNext();
+              this.handClass = 'hidehand';
+            }, 2500),
+          );
           break;
         case 6:
-          this.clearTutorTimeout()
-          this.handClass = 'hand'//clickhand
-          this.tutorClass = 'tutor6start'
-          tutorTimeout.push(setTimeout(()=>{
-            this.handClass = 'clickhand'//clickhand
-            this.tutorClass = 'tutor6end'
-          },500))
-          tutorTimeout.push(setTimeout(()=>{
-            this.handClass = 'hand'//clickhand
-            this.tutorClass = 'tutor6end'
-          },800))
-          tutorTimeout.push(setTimeout(()=>{
-            this.handClass = 'hidehand'
-          },1500))
+          this.clearTutorTimeout();
+          this.handClass = 'hand'; //clickhand
+          this.tutorClass = 'tutor6start';
+          tutorTimeout.push(
+            setTimeout(() => {
+              this.handClass = 'clickhand'; //clickhand
+              this.tutorClass = 'tutor6end';
+            }, 500),
+          );
+          tutorTimeout.push(
+            setTimeout(() => {
+              this.handClass = 'hand'; //clickhand
+              this.tutorClass = 'tutor6end';
+            }, 800),
+          );
+          tutorTimeout.push(
+            setTimeout(() => {
+              this.handClass = 'hidehand';
+            }, 1500),
+          );
           break;
         default:
           this.tutorSession = 0;
@@ -509,25 +564,25 @@ export default {
       }
     },
     clearTutorTimeout() {
-      this.showExtendBtns=false;
-      tutorTimeout.forEach(v=>clearTimeout(v))
-      tutorTimeout = []
-    }
+      this.showExtendBtns = false;
+      tutorTimeout.forEach(v => clearTimeout(v));
+      tutorTimeout = [];
+    },
   },
   created() {
     //check cookie to get serviceToken first
     // if stoken not exist, go auth
 
-    const self = this
-    Tone.Transport.cancel()
-    tonepart = []
-    bouncepart = []
+    const self = this;
+    Tone.Transport.cancel();
+    tonepart = [];
+    bouncepart = [];
     // this is very important
     var docElem = document.documentElement;
     window.rem = docElem.getBoundingClientRect().width / 10;
     docElem.style.fontSize = window.rem + 'px';
 
-    this.PARTNUM = 3
+    this.PARTNUM = 3;
     this.pianoRollSwiperOption = {
       initialSlide: this.PARTNUM,
       // centeredSlides: true,
@@ -540,68 +595,75 @@ export default {
         //   console.log('2',e)
         // },
         transitionEnd: function(e) {
-          console.log('3', this.activeIndex) // THIS!!! within swiper...scope.....
-          self.activeSwiperIndex = this.activeIndex
-          self.confirmRecordPart(!isLinger)
-        }
-      }
-    }
-    const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase())
-    if (!inWechat) return
+          console.log('3', this.activeIndex); // THIS!!! within swiper...scope.....
+          self.activeSwiperIndex = this.activeIndex;
+          self.confirmRecordPart(!isLinger);
+        },
+      },
+    };
+    const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase());
+    if (!inWechat) return;
     // alert(Cookies.get('serviceToken'))
-    WxShare.prepareShareConfig().then(()=>{
+    WxShare.prepareShareConfig().then(() => {
       WxShare.prepareShareContent({
-        title:'MUSIXISE',
-        desc:'寻找你自己的八音盒',
-        fullPath:`${location.origin}${location.pathname}#/new-music-box-maker`,
-        imgUrl:'http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png',
-      })
-    })
+        title: 'MUSIXISE',
+        desc: '寻找你自己的八音盒',
+        fullPath: `${location.origin}${location.pathname}#/new-music-box-maker`,
+        imgUrl: 'http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png',
+      });
+    });
     if (Util.getUrlParam('code') || Cookies.get('serviceToken')) {
       //TODO:ajax call to get info
       Api.getUserInfo(Util.getUrlParam('code'))
-        .then((res) => {
+        .then(res => {
           if (res.data.errcode >= 20000) {
             // 网页内cookie失效，需要重新验证
-            Cookies.remove('serviceToken')
+            Cookies.remove('serviceToken');
             location.replace(
               // will publish to node project m-musixise, under '/music-box' path
               // 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect'
               // `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
-              `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(location.origin+location.pathname+'#/new-music-box-maker')}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
-            )
+              `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(
+                location.origin + location.pathname + '#/new-music-box-maker',
+              )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`,
+            );
           }
           // alert(`welcome${res.data.data.realname}`)
-          console.log('get user info success', res.data.data)
+          console.log('get user info success', res.data.data);
         })
-        .catch((err) => {
-          Cookies.remove('serviceToken')
+        .catch(err => {
+          Cookies.remove('serviceToken');
           location.replace(
             // 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect'
             // `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
-            `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(location.origin+location.pathname+'#/new-music-box-maker')}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
-          )
-        })
-    } else { //又没有微信给的auth code又没有token存在cookie，只得验证
+            `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(
+              location.origin + location.pathname + '#/new-music-box-maker',
+            )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`,
+          );
+        });
+    } else {
+      //又没有微信给的auth code又没有token存在cookie，只得验证
       location.replace(
         // 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect'
         // `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
-        `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(location.origin+location.pathname+'#/new-music-box-maker')}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
-      )
+        `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(
+          location.origin + location.pathname + '#/new-music-box-maker',
+        )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`,
+      );
     }
   },
-  beforeRouteLeave (to, from, next) {
-    Magic.clearTone(tonepart)
-    next()
+  beforeRouteLeave(to, from, next) {
+    Magic.clearTone(tonepart);
+    next();
   },
   mounted() {
     // this.startRecord();
     // pointer events以后可以使用
-    this.tutorStart()
+    this.tutorStart();
   },
-  updated() {
-  }
+  updated() {},
 };
+
 </script>
 
 <template>

@@ -1,12 +1,12 @@
 <script>
 // window.Tone = require('tone')
-import * as Util from '../_common/js/util'
-import * as Api from '../_common/js/api'
-import * as Cookies from "js-cookie"
-import * as Magic from '../_common/js/magic'
-import countButton from './common/countButton'
-import * as WxShare from '../_common/js/wx_share'
-let musicPart = undefined
+import * as Util from '../_common/js/util';
+import * as Api from '../_common/js/api';
+import * as Cookies from 'js-cookie';
+import * as Magic from '../_common/js/magic';
+import countButton from './common/countButton';
+import * as WxShare from '../_common/js/wx_share';
+let musicPart = undefined;
 
 export default {
   components: {
@@ -15,89 +15,96 @@ export default {
   data() {
     return {
       // playing: false,
-      loading:true,
-      workIntroAppear:false,
-      controlPanalAppear:false,
-      titleUpdateAppear:false,
-      playing:false,
-      userId:0,
-      favStatus:false,
-      newWorkTitle:'',
-      finalNewWorkTitle:'',
-    }
+      loading: true,
+      workIntroAppear: false,
+      controlPanalAppear: false,
+      titleUpdateAppear: false,
+      playing: false,
+      userId: 0,
+      favStatus: false,
+      newWorkTitle: '',
+      finalNewWorkTitle: '',
+    };
   },
   computed: {
     project() {
-      return this.$store.state.recordProject
+      return this.$store.state.recordProject;
     },
     projectInfo() {
-      return this.$store.state.recordProjectInfo
+      return this.$store.state.recordProjectInfo;
     },
   },
   methods: {
     load() {},
     loadMusicById() {
-      console.log('hehe', this.$store.state)
-      const {id} = this.$store.state.route.query
-      if(id){ //从id取作品
-        console.log('mmm',id)
-        this.$store.dispatch('FETCH_MBOX',{id}).then(() => {
-          console.log('workPart',this.project)
-          console.log('work info',this.projectInfo)
-          this.favStatus = this.projectInfo.favStatus
+      console.log('hehe', this.$store.state);
+      const { id } = this.$store.state.route.query;
+      if (id) {
+        //从id取作品
+        console.log('mmm', id);
+        this.$store.dispatch('FETCH_MBOX', { id }).then(() => {
+          console.log('workPart', this.project);
+          console.log('work info', this.projectInfo);
+          this.favStatus = this.projectInfo.favStatus;
           // alert('load complete');
           // this.togglePlay();
-          const fullPath = `${location.origin}${location.pathname}#/new-music-box-viewer?id=${this.$store.state.route.query.id}`
+          const fullPath = `${location.origin}${location.pathname}#/new-music-box-viewer?id=${
+            this.$store.state.route.query.id
+          }`;
           WxShare.prepareShareContent({
-            title:'MUSIXISE',
-            desc:`来听${this.projectInfo.userVO.realname}的作品-${this.projectInfo.title}`,
+            title: 'MUSIXISE',
+            desc: `来听${this.projectInfo.userVO.realname}的作品-${this.projectInfo.title}`,
             // fullPath:location.href.split('#')[0],
             fullPath,
-            imgUrl:'http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png',
-          })
-        })
+            imgUrl: 'http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png',
+          });
+        });
       } else {
         // 不会出现这个情况
-        this.$store.dispatch('FETCH_MBOX',{id:50}).then(() => {
-          console.log('workPart',this.project)
-          console.log('work info',this.projectInfo)
-          this.favStatus = this.projectInfo.favStatus
+        this.$store.dispatch('FETCH_MBOX', { id: 50 }).then(() => {
+          console.log('workPart', this.project);
+          console.log('work info', this.projectInfo);
+          this.favStatus = this.projectInfo.favStatus;
           // alert('load complete');
           // this.togglePlay();
-        })
+        });
       }
     },
     togglePlay() {
       // alert('111')
-      Magic.preview(this.project,!this.playing)
+      Magic.preview(this.project, !this.playing);
       this.playing = !this.playing;
     },
     toggleFav() {
       this.favStatus = +!this.favStatus;
       Api.toggleFavSong({
-        workId:this.$store.state.route.query.id,
-        status:this.favStatus,
-      }).then(()=>{
-
-      }).catch((err)=>{
-        // alert(JSON.stringify(err))
+        workId: this.$store.state.route.query.id,
+        status: this.favStatus,
       })
+        .then(() => {})
+        .catch(err => {
+          // alert(JSON.stringify(err))
+        });
     },
     updateWorkTitle() {
       Api.updateWorkTitle({
-        id:this.$store.state.route.query.id,
-        title:this.newWorkTitle,
-      })
-      this.finalNewWorkTitle = this.newWorkTitle
-      const fullPath = `${location.origin}${location.pathname}#/new-music-box-viewer?id=${this.$store.state.route.query.id}`
+        id: this.$store.state.route.query.id,
+        title: this.newWorkTitle,
+      });
+      this.finalNewWorkTitle = this.newWorkTitle;
+      const fullPath = `${location.origin}${location.pathname}#/new-music-box-viewer?id=${
+        this.$store.state.route.query.id
+      }`;
       WxShare.prepareShareContent({
-        title:'MUSIXISE',
-        desc:`来听${this.projectInfo.userVO.realname}的作品-${this.newWorkTitle}`,
+        title: 'MUSIXISE',
+        desc: `来听${this.projectInfo.userVO.realname}的作品-${this.newWorkTitle}`,
         // fullPath:location.href.split('#')[0],
         fullPath,
-        imgUrl:'http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png',
-      })
-      setTimeout(()=>{this.titleUpdateAppear=false},300);
+        imgUrl: 'http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png',
+      });
+      setTimeout(() => {
+        this.titleUpdateAppear = false;
+      }, 300);
     },
     redirectToMaker() {
       this.$router.push({
@@ -105,93 +112,108 @@ export default {
         // query: {
         //   id
         // }
-      })
+      });
     },
     redirectToMusixiser(id) {
       if (id) {
         this.$router.push({
-          path:'/musixiser',
-          query:{
-            id
-          }
-        })
+          path: '/musixiser',
+          query: {
+            id,
+          },
+        });
       }
     },
     purchaseItem() {
-      console.log(`you are about to purchase ${this.projectInfo.id}`)
-      this.$toast('尚未开发购买功能')
-    }
+      console.log(`you are about to purchase ${this.projectInfo.id}`);
+      this.$toast('尚未开发购买功能');
+    },
   },
-  beforeRouteLeave (to, from, next) {
-    Magic.clearTone()
-    next()
+  beforeRouteLeave(to, from, next) {
+    Magic.clearTone();
+    next();
   },
   created() {
     //check cookie to get serviceToken first
     // if stoken not exist, go auth
-    const self = this
+    const self = this;
     var docElem = document.documentElement;
     window.rem = docElem.getBoundingClientRect().width / 10;
     docElem.style.fontSize = window.rem + 'px';
 
-
-    const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase())
+    const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase());
     if (!inWechat) {
-       self.loadMusicById()
-       return
-     }
-    const fullPath = `${location.origin}${location.pathname}#/new-music-box-viewer?id=${self.$store.state.route.query.id}`
-    WxShare.prepareShareConfig().then(()=>{
+      self.loadMusicById();
+      return;
+    }
+    const fullPath = `${location.origin}${location.pathname}#/new-music-box-viewer?id=${
+      self.$store.state.route.query.id
+    }`;
+    WxShare.prepareShareConfig().then(() => {
       WxShare.prepareShareContent({
-        title:'MUSIXISE',
-        desc:'分享一个八音盒',
+        title: 'MUSIXISE',
+        desc: '分享一个八音盒',
         // fullPath:location.href.split('#')[0],
         fullPath,
-        imgUrl:'http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png',
-      })
-    })
+        imgUrl: 'http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png',
+      });
+    });
     // alert(Cookies.get('serviceToken'))
     if (Util.getUrlParam('code') || Cookies.get('serviceToken')) {
       //TODO:ajax call to get info
       Api.getUserInfo(Util.getUrlParam('code'))
-        .then((res) => {
+        .then(res => {
           if (res.data.errcode >= 20000) {
             // 网页内cookie失效，需要重新验证
-            Cookies.remove('serviceToken')
+            Cookies.remove('serviceToken');
             location.replace(
               // will publish to node project m-musixise, under '/music-box' path
-              `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(fullPath)}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
-            )
+              `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(
+                fullPath,
+              )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`,
+            );
           }
-          self.userId = res.data.data.userId
+          self.userId = res.data.data.userId;
           // alert(`welcome${res.data.data.realname}`)
           // if (!this.project) {
-            self.loadMusicById()
+          self.loadMusicById();
           // }
 
-          console.log('get user info success', res.data.data)
+          console.log('get user info success', res.data.data);
         })
-        .catch((err) => {
-          Cookies.remove('serviceToken')
+        .catch(err => {
+          Cookies.remove('serviceToken');
           location.replace(
-            `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(fullPath)}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
-          )
-        })
-    } else { //又没有微信给的auth code又没有token存在cookie，只得验证
+            `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(
+              fullPath,
+            )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`,
+          );
+        });
+    } else {
+      //又没有微信给的auth code又没有token存在cookie，只得验证
       location.replace(
-        `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(fullPath)}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
-      )
+        `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(
+          fullPath,
+        )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`,
+      );
     }
   },
   mounted() {
     // this.startRecord();
-    setTimeout(()=>{this.loading = false},2000)
-    setTimeout(()=>{this.workIntroAppear = true;},4500)
-    setTimeout(()=>{this.controlPanalAppear = true},5500)
+    setTimeout(() => {
+      this.loading = false;
+    }, 2000);
+    setTimeout(() => {
+      this.workIntroAppear = true;
+    }, 4500);
+    setTimeout(() => {
+      this.controlPanalAppear = true;
+    }, 5500);
     // setTimeout(()=>{this.playing = true},6000)
   },
-  updated() {}
+  updated() {},
 };
+
 </script>
 
 <template>

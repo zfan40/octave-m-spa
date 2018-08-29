@@ -1,46 +1,70 @@
 <script>
-window.Tone = require('tone')
-import * as Util from '../_common/js/util'
-import * as Api from '../_common/js/api'
-import * as Cookies from "js-cookie"
-import * as Magic from '../_common/js/magic'
+window.Tone = require('tone');
+import * as Util from '../_common/js/util';
+import * as Api from '../_common/js/api';
+import * as Cookies from 'js-cookie';
+import * as Magic from '../_common/js/magic';
 // import countButton from './common/countButton'
-import * as WxShare from '../_common/js/wx_share'
-let musicPart = undefined
-import Vue from 'vue'
-import VueKonva from 'vue-konva'
-const musicScale = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24, 26, 28, 29]
-const colors = ['#8fd3c7', '#95c631', '#edda28', '#f7943d', '#e43159', '#bf4ea8', '#4d61d9', '#45b5a1', '#8fd3c7', '#95c631', '#edda28', '#f7943d', '#e43159', '#bf4ea8', '#4d61d9', '#45b5a1', '#edda28', '#f7943d']
-let last_i = -1
-let last_j = -1
-window.schedules = []
+import * as WxShare from '../_common/js/wx_share';
+let musicPart = undefined;
+import Vue from 'vue';
+import VueKonva from 'vue-konva';
+const musicScale = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24, 26, 28, 29];
+// const colors = ['#8fd3c7', '#95c631', '#edda28', '#f7943d', '#e43159', '#bf4ea8', '#4d61d9', '#45b5a1', '#8fd3c7', '#95c631', '#edda28', '#f7943d', '#e43159', '#bf4ea8', '#4d61d9', '#45b5a1', '#edda28', '#f7943d']
+const colors = [
+  '#9FB2CF',
+  '#9FB2CF',
+  '#9FB2CF',
+  '#9FB2CF',
+  '#9FB2CF',
+  '#9FB2CF',
+  '#9FB2CF',
+  '#9FB2CF',
+  '#9FB2CF',
+  '#9FB2CF',
+  '#9FB2CF',
+  '#9FB2CF',
+  '#9FB2CF',
+  '#9FB2CF',
+  '#9FB2CF',
+  '#9FB2CF',
+  '#9FB2CF',
+  '#9FB2CF',
+];
+let last_i = -1;
+let last_j = -1;
+window.schedules = [];
 let aInterval = undefined;
-const TIME_PER_NOTE = 0.25
-const FULL_NOTE_NUM = 80 //80 notes, then if set 20 per page, it would be 4 pages
-const NOTE_NUM_PER_SECTOR = 10
-Vue.use(VueKonva)
-var synth = new Tone.Sampler({
-  'C4': 'C4.[mp3|ogg]',
-  'D#4': 'Ds4.[mp3|ogg]',
-  'F#4': 'Fs4.[mp3|ogg]',
-  'A4': 'A4.[mp3|ogg]',
-  'C5': 'C5.[mp3|ogg]',
-  'D#5': 'Ds5.[mp3|ogg]',
-  'F#5': 'Fs5.[mp3|ogg]',
-  'A5': 'A5.[mp3|ogg]',
-  'C6': 'C6.[mp3|ogg]',
-}, {
-  'release': 1,
-  // 'baseUrl': '/static/audio/'
-  'baseUrl': '//cnbj1.fds.api.xiaomi.com/mbox/audio/'
-}).toMaster()
+let extendBtnsTimeout = undefined;
+const TIME_PER_NOTE = 0.25;
+const FULL_NOTE_NUM = 80; //80 notes, then if set 20 per page, it would be 4 pages
+const NOTE_NUM_PER_SECTOR = 10;
+Vue.use(VueKonva);
+var synth = new Tone.Sampler(
+  {
+    C4: 'C4.[mp3|ogg]',
+    'D#4': 'Ds4.[mp3|ogg]',
+    'F#4': 'Fs4.[mp3|ogg]',
+    A4: 'A4.[mp3|ogg]',
+    C5: 'C5.[mp3|ogg]',
+    'D#5': 'Ds5.[mp3|ogg]',
+    'F#5': 'Fs5.[mp3|ogg]',
+    A5: 'A5.[mp3|ogg]',
+    C6: 'C6.[mp3|ogg]',
+  },
+  {
+    release: 1,
+    // 'baseUrl': '/static/audio/'
+    baseUrl: '//cnbj1.fds.api.xiaomi.com/mbox/audio/',
+  },
+).toMaster();
 var pulseOptions = {
   oscillator: {
-    type: "triangle"
+    type: 'triangle',
   },
   envelope: {
-    release: 0.07
-  }
+    release: 0.07,
+  },
 };
 const piano = new Tone.PolySynth(18, Tone.Synth, pulseOptions).toMaster();
 export default {
@@ -55,277 +79,341 @@ export default {
       tempo: 120,
       configKonva: {
         width: 0,
-        height: 0
+        height: 0,
       },
-      configNoteRect: {
-
-      },
+      configNoteRect: {},
       activeJ: -1, // highlight timeline
       sector: 1, // 2*4-1,可以滚动7次，营造处4页的氛围
-      rectArray: [
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        []
-      ],
+      rectArray: [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []],
       alertAppear: false,
-    }
+      showExtendBtns: false,
+      playing: false,
+    };
   },
-  computed: {
-
-  },
+  computed: {},
   methods: {
     setupCanvas() {
       const docElem = document.documentElement;
       this.configKonva = {
-        width: docElem.getBoundingClientRect().width - 60,
-        height: window.innerHeight
+        width: docElem.getBoundingClientRect().width - 50,
+        height: window.innerHeight,
       };
       this.configNoteRect = {
-        width: (docElem.getBoundingClientRect().width - 60) / this.NOTE_CATEGORY,
+        width: (docElem.getBoundingClientRect().width - 50) / this.NOTE_CATEGORY,
         height: window.innerHeight / this.ONE_PAGE_NOTE_NUM,
         fill: '#fff',
-        stroke: '#d2ecfc',
-        strokeWidth: 1
-      }
+        stroke: '#000',
+        strokeWidth: 0.5,
+      };
       for (let j = 0; j <= FULL_NOTE_NUM - 1; j++) {
         for (let sector = 0; sector <= this.sector; sector++) {
           // console.log(111)
-          Tone.Transport.scheduleRepeat((time) => {
-            this.activeJ = j + (sector - 1) * this.NOTE_NUM_PER_SECTOR
-          }, FULL_NOTE_NUM * TIME_PER_NOTE * 120 / this.tempo, (j + (sector - 1) * this.NOTE_NUM_PER_SECTOR) * TIME_PER_NOTE * 120 / this.tempo);
+          Tone.Transport.scheduleRepeat(
+            time => {
+              this.activeJ = j + (sector - 1) * this.NOTE_NUM_PER_SECTOR;
+            },
+            FULL_NOTE_NUM * TIME_PER_NOTE * 120 / this.tempo,
+            (j + (sector - 1) * this.NOTE_NUM_PER_SECTOR) * TIME_PER_NOTE * 120 / this.tempo,
+          );
         }
       }
-
     },
     setupRect(i, j, sector) {
       let fill = '';
       // split NOTE_NUM_PER_SECTOR and this.NOTE_NUM_PER_SECTOR for ANIMATION!!!
-      if (j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR == this.activeJ &&
-        this.rectArray[i][j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]) {
+      if (
+        j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR == this.activeJ &&
+        this.rectArray[i][j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]
+      ) {
         // active current note: lighter color
-        fill = colors[i]
+        fill = '#A9B9FF';
       } else if (
         j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR == this.activeJ &&
         !this.rectArray[i][j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]
       ) {
         // inactive current light blue
-        fill = '#f0f8ff'
-      } else if (this.rectArray[i][j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]) {
+        fill = '#2B2E3D';
+      } else if (
+        this.rectArray[i][j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]
+      ) {
         // active non-current note
-        fill = colors[i]
+        fill = colors[i];
       } else {
         // incative non-current note
-        fill = '#fff';
+        fill = `rgba(0,0,0,${1 - i * 0.3 / this.NOTE_CATEGORY})`;
       }
       return {
         ...this.configNoteRect,
         x: i * this.configKonva.width / this.NOTE_CATEGORY,
         y: j * this.configKonva.height / this.ONE_PAGE_NOTE_NUM,
-        fill
-      }
+        fill,
+      };
     },
     handleTouchRect(i, j, sector) {
       // console.log(`trigger ${i},${j+(sector-1)*this.NOTE_NUM_PER_SECTOR}`)
       // make sound
-      synth.triggerAttackRelease(Tone.Frequency(60 + musicScale[i], "midi"), 0.5)
+      synth.triggerAttackRelease(Tone.Frequency(60 + musicScale[i], 'midi'), 0.5);
       // this.rectArray[i][j] = !this.rectArray[i][j] // this is how to assign a two dim array in vue 2.0...
-      const newRow = this.rectArray[i].slice(0)
-      newRow[j + (sector - 1) * this.NOTE_NUM_PER_SECTOR] = !newRow[j + (sector - 1) * this.NOTE_NUM_PER_SECTOR]
-      this.$set(this.rectArray, i, newRow)
+      const newRow = this.rectArray[i].slice(0);
+      newRow[j + (sector - 1) * this.NOTE_NUM_PER_SECTOR] = !newRow[
+        j + (sector - 1) * this.NOTE_NUM_PER_SECTOR
+      ];
+      this.$set(this.rectArray, i, newRow);
       // schedule/clearEvent
-      if (newRow[j + (sector - 1) * this.NOTE_NUM_PER_SECTOR]) { //schedule
-        schedules[i][j + (sector - 1) * this.NOTE_NUM_PER_SECTOR] = Tone.Transport.scheduleRepeat((time) => {
-          synth.triggerAttackRelease(Tone.Frequency(60 + musicScale[i], "midi"), 0.5)
-        }, FULL_NOTE_NUM * TIME_PER_NOTE * 120 / this.tempo, (j + (sector - 1) * this.NOTE_NUM_PER_SECTOR) * TIME_PER_NOTE * 120 / this.tempo);
-        console.log(`schedule ${i},${j + (sector - 1) * this.NOTE_NUM_PER_SECTOR}`, schedules[i][j + (sector - 1) * this.NOTE_NUM_PER_SECTOR])
-      } else { // clear
-        console.log(`clear ${i},${j + (sector - 1) * this.NOTE_NUM_PER_SECTOR}`, schedules[i][j + (sector - 1) * this.NOTE_NUM_PER_SECTOR])
-        Tone.Transport.clear(schedules[i][j + (sector - 1) * this.NOTE_NUM_PER_SECTOR])
+      if (newRow[j + (sector - 1) * this.NOTE_NUM_PER_SECTOR]) {
+        //schedule
+        schedules[i][j + (sector - 1) * this.NOTE_NUM_PER_SECTOR] = Tone.Transport.scheduleRepeat(
+          time => {
+            synth.triggerAttackRelease(Tone.Frequency(60 + musicScale[i], 'midi'), 0.5);
+          },
+          FULL_NOTE_NUM * TIME_PER_NOTE * 120 / this.tempo,
+          (j + (sector - 1) * this.NOTE_NUM_PER_SECTOR) * TIME_PER_NOTE * 120 / this.tempo,
+        );
+        console.log(
+          `schedule ${i},${j + (sector - 1) * this.NOTE_NUM_PER_SECTOR}`,
+          schedules[i][j + (sector - 1) * this.NOTE_NUM_PER_SECTOR],
+        );
+      } else {
+        // clear
+        console.log(
+          `clear ${i},${j + (sector - 1) * this.NOTE_NUM_PER_SECTOR}`,
+          schedules[i][j + (sector - 1) * this.NOTE_NUM_PER_SECTOR],
+        );
+        Tone.Transport.clear(schedules[i][j + (sector - 1) * this.NOTE_NUM_PER_SECTOR]);
       }
       // update last
-      last_i = i
-      last_j = j
+      last_i = i;
+      last_j = j;
     },
     handleMoveRect(i, j, sector) {
-      if (j != last_j) { // take this as real note, store arrange
-        this.handleTouchRect(i, j, sector)
-      } else if (i != last_i && j == last_j) { // take this as testing note, no store, no arrange
+      if (j != last_j) {
+        // take this as real note, store arrange
+        this.handleTouchRect(i, j, sector);
+      } else if (i != last_i && j == last_j) {
+        // take this as testing note, no store, no arrange
         // make sound
-        synth.triggerAttackRelease(Tone.Frequency(60 + musicScale[i], "midi"), 0.5)
+        synth.triggerAttackRelease(Tone.Frequency(60 + musicScale[i], 'midi'), 0.5);
 
         // operate current note view
-        const newRow = this.rectArray[i].slice(0)
-        newRow[j + (sector - 1) * this.NOTE_NUM_PER_SECTOR] = !newRow[j + (sector - 1) * this.NOTE_NUM_PER_SECTOR]
-        this.$set(this.rectArray, i, newRow)
+        const newRow = this.rectArray[i].slice(0);
+        newRow[j + (sector - 1) * this.NOTE_NUM_PER_SECTOR] = !newRow[
+          j + (sector - 1) * this.NOTE_NUM_PER_SECTOR
+        ];
+        this.$set(this.rectArray, i, newRow);
 
         // operate current note scheduling
-        if (newRow[j + (sector - 1) * this.NOTE_NUM_PER_SECTOR]) { // to activate the note
-          schedules[i][j + (sector - 1) * this.NOTE_NUM_PER_SECTOR] = Tone.Transport.scheduleRepeat((time) => {
-            // this.activeJ = j + (sector - 1) * this.NOTE_NUM_PER_SECTOR
-            // console.log('bibibi', this.activeJ)
-            synth.triggerAttackRelease(Tone.Frequency(60 + musicScale[i], "midi"), 0.5)
-          }, FULL_NOTE_NUM * TIME_PER_NOTE * 120 / this.tempo, (j + (sector - 1) * this.NOTE_NUM_PER_SECTOR) * TIME_PER_NOTE * 120 / this.tempo);
-          console.log(`schedule ${i},${j + (sector - 1) * this.NOTE_NUM_PER_SECTOR}`, schedules[i][j + (sector - 1) * this.NOTE_NUM_PER_SECTOR])
+        if (newRow[j + (sector - 1) * this.NOTE_NUM_PER_SECTOR]) {
+          // to activate the note
+          schedules[i][j + (sector - 1) * this.NOTE_NUM_PER_SECTOR] = Tone.Transport.scheduleRepeat(
+            time => {
+              // this.activeJ = j + (sector - 1) * this.NOTE_NUM_PER_SECTOR
+              // console.log('bibibi', this.activeJ)
+              synth.triggerAttackRelease(Tone.Frequency(60 + musicScale[i], 'midi'), 0.5);
+            },
+            FULL_NOTE_NUM * TIME_PER_NOTE * 120 / this.tempo,
+            (j + (sector - 1) * this.NOTE_NUM_PER_SECTOR) * TIME_PER_NOTE * 120 / this.tempo,
+          );
+          console.log(
+            `schedule ${i},${j + (sector - 1) * this.NOTE_NUM_PER_SECTOR}`,
+            schedules[i][j + (sector - 1) * this.NOTE_NUM_PER_SECTOR],
+          );
         } else {
-          Tone.Transport.clear(schedules[i][j + (sector - 1) * this.NOTE_NUM_PER_SECTOR])
-          console.log(`clear ${i},${j + (sector - 1) * this.NOTE_NUM_PER_SECTOR}`, schedules[i][j + (sector - 1) * this.NOTE_NUM_PER_SECTOR])
+          Tone.Transport.clear(schedules[i][j + (sector - 1) * this.NOTE_NUM_PER_SECTOR]);
+          console.log(
+            `clear ${i},${j + (sector - 1) * this.NOTE_NUM_PER_SECTOR}`,
+            schedules[i][j + (sector - 1) * this.NOTE_NUM_PER_SECTOR],
+          );
         }
         // restore last note view
-        const newLastRow = this.rectArray[last_i].slice(0)
-        newLastRow[last_j + (sector - 1) * this.NOTE_NUM_PER_SECTOR] = !newLastRow[last_j + (sector - 1) * this.NOTE_NUM_PER_SECTOR]
-        this.$set(this.rectArray, last_i, newLastRow)
+        const newLastRow = this.rectArray[last_i].slice(0);
+        newLastRow[last_j + (sector - 1) * this.NOTE_NUM_PER_SECTOR] = !newLastRow[
+          last_j + (sector - 1) * this.NOTE_NUM_PER_SECTOR
+        ];
+        this.$set(this.rectArray, last_i, newLastRow);
         // restore last note scheduling
         if (newLastRow[last_j + (sector - 1) * this.NOTE_NUM_PER_SECTOR]) {
-          schedules[last_i][last_j + (sector - 1) * this.NOTE_NUM_PER_SECTOR] = Tone.Transport.scheduleRepeat((time) => {
-            // this.activeJ = j + (sector - 1) * this.NOTE_NUM_PER_SECTOR
-            // console.log('bibibi', this.activeJ)
-            synth.triggerAttackRelease(Tone.Frequency(60 + musicScale[last_i], "midi"), 0.5)
-          }, FULL_NOTE_NUM * TIME_PER_NOTE * 120 / this.tempo, (last_j + (sector - 1) * this.NOTE_NUM_PER_SECTOR) * TIME_PER_NOTE * 120 / this.tempo);
-          console.log(`reschedule ${last_i},${last_j + (sector - 1) * this.NOTE_NUM_PER_SECTOR}`, schedules[last_i][last_j + (sector - 1) * this.NOTE_NUM_PER_SECTOR])
+          schedules[last_i][
+            last_j + (sector - 1) * this.NOTE_NUM_PER_SECTOR
+          ] = Tone.Transport.scheduleRepeat(
+            time => {
+              // this.activeJ = j + (sector - 1) * this.NOTE_NUM_PER_SECTOR
+              // console.log('bibibi', this.activeJ)
+              synth.triggerAttackRelease(Tone.Frequency(60 + musicScale[last_i], 'midi'), 0.5);
+            },
+            FULL_NOTE_NUM * TIME_PER_NOTE * 120 / this.tempo,
+            (last_j + (sector - 1) * this.NOTE_NUM_PER_SECTOR) * TIME_PER_NOTE * 120 / this.tempo,
+          );
+          console.log(
+            `reschedule ${last_i},${last_j + (sector - 1) * this.NOTE_NUM_PER_SECTOR}`,
+            schedules[last_i][last_j + (sector - 1) * this.NOTE_NUM_PER_SECTOR],
+          );
         } else {
-          console.log(`reclear ${last_i},${last_j + (sector - 1) * this.NOTE_NUM_PER_SECTOR}`, schedules[last_i][last_j + (sector - 1) * this.NOTE_NUM_PER_SECTOR])
-          Tone.Transport.clear(schedules[last_i][last_j + (sector - 1) * this.NOTE_NUM_PER_SECTOR])
+          console.log(
+            `reclear ${last_i},${last_j + (sector - 1) * this.NOTE_NUM_PER_SECTOR}`,
+            schedules[last_i][last_j + (sector - 1) * this.NOTE_NUM_PER_SECTOR],
+          );
+          Tone.Transport.clear(schedules[last_i][last_j + (sector - 1) * this.NOTE_NUM_PER_SECTOR]);
         }
         // update last
-        last_i = i
-        last_j = j
+        last_i = i;
+        last_j = j;
       } else {
         // console.log(`ignore ${i},${j}`)
       }
     },
     startloop() {
-      Tone.Transport.start('+0.1')
+      Tone.Transport.start('+0.1');
+      this.playing = true;
     },
     stoploop() {
-      Tone.Transport.stop()
+      Tone.Transport.stop();
+      this.playing = false;
+    },
+    toggleReplay() {
+      if (this.playing) this.stoploop();
+      else this.startloop();
     },
     minusTempo() {
-      this.tempo -= 10
-      Tone.Transport.bpm.rampTo(this.tempo, .1);
+      this.tempo -= 10;
+      Tone.Transport.bpm.rampTo(this.tempo, 0.1);
     },
     addTempo() {
-      this.tempo += 10
-      Tone.Transport.bpm.rampTo(this.tempo, .1);
+      this.tempo += 10;
+      Tone.Transport.bpm.rampTo(this.tempo, 0.1);
     },
     scrolldown() {
-      clearInterval(aInterval)
-      this.sector == (FULL_NOTE_NUM / NOTE_NUM_PER_SECTOR - 1) ? this.NOTE_NUM_PER_SECTOR = NOTE_NUM_PER_SECTOR - 2 : this.NOTE_NUM_PER_SECTOR = 1 // for animation,
-      this.sector <= (FULL_NOTE_NUM / NOTE_NUM_PER_SECTOR - 2) ? this.sector += 1 : '' // this line is real scroll down
+      clearInterval(aInterval);
+      this.sector == FULL_NOTE_NUM / NOTE_NUM_PER_SECTOR - 1
+        ? (this.NOTE_NUM_PER_SECTOR = NOTE_NUM_PER_SECTOR - 2)
+        : (this.NOTE_NUM_PER_SECTOR = 1); // for animation,
+      this.sector <= FULL_NOTE_NUM / NOTE_NUM_PER_SECTOR - 2 ? (this.sector += 1) : ''; // this line is real scroll down
       // below is for animation
       aInterval = setInterval(() => {
         this.NOTE_NUM_PER_SECTOR += 1;
         if (this.NOTE_NUM_PER_SECTOR == 10) {
-          clearInterval(aInterval)
+          clearInterval(aInterval);
         }
-      }, 50)
+      }, 50);
     },
     scrollup() {
-      clearInterval(aInterval)
-      this.sector == 1 ? this.NOTE_NUM_PER_SECTOR = NOTE_NUM_PER_SECTOR + 2 : this.NOTE_NUM_PER_SECTOR = 20 // for animation,
-      this.sector >= 2 ? this.sector -= 1 : ''
+      clearInterval(aInterval);
+      this.sector == 1
+        ? (this.NOTE_NUM_PER_SECTOR = NOTE_NUM_PER_SECTOR + 2)
+        : (this.NOTE_NUM_PER_SECTOR = 20); // for animation,
+      this.sector >= 2 ? (this.sector -= 1) : '';
       aInterval = setInterval(() => {
         this.NOTE_NUM_PER_SECTOR -= 1;
         if (this.NOTE_NUM_PER_SECTOR == 10) {
-          clearInterval(aInterval)
+          clearInterval(aInterval);
         }
-      }, 50)
+      }, 50);
     },
     checkBouncibility() {
-      const result = []
+      const result = [];
       for (let i = 0; i <= this.NOTE_CATEGORY - 1; i++) {
         for (let j = 0; j <= FULL_NOTE_NUM - 1; j++) {
           if (this.rectArray[i][j]) {
             result.push({
-              note: Tone.Frequency(60 + musicScale[i], "midi").toNote(),
-              time: j * TIME_PER_NOTE * 120 / this.tempo
-            })
+              note: Tone.Frequency(60 + musicScale[i], 'midi').toNote(),
+              time: j * TIME_PER_NOTE * 120 / this.tempo,
+            });
           }
         }
       }
-      result.sort((a, b) => (0 + a.time - b.time))
-      return Magic.RealMagic(result)
+      result.sort((a, b) => 0 + a.time - b.time);
+      return Magic.RealMagic(result);
     },
     bounceProject() {
       // finally get something like [{note:'A4',time:0},{note:'A5',time:0.3227}]
-      const result = []
+      const result = [];
       for (let i = 0; i <= this.NOTE_CATEGORY - 1; i++) {
         for (let j = 0; j <= FULL_NOTE_NUM - 1; j++) {
           if (this.rectArray[i][j]) {
             result.push({
-              note: Tone.Frequency(60 + musicScale[i], "midi").toNote(),
-              time: j * TIME_PER_NOTE * 120 / this.tempo
-            })
+              note: Tone.Frequency(60 + musicScale[i], 'midi').toNote(),
+              time: j * TIME_PER_NOTE * 120 / this.tempo,
+            });
           }
         }
       }
-      this.$store.dispatch('BOUNCE_PROJECT', {
-        record: result,
-        info: {
-          title: '尚未起名',
-          content: 'default',
-          cover: 'default'
-        },
-      }).then(id => {
-        console.log('successfully bounced')
-        this.bouncing = false;
-        this.$toast('作品已为您存储')
-        this.$router.push({
-          path: '/new-music-box-viewer',
-          query: {
-            id
-          }
+      this.$store
+        .dispatch('BOUNCE_PROJECT', {
+          record: result,
+          info: {
+            title: '尚未起名',
+            content: 'default',
+            cover: 'default',
+          },
         })
-      }).catch((err) => {
-        this.bouncing = false;
-        this.$toast('非常抱歉，上传作品失败了')
-      })
+        .then(id => {
+          console.log('successfully bounced');
+          this.bouncing = false;
+          this.$toast('作品已为您存储');
+          this.$router.push({
+            path: '/new-music-box-viewer',
+            query: {
+              id,
+            },
+          });
+        })
+        .catch(err => {
+          this.bouncing = false;
+          this.$toast('非常抱歉，上传作品失败了');
+        });
     },
     submitProject() {
       if (this.checkBouncibility()) {
-        alert(1)
-        this.bounceProject()
+        alert(1);
+        this.bounceProject();
       } else {
-        alert(2)
+        alert(2);
         this.alertAppear = true;
       }
     },
-    clearProject() {
-
-    }
+    clearProject() {},
+    btnStart(e) {
+      console.log(e);
+      extendBtnsTimeout = setTimeout(() => {
+        //show extend buttons
+        this.showExtendBtns = true;
+      }, 200);
+    },
+    btnEnd(e) {
+      // console.log(e)
+      clearTimeout(extendBtnsTimeout);
+      const a = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+      console.log(a);
+      if (a && a.classList.contains('bounceBtn')) {
+        this.submitProject()
+      } else if (a && (a.classList.contains('playBtn') || a.classList.contains('pauseBtn'))) {
+        //播放
+        // console.log(Tone.Transport.state)
+        this.toggleReplay();
+        this.showExtendBtns = false;
+      } else if (a && (a.classList.contains('playBtn') || a.classList.contains('cancelBtn'))) {
+        //hide extend buttons
+        this.showExtendBtns = false;
+      }
+    },
   },
   beforeRouteLeave(to, from, next) {
-    Magic.clearTone()
-    next()
+    Magic.clearTone();
+    next();
   },
   created() {
-    this.setupCanvas()
-    schedules = JSON.parse(JSON.stringify(this.rectArray))
+    this.setupCanvas();
+    schedules = JSON.parse(JSON.stringify(this.rectArray));
 
     // regular setup
-    const self = this
-    Tone.Transport.cancel()
+    const self = this;
+    Tone.Transport.cancel();
     // this is very important
     var docElem = document.documentElement;
     window.rem = docElem.getBoundingClientRect().width / 10;
     docElem.style.fontSize = window.rem + 'px';
 
-    const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase())
-    if (!inWechat) return
+    const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase());
+    if (!inWechat) return;
     // alert(Cookies.get('serviceToken'))
     WxShare.prepareShareConfig().then(() => {
       WxShare.prepareShareContent({
@@ -333,69 +421,84 @@ export default {
         desc: '划拉划拉八音盒',
         fullPath: `${location.origin}${location.pathname}#/new-music-box-roll`,
         imgUrl: 'http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png',
-      })
-    })
+      });
+    });
     if (Util.getUrlParam('code') || Cookies.get('serviceToken')) {
       //TODO:ajax call to get info
       Api.getUserInfo(Util.getUrlParam('code'))
-        .then((res) => {
+        .then(res => {
           if (res.data.errcode >= 20000) {
             // 网页内cookie失效，需要重新验证
-            Cookies.remove('serviceToken')
+            Cookies.remove('serviceToken');
             location.replace(
               // will publish to node project m-musixise, under '/music-box' path
               // 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect'
               // `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
-              `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(location.origin+location.pathname+'#/new-music-box-roll')}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
-            )
+              `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(
+                location.origin + location.pathname + '#/new-music-box-roll',
+              )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`,
+            );
           }
           // alert(`welcome${res.data.data.realname}`)
-          console.log('get user info success', res.data.data)
+          console.log('get user info success', res.data.data);
         })
-        .catch((err) => {
-          Cookies.remove('serviceToken')
+        .catch(err => {
+          Cookies.remove('serviceToken');
           location.replace(
             // 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect'
             // `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
-            `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(location.origin+location.pathname+'#/new-music-box-roll')}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
-          )
-        })
-    } else { //又没有微信给的auth code又没有token存在cookie，只得验证
+            `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(
+              location.origin + location.pathname + '#/new-music-box-roll',
+            )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`,
+          );
+        });
+    } else {
+      //又没有微信给的auth code又没有token存在cookie，只得验证
       location.replace(
         // 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect'
         // `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
-        `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(location.origin+location.pathname+'#/new-music-box-roll')}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
-      )
+        `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(
+          location.origin + location.pathname + '#/new-music-box-roll',
+        )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`,
+      );
     }
   },
-  mounted() {
-
-  },
-  updated() {}
+  mounted() {},
+  updated() {},
 };
+
 </script>
 
 <template>
 <div class="">
-  <v-stage :config="configKonva">
-    <v-layer>
-      <template v-for='i in NOTE_CATEGORY'>
-          <v-rect v-for='j in ONE_PAGE_NOTE_NUM'
-          @touchstart="handleTouchRect(i-1,j-1,sector)"
-          @touchmove="handleMoveRect(i-1,j-1,sector)"
-          :config="setupRect(i-1,j-1,sector)" />
-        </template>
-    </v-layer>
-  </v-stage>
+  <div class="roll">
+    <v-stage :config="configKonva">
+      <v-layer>
+        <template v-for='i in NOTE_CATEGORY'>
+            <v-rect v-for='j in ONE_PAGE_NOTE_NUM'
+            @touchstart="handleTouchRect(i-1,j-1,sector)"
+            @touchmove="handleMoveRect(i-1,j-1,sector)"
+            :config="setupRect(i-1,j-1,sector)" />
+          </template>
+      </v-layer>
+    </v-stage>
+  </div>
+
   <div class="control-panal">
-    <div @touchstart="startloop">></div>
-    <div @touchstart="stoploop">口</div>
-    <div @touchstart="scrollup">↑</div>
-    <div @touchstart="scrolldown">↓</div>
-    <div style="font-size:16px;line-height:46px;" @touchstart="minusTempo">减速</div>
-    <div style="font-size:16px;line-height:46px;" @touchstart="addTempo">加速</div>
+    <div @touchstart="scrollup" id="scrollup" class="rotate"></div>
+    <div @touchstart="scrolldown" id="scrolldown"></div>
+    <!-- <div @touchstart="startloop">></div>
+    <div @touchstart="stoploop">口</div> -->
+    <div @touchstart="minusTempo" id="minustempo" class="rotate"></div>
+    <div @touchstart="addTempo" id="addtempo" class="rotate"></div>
     <div @touchstart="clearProject">x</div>
-    <div @touchstart="submitProject">✓</div>
+    <div class="btnContainer" @touchstart.stop.prevent="btnStart" @touchend.stop.event="btnEnd">
+      <div :class="[playing?'pauseBtn':'playBtn', 'rotate']" @click="toggleReplay"></div>
+      <div :class="[showExtendBtns?'extendBtnsShow':'extendBtnsHide','extendBtns']">
+        <div class='bounceBtn rotate'></div>
+        <div class='cancelBtn'></div>
+      </div>
+    </div>
   </div>
   <transition name="fade">
     <div id="alert-mask" v-show="alertAppear">
@@ -418,12 +521,25 @@ export default {
 @import '../_common/style/_variables.scss';
 @import '../_common/style/_mixins.scss';
 @import '../_common/style/_reboot.scss';
+.roll {
+  position:absolute;
+  right:0;
+}
 .control-panal {
     position: absolute;
-    width: 60px;
+    display:flex;
+    flex-direction: column;
+    align-items:center;
+    width: 50px;
     height: 100%;
     top: 0;
-    right: 0;
+    left: 0;
+    background-color:black;
+    color:white;
+    #scrollup {width:34px;height:34px;background:url('../assets/left.png') center center;background-size:contain;}
+    #scrolldown {width:34px;height:34px;background:url('../assets/left.png') center center;background-size:contain;transform: rotate(270deg);}
+    #minustempo {width:20px;height:20px;background:url('../assets/minus.png') center center;background-size:contain;}
+    #addtempo {width:20px;height:20px;background:url('../assets/plus.png') center center;background-size:contain;}
 }
 
 .fadein {
@@ -452,6 +568,70 @@ export default {
     to {
         opacity: 0;
     }
+}
+.btnContainer {
+    position: relative;
+    width: getRem(84);
+    height: getRem(84);
+    margin-top: 0.3rem;
+    .playBtn {
+        z-index: 2;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: getRem(42);
+        background: url('../assets/play.svg') center center no-repeat;
+        background-size: getRem(32);
+        background-color: rgb(69,106,255);
+    }
+    .pauseBtn {
+        z-index: 2;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: getRem(42);
+        background: url('../assets/pause.svg') center center no-repeat;
+        background-size: getRem(32);
+        background-color: rgb(69,106,255);
+    }
+    .bounceBtn {
+        position: absolute;
+        width: getRem(84);
+        height: getRem(84);
+        border-radius: getRem(42);
+        left:getRem(310);
+        background: url('../assets/check.svg') center center no-repeat;
+        // background-size: getRem(32);
+    }
+    .cancelBtn {
+        position: absolute;
+        width: getRem(84);
+        height: getRem(84);
+        border-radius: getRem(42);
+        left:getRem(600);
+        background: url('../assets/cancel.svg') center center no-repeat;
+        // background-size: getRem(32);
+    }
+    .extendBtns {
+        // this element is within rotate, everything is opposite
+        position: absolute;
+        height: getRem(84);
+        border-radius: getRem(42);
+        overflow: hidden;
+        left: 0px;
+        z-index: 1;
+        transition: width 1s;
+        background: linear-gradient(to left, rgb(254, 64, 64),rgb(142, 122, 239),rgb(69,106,255) 80%);
+    }
+    .extendBtnsShow {
+        width: getRem(690);
+    }
+    .extendBtnsHide {
+        width: getRem(84);
+    }
+}
+.rotate {
+    transform: rotate(90deg);
 }
 #alert-mask {
     position: absolute;

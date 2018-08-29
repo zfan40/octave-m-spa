@@ -1,12 +1,12 @@
 <script>
 // window.Tone = require('tone')
-import * as Util from '../_common/js/util'
-import * as Api from '../_common/js/api'
-import * as Cookies from "js-cookie"
-import * as Magic from '../_common/js/magic'
-import countButton from './common/countButton'
-import * as WxShare from '../_common/js/wx_share'
-let musicPart = undefined
+import * as Util from '../_common/js/util';
+import * as Api from '../_common/js/api';
+import * as Cookies from 'js-cookie';
+import * as Magic from '../_common/js/magic';
+import countButton from './common/countButton';
+import * as WxShare from '../_common/js/wx_share';
+let musicPart = undefined;
 
 export default {
   components: {
@@ -17,89 +17,102 @@ export default {
       searching: false,
       loading: false,
       recommendations: {},
-    }
+    };
   },
-  computed: {
-
-  },
+  computed: {},
   methods: {
     load() {
-      Api.getRecommendations().then((res)=>{console.log('index:',res)})
+      Api.getRecommendations().then(res => {
+        console.log('index:', res);
+      });
     },
-    search() {
-
-    },
+    search() {},
   },
-  beforeRouteLeave (to, from, next) {
-    Magic.clearTone()
-    next()
+  beforeRouteLeave(to, from, next) {
+    Magic.clearTone();
+    next();
   },
   created() {
     //check cookie to get serviceToken first
     // if stoken not exist, go auth
-    const self = this
+    const self = this;
     var docElem = document.documentElement;
     window.rem = docElem.getBoundingClientRect().width / 10;
     docElem.style.fontSize = window.rem + 'px';
 
-
-    const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase())
+    const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase());
     if (!inWechat) {
-       self.loadMusicById()
-       return
-     }
-    const fullPath = `${location.origin}${location.pathname}#/new-music-box-viewer?id=${self.$store.state.route.query.id}`
-    WxShare.prepareShareConfig().then(()=>{
+      self.loadMusicById();
+      return;
+    }
+    const fullPath = `${location.origin}${location.pathname}#/new-music-box-viewer?id=${
+      self.$store.state.route.query.id
+    }`;
+    WxShare.prepareShareConfig().then(() => {
       WxShare.prepareShareContent({
-        title:'MUSIXISE',
-        desc:'分享一个八音盒',
+        title: 'MUSIXISE',
+        desc: '分享一个八音盒',
         // fullPath:location.href.split('#')[0],
         fullPath,
-        imgUrl:'http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png',
-      })
-    })
+        imgUrl: 'http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png',
+      });
+    });
     // alert(Cookies.get('serviceToken'))
     if (Util.getUrlParam('code') || Cookies.get('serviceToken')) {
       //TODO:ajax call to get info
       Api.getUserInfo(Util.getUrlParam('code'))
-        .then((res) => {
+        .then(res => {
           if (res.data.errcode >= 20000) {
             // 网页内cookie失效，需要重新验证
-            Cookies.remove('serviceToken')
+            Cookies.remove('serviceToken');
             location.replace(
               // will publish to node project m-musixise, under '/music-box' path
-              `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(fullPath)}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
-            )
+              `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(
+                fullPath,
+              )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`,
+            );
           }
-          self.userId = res.data.data.userId
+          self.userId = res.data.data.userId;
           // alert(`welcome${res.data.data.realname}`)
           // if (!this.project) {
-            self.loadMusicById()
+          self.loadMusicById();
           // }
 
-          console.log('get user info success', res.data.data)
+          console.log('get user info success', res.data.data);
         })
-        .catch((err) => {
-          Cookies.remove('serviceToken')
+        .catch(err => {
+          Cookies.remove('serviceToken');
           location.replace(
-            `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(fullPath)}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
-          )
-        })
-    } else { //又没有微信给的auth code又没有token存在cookie，只得验证
+            `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(
+              fullPath,
+            )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`,
+          );
+        });
+    } else {
+      //又没有微信给的auth code又没有token存在cookie，只得验证
       location.replace(
-        `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(fullPath)}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
-      )
+        `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(
+          fullPath,
+        )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`,
+      );
     }
   },
   mounted() {
     // this.startRecord();
-    setTimeout(()=>{this.loading = false},2000)
-    setTimeout(()=>{this.workIntroAppear = true;},4500)
-    setTimeout(()=>{this.controlPanalAppear = true},5500)
+    setTimeout(() => {
+      this.loading = false;
+    }, 2000);
+    setTimeout(() => {
+      this.workIntroAppear = true;
+    }, 4500);
+    setTimeout(() => {
+      this.controlPanalAppear = true;
+    }, 5500);
     // setTimeout(()=>{this.playing = true},6000)
   },
-  updated() {}
+  updated() {},
 };
+
 </script>
 
 <template>

@@ -1,50 +1,50 @@
 <script>
   export default {
-    // https://vuejs.org/v2/guide/components.html#Props
-    props: {
-      initCount:Number,
-      initActive:Boolean,
-      iconImg: String,
-      onClickCall: {
-        type: Function,
-        default() {
-          return function(){console.log('tap tap in count Button')};
-        },
+  // https://vuejs.org/v2/guide/components.html#Props
+  props: {
+    initCount: Number,
+    initActive: Boolean,
+    iconImg: String,
+    onClickCall: {
+      type: Function,
+      default() {
+        return function() {
+          console.log('tap tap in count Button');
+        };
       },
     },
-    computed: {
-      style() {
-        // return 'background-color: ' + this.hovering ? this.color: 'red';
-      }
+  },
+  computed: {
+    style() {
+      // return 'background-color: ' + this.hovering ? this.color: 'red';
     },
-    data() {
-      return {
-        currentActiveCount:0,
-        currentActive:false,
-      };
+  },
+  data() {
+    return {
+      currentActiveCount: 0,
+      currentActive: false,
+    };
+  },
+  watch: {},
+  created() {
+    this.currentActive = this.initActive;
+    this.currentActiveCount = this.currentActive ? this.initCount : this.initCount + 1;
+  },
+  mounted() {},
+  updated() {},
+  methods: {
+    updateButton() {
+      // if (this.currentActive) {
+      //   this.currentActiveCount -= 1;
+      // } else {
+      //   this.currentActiveCount += 1;
+      // }
+      this.currentActive = !this.currentActive;
+      this.onClickCall();
     },
-    watch: {
-    },
-    created() {
-      this.currentActive = this.initActive
-      this.currentActiveCount = this.currentActive?this.initCount:this.initCount+1
-    },
-    mounted() {
-    },
-    updated() {
-    },
-    methods: {
-      updateButton() {
-        // if (this.currentActive) {
-        //   this.currentActiveCount -= 1;
-        // } else {
-        //   this.currentActiveCount += 1;
-        // }
-        this.currentActive = !this.currentActive;
-        this.onClickCall()
-      }
-    },
-  };
+  },
+};
+
 </script>
 
 <template>

@@ -8,9 +8,9 @@
 </template>
 
 <script>
-import * as Util from '../_common/js/util'
-import * as Api from '../_common/js/api'
-import * as Cookies from "js-cookie"
+import * as Util from '../_common/js/util';
+import * as Api from '../_common/js/api';
+import * as Cookies from 'js-cookie';
 export default {
   name: 'hello',
   data() {
@@ -18,47 +18,49 @@ export default {
       msg: 'Welcome to Your Vue.js App',
     };
   },
-  methods:{
+  methods: {
     redirectTo(path) {
       // IMPORTANT keng. 从主页跳制作页，如果相对路径会带上参数，比如auth回来的code会一直带着，污染之后的auth
       // 成功auth一次，就写入cookie了，所以往后跳就直接给全路径，摒弃微信弄回来的乱七八糟的参数
-      this.$router.push(path)
-    }
+      this.$router.push(path);
+    },
   },
   created() {
     var docElem = document.documentElement;
     window.rem = docElem.getBoundingClientRect().width / 10;
     docElem.style.fontSize = window.rem + 'px';
 
-    const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase())
-    if (!inWechat) return
+    const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase());
+    if (!inWechat) return;
     if (Util.getUrlParam('code') || Cookies.get('serviceToken')) {
       //TODO:ajax call to get info
       Api.getUserInfo(Util.getUrlParam('code'))
-        .then((res) => {
+        .then(res => {
           if (res.data.errcode >= 20000) {
             // 网页内cookie失效，需要重新验证
-            Cookies.remove('serviceToken')
+            Cookies.remove('serviceToken');
             location.replace(
-              'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect'
-            )
+              'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect',
+            );
           }
-          alert(`welcome${res.data.data.realname}`)
-          console.log('get user info success', res.data.data)
+          alert(`welcome${res.data.data.realname}`);
+          console.log('get user info success', res.data.data);
         })
-        .catch((err) => {
-          Cookies.remove('serviceToken')
+        .catch(err => {
+          Cookies.remove('serviceToken');
           location.replace(
-            'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect'
-          )
-        })
-    } else { //又没有微信给的auth code又没有token存在cookie，只得验证
+            'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect',
+          );
+        });
+    } else {
+      //又没有微信给的auth code又没有token存在cookie，只得验证
       location.replace(
-        'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect'
-      )
+        'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect',
+      );
     }
   },
 };
+
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
