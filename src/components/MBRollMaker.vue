@@ -31,6 +31,26 @@ const colors = [
   '#9FB2CF',
   '#9FB2CF',
 ];
+const invalid_colors = [
+  '#7D90AD',
+  '#7D90AD',
+  '#7D90AD',
+  '#7D90AD',
+  '#7D90AD',
+  '#7D90AD',
+  '#7D90AD',
+  '#7D90AD',
+  '#7D90AD',
+  '#7D90AD',
+  '#7D90AD',
+  '#7D90AD',
+  '#7D90AD',
+  '#7D90AD',
+  '#7D90AD',
+  '#7D90AD',
+  '#7D90AD',
+  '#7D90AD',
+];
 let last_i = -1;
 let last_j = -1;
 window.schedules = [];
@@ -39,6 +59,7 @@ let extendBtnsTimeout = undefined;
 const TIME_PER_NOTE = 0.25;
 const FULL_NOTE_NUM = 80; //80 notes, then if set 20 per page, it would be 4 pages
 const NOTE_NUM_PER_SECTOR = 10;
+const MB_DUR = 5 // 20 seconds length
 Vue.use(VueKonva);
 var synth = new Tone.Sampler(
   {
@@ -121,27 +142,54 @@ export default {
     setupRect(i, j, sector) {
       let fill = '';
       // split NOTE_NUM_PER_SECTOR and this.NOTE_NUM_PER_SECTOR for ANIMATION!!!
-      if (
-        j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR == this.activeJ &&
-        this.rectArray[i][j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]
-      ) {
-        // active current note: lighter color
-        fill = '#A9B9FF';
-      } else if (
-        j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR == this.activeJ &&
-        !this.rectArray[i][j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]
-      ) {
-        // inactive current light blue
-        fill = '#2B2E3D';
-      } else if (
-        this.rectArray[i][j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]
-      ) {
-        // active non-current note
-        fill = colors[i];
+      if ((j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR)* TIME_PER_NOTE * 120 / this.tempo<MB_DUR) {
+        if (
+          j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR == this.activeJ &&
+          this.rectArray[i][j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]
+        ) {
+          // active current note: lighter color
+          fill = '#6477b1';
+        } else if (
+          j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR == this.activeJ &&
+          !this.rectArray[i][j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]
+        ) {
+          // inactive current light blue
+          fill = '#292B3A';
+        } else if (
+          this.rectArray[i][j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]
+        ) {
+          // active non-current note
+          fill = colors[i];
+        } else {
+          // incative non-current note
+          fill = `rgba(0,0,0,${.98 - i * 0.3 / this.NOTE_CATEGORY})`;
+        }
       } else {
-        // incative non-current note
-        fill = `rgba(0,0,0,${1 - i * 0.3 / this.NOTE_CATEGORY})`;
+        if (
+          j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR == this.activeJ &&
+          this.rectArray[i][j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]
+        ) {
+          // active current note: lighter color
+          fill = '#A9B9FF';
+        } else if (
+          j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR == this.activeJ &&
+          !this.rectArray[i][j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]
+        ) {
+          // inactive current light blue
+          fill = '#2B2E3D';
+        } else if (
+          this.rectArray[i][j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]
+        ) {
+          // active non-current note
+          // fill = colors[i];
+          fill = 'FF0000'
+        } else {
+          // incative non-current note
+          // fill = `rgba(0,0,0,.98)`;
+          fill = '#FFCC33'
+        }
       }
+
       return {
         ...this.configNoteRect,
         x: i * this.configKonva.width / this.NOTE_CATEGORY,
