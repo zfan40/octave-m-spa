@@ -54,12 +54,15 @@ const invalid_colors = [
 let last_i = -1;
 let last_j = -1;
 window.schedules = [];
+window.cursor_schedules = [];
 let aInterval = undefined;
 let extendBtnsTimeout = undefined;
 const TIME_PER_NOTE = 0.25;
-const FULL_NOTE_NUM = 80; //80 notes, then if set 20 per page, it would be 4 pages
+const FULL_NOTE_NUM = 40; //80 notes, then if set 20 per page, it would be 4 pages
 const NOTE_NUM_PER_SECTOR = 10;
-const MB_DUR = 5 // 20 seconds length
+const MB_DUR = 5; // 20 seconds length
+const MIN_TEMPO = 60;
+const MAX_TEMPO = 180;
 Vue.use(VueKonva);
 var synth = new Tone.Sampler(
   {
@@ -126,70 +129,41 @@ export default {
         stroke: '#000',
         strokeWidth: 0.5,
       };
+      //TODO: why wrote two for loop here before. stupid
       for (let j = 0; j <= FULL_NOTE_NUM - 1; j++) {
-        for (let sector = 0; sector <= this.sector; sector++) {
-          // console.log(111)
-          Tone.Transport.scheduleRepeat(
-            time => {
-              this.activeJ = j + (sector - 1) * this.NOTE_NUM_PER_SECTOR;
-            },
-            FULL_NOTE_NUM * TIME_PER_NOTE * 120 / this.tempo,
-            (j + (sector - 1) * this.NOTE_NUM_PER_SECTOR) * TIME_PER_NOTE * 120 / this.tempo,
-          );
-        }
+        // for (let sector = 1; sector <= this.sector; sector++) {
+        // console.log(111)
+        // const index = j + (sector - 1) * this.NOTE_NUM_PER_SECTOR
+        const index = j;
+        console.log('12112', index);
+        cursor_schedules[index] = Tone.Transport.scheduleRepeat(
+          time => {
+            this.activeJ = index;
+          },
+          FULL_NOTE_NUM * TIME_PER_NOTE * 120 / this.tempo,
+          index * TIME_PER_NOTE * 120 / this.tempo,
+        );
+        // }
       }
     },
     setupRect(i, j, sector) {
       let fill = '';
       // split NOTE_NUM_PER_SECTOR and this.NOTE_NUM_PER_SECTOR for ANIMATION!!!
-      if ((j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR)* TIME_PER_NOTE * 120 / this.tempo<MB_DUR) {
-        if (
-          j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR == this.activeJ &&
-          this.rectArray[i][j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]
-        ) {
-          // active current note: lighter color
-          fill = '#6477b1';
-        } else if (
-          j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR == this.activeJ &&
-          !this.rectArray[i][j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]
-        ) {
-          // inactive current light blue
-          fill = '#292B3A';
-        } else if (
-          this.rectArray[i][j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]
-        ) {
-          // active non-current note
-          fill = colors[i];
-        } else {
-          // incative non-current note
-          fill = `rgba(0,0,0,${.98 - i * 0.3 / this.NOTE_CATEGORY})`;
-        }
+      const index = j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR;
+      const withinDur = index * TIME_PER_NOTE * 120 / this.tempo < MB_DUR
+      if (index == this.activeJ && this.rectArray[i][index]) {
+        // active current note: lighter color
+        fill = withinDur?'#6477b1':'#A9B9FF';
+      } else if (index == this.activeJ && !this.rectArray[i][index]) {
+        // inactive current light blue
+        fill = withinDur?'#292B3A':'#2B2E3D';
+      } else if (this.rectArray[i][index]) {
+        // active non-current note
+        fill = withinDur?colors[i]:'#FF0000';
       } else {
-        if (
-          j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR == this.activeJ &&
-          this.rectArray[i][j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]
-        ) {
-          // active current note: lighter color
-          fill = '#A9B9FF';
-        } else if (
-          j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR == this.activeJ &&
-          !this.rectArray[i][j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]
-        ) {
-          // inactive current light blue
-          fill = '#2B2E3D';
-        } else if (
-          this.rectArray[i][j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR]
-        ) {
-          // active non-current note
-          // fill = colors[i];
-          fill = 'FF0000'
-        } else {
-          // incative non-current note
-          // fill = `rgba(0,0,0,.98)`;
-          fill = '#FFCC33'
-        }
+        // incative non-current note
+        fill = withinDur?`rgba(0,0,0,${0.98 - i * 0.3 / this.NOTE_CATEGORY})`:'#FFCC33';
       }
-
       return {
         ...this.configNoteRect,
         x: i * this.configKonva.width / this.NOTE_CATEGORY,
@@ -322,12 +296,57 @@ export default {
       else this.startloop();
     },
     minusTempo() {
-      this.tempo -= 10;
+      // if (this.tempo>MIN_TEMPO)
+      this.tempo -= 5;
       Tone.Transport.bpm.rampTo(this.tempo, 0.1);
+
+      //TODO: cursor_schedules arrange
+      // for (let j = 0; j <= FULL_NOTE_NUM - 1; j++) {
+      //   Tone.Transport.clear(cursor_schedules[j])
+      // }
+      // cursor_schedules = []
+      // const fullNoteNumWithinDur = Math.ceil(MB_DUR/(TIME_PER_NOTE * 120 / this.tempo))
+      // for (let j = 0; j <= FULL_NOTE_NUM - 1; j++) {
+      //   if (j*TIME_PER_NOTE * 120 / this.tempo<MB_DUR) {
+      //     // minusTempo => less active notes(only clear cursor schedules)
+      //     const index = j
+      //     cursor_schedules[index] = Tone.Transport.scheduleRepeat(
+      //       time => {
+      //         this.activeJ = index;
+      //       },
+      //       fullNoteNumWithinDur * TIME_PER_NOTE * 120 / this.tempo,
+      //       index * TIME_PER_NOTE * 120 / this.tempo,
+      //     );
+      //   }
+      // }
+      // TIME_PER_NOTE * 120 / this.tempo
+      // Tone.Transport.clear(schedules[last_i][last_j + (sector - 1) * this.NOTE_NUM_PER_SECTOR]);
+      //TODO: schedules arrange
     },
     addTempo() {
-      this.tempo += 10;
+      // if (this.tempo<MAX_TEMPO)
+      this.tempo += 5;
       Tone.Transport.bpm.rampTo(this.tempo, 0.1);
+      //TODO: cursor_schedules arrange
+      // for (let j = 0; j <= FULL_NOTE_NUM - 1; j++) {
+      //   Tone.Transport.clear(cursor_schedules[j])
+      // }
+      // cursor_schedules = []
+      // const fullNoteNumWithinDur = Math.ceil(MB_DUR/(TIME_PER_NOTE * 120 / this.tempo))
+      // for (let j = 0; j <= FULL_NOTE_NUM - 1; j++) {
+      //   if (j*TIME_PER_NOTE * 120 / this.tempo<MB_DUR) {
+      //     // minusTempo => less active notes(only clear cursor schedules)
+      //     const index = j
+      //     cursor_schedules[index] = Tone.Transport.scheduleRepeat(
+      //       time => {
+      //         this.activeJ = index;
+      //       },
+      //       fullNoteNumWithinDur * TIME_PER_NOTE * 120 / this.tempo,
+      //       index * TIME_PER_NOTE * 120 / this.tempo,
+      //     );
+      //   }
+      // }
+      //TODO: schedules arrange
     },
     scrolldown() {
       clearInterval(aInterval);
@@ -432,7 +451,7 @@ export default {
       const a = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
       console.log(a);
       if (a && a.classList.contains('bounceBtn')) {
-        this.submitProject()
+        this.submitProject();
       } else if (a && (a.classList.contains('playBtn') || a.classList.contains('pauseBtn'))) {
         //播放
         // console.log(Tone.Transport.state)
@@ -480,21 +499,16 @@ export default {
             Cookies.remove('serviceToken');
             location.replace(
               // will publish to node project m-musixise, under '/music-box' path
-              // 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect'
-              // `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
               `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(
                 location.origin + location.pathname + '#/new-music-box-roll',
               )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`,
             );
           }
-          // alert(`welcome${res.data.data.realname}`)
           console.log('get user info success', res.data.data);
         })
         .catch(err => {
           Cookies.remove('serviceToken');
           location.replace(
-            // 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect'
-            // `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
             `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(
               location.origin + location.pathname + '#/new-music-box-roll',
             )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`,
@@ -503,8 +517,6 @@ export default {
     } else {
       //又没有微信给的auth code又没有token存在cookie，只得验证
       location.replace(
-        // 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect'
-        // `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
         `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(
           location.origin + location.pathname + '#/new-music-box-roll',
         )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`,
