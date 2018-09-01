@@ -37,6 +37,6 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
     'no-console': 'off',
     'no-param-reassign': 'off',
-    'no-underscore-dangle': 'off'
+    'no-underscore-dangle': 'off',
   }
 }
