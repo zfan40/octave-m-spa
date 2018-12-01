@@ -132,7 +132,7 @@ export default {
             Cookies.remove('serviceToken');
             location.replace(
               // will publish to node project m-musixise, under '/music-box' path
-              `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(
+              `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx353a60a8b049d366&redirect_uri=${encodeURIComponent(
                 fullPath,
               )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`,
             );
@@ -146,7 +146,7 @@ export default {
         .catch(err => {
           Cookies.remove('serviceToken');
           location.replace(
-            `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(
+            `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx353a60a8b049d366&redirect_uri=${encodeURIComponent(
               fullPath,
             )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`,
           );
@@ -154,7 +154,7 @@ export default {
     } else {
       //又没有微信给的auth code又没有token存在cookie，只得验证
       location.replace(
-        `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2cb950ff65a142c5&redirect_uri=${encodeURIComponent(
+        `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx353a60a8b049d366&redirect_uri=${encodeURIComponent(
           fullPath,
         )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`,
       );

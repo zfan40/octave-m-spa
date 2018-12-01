@@ -24,12 +24,12 @@ export function getUserInfo(wxcode) {
     // alert('cookie used');
     reqConfig.headers.Authorization = `${tokenInCookie}`;
     // tokenObj.access_token = tokenInCookie;
-    return axios.get('//api.musixise.com/api/v1/user/getInfo', reqConfig);
+    return axios.get('//api.octave-love.com/api/v1/user/getInfo', reqConfig);
   } else if (!tokenInCookie && wxcode) {
     // alert('no cookie');
     return new Promise((resolve, reject) => {
       axios
-        .post(`//api.musixise.com/api/v1/user/oauth/wechat/callback?code=${wxcode}`, '', reqConfig)
+        .post(`//api.octave-love.com/api/v1/user/oauth/wechat/callback?code=${wxcode}`, '', reqConfig)
         .then(
           (res) => {
             if (res.data.errcode === 20001) {
@@ -41,7 +41,7 @@ export function getUserInfo(wxcode) {
             Cookies.set('serviceToken', serviceToken, {
               expires: 7,
             });
-            return axios.get('//api.musixise.com/api/v1/user/getInfo', reqConfig);
+            return axios.get('//api.octave-love.com/api/v1/user/getInfo', reqConfig);
           },
           () => {
             reject();
@@ -78,7 +78,7 @@ export function uploadRecord(record, info) {
       let postFix = '';
       try {
         // important, othereise dispatch won't be stoped here...
-        postFix = await axios.post('//api.musixise.com/api/v1/uploadAudio', fd, formReqConfig);
+        postFix = await axios.post('//api.octave-love.com/api/v1/uploadAudio', fd, formReqConfig);
       } catch (e) {
         console.log(e);
         reject(e);
@@ -91,7 +91,7 @@ export function uploadRecord(record, info) {
       };
       console.log(workURL);
       return axios
-        .post('//api.musixise.com/api/v1/work/create', JSON.stringify(param), reqConfig)
+        .post('//api.octave-love.com/api/v1/work/create', JSON.stringify(param), reqConfig)
         .then((res) => {
           resolve(res.data.data);
         })
@@ -105,26 +105,26 @@ export function uploadRecord(record, info) {
 }
 
 export function fetchMbox(id) {
-  return axios.get(`//api.musixise.com/api/v1/work/detail/${id}`, reqConfig);
+  return axios.get(`//api.octave-love.com/api/v1/work/detail/${id}`, reqConfig);
 }
 export function fetchMusixiser(id) {
-  return axios.get(`//api.musixise.com/api/v1/user/detail/${id}`, reqConfig);
+  return axios.get(`//api.octave-love.com/api/v1/user/detail/${id}`, reqConfig);
 }
 export function fetchWorksFromMusixiser(id, page) {
   return axios.get(
-    `//api.musixise.com/api/v1/work/getListByUid/${id}?page=${page}&size=15`,
+    `//api.octave-love.com/api/v1/work/getListByUid/${id}?page=${page}&size=15`,
     reqConfig,
   );
 }
 export function fetchFavWorks(id, page) {
   return axios.get(
-    `//api.musixise.com/api/v1/favorite/getWorkList/${id}?page=${page}&size=15`,
+    `//api.octave-love.com/api/v1/favorite/getWorkList/${id}?page=${page}&size=15`,
     reqConfig,
   );
 }
 export function toggleFavSong({ workId, status }) {
   return axios.post(
-    '//api.musixise.com/api/v1/favorite/create',
+    '//api.octave-love.com/api/v1/favorite/create',
     JSON.stringify({ workId, status }),
     reqConfig,
   );
@@ -133,7 +133,7 @@ export function toggleFavSong({ workId, status }) {
 }
 export function updateWorkTitle({ id, title }) {
   return axios.put(
-    `//api.musixise.com/api/v1/work/updateWork/${id}`,
+    `//api.octave-love.com/api/v1/work/updateWork/${id}`,
     JSON.stringify({ title }),
     reqConfig,
   );
@@ -141,5 +141,5 @@ export function updateWorkTitle({ id, title }) {
   // .catch((err) => { console.log(err); });
 }
 export function getRecommendations() {
-  return axios.post('//api.musixise.com/api/v1/home', '', reqConfig);
+  return axios.post('//api.octave-love.com/api/v1/home', '', reqConfig);
 }
