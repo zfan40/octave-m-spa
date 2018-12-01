@@ -52,8 +52,8 @@ module.exports = {
 
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
-    assetsSubDirectory: 'octave-m/static',
-    assetsPublicPath: '//s.musixise.com/',
+    assetsSubDirectory: 'static',
+    assetsPublicPath: '//s.musixise.com/octave-m/',
 
     /**
      * Source Maps
