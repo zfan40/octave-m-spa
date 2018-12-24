@@ -29,7 +29,11 @@ export function getUserInfo(wxcode) {
     // alert('no cookie');
     return new Promise((resolve, reject) => {
       axios
-        .post(`//api.octave-love.com/api/v1/user/oauth/wechat/callback?code=${wxcode}`, '', reqConfig)
+        .post(
+          `//api.octave-love.com/api/v1/user/oauth/wechat/callback?code=${wxcode}`,
+          '',
+          reqConfig,
+        )
         .then(
           (res) => {
             if (res.data.errcode === 20001) {
@@ -142,4 +146,20 @@ export function updateWorkTitle({ id, title }) {
 }
 export function getRecommendations() {
   return axios.post('//api.octave-love.com/api/v1/home', '', reqConfig);
+}
+
+export function createOrder({ pid, wid, amount }) {
+  return axios.post(
+    '//api.octave-love.com/api/v1/shop/orders/create',
+    JSON.stringify({ pid, wid, amount }),
+    reqConfig,
+  );
+}
+
+export function payOrder({ orderId }) {
+  return axios.post(
+    `//api.octave-love.com/api/v1/shop/pay/unifiedorder?orderId=${orderId}`,
+    '',
+    reqConfig,
+  );
 }

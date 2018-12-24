@@ -1,25 +1,25 @@
-<!DOCTYPE html><html><head><script type=text/javascript>(function() {
-      var win = window;
-      var docElem = document.documentElement;
-      var on = 'addEventListener';
-      var timeoutId;
+<!DOCTYPE html><html><head><script type=text/javascript data-class=m-log data-showlog=true src=static/mlog.js></script><script type=text/javascript>(function() {
+        var win = window;
+        var docElem = document.documentElement;
+        var on = "addEventListener";
+        var timeoutId;
 
-      function delaySetRem() {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(setRem, 300);
-      }
-
-      function setRem() {
-        win.rem = docElem.getBoundingClientRect().width / 10;
-        docElem.style.fontSize = win.rem + 'px';
-      }
-
-      setRem();
-      docElem.setAttribute('data-dpr', win.devicePixelRatio);
-      win[on]('resize', delaySetRem);
-      win[on]('pageshow', function(e) {
-        if (e.persisted) {
-          delaySetRem();
+        function delaySetRem() {
+          clearTimeout(timeoutId);
+          timeoutId = setTimeout(setRem, 300);
         }
-      });
-    })();</script><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no"><meta name=apple-mobile-web-app-capable content=yes><meta name=apple-mobile-web-app-status-bar-style content=black><meta name=format-detection content="telephone=no"><meta name=screen-orientation content=portrait><meta http-equiv=Cache-Control content="no-cache, no-store, must-revalidate"><meta http-equiv=Pragma content=no-cache><meta http-equiv=Expires content=0><title>我的小盒盒</title><link href=//s.musixise.com/octave-m/static/css/app.b79bd141a1a95bb829017e6ffe9b50db.css rel=stylesheet></head><body><div id=app></div><script type=text/javascript src=//s.musixise.com/octave-m/static/js/manifest.644bf895009fba5f9c82.js></script><script type=text/javascript src=//s.musixise.com/octave-m/static/js/vendor.4796e52451d2f5579e9c.js></script><script type=text/javascript src=//s.musixise.com/octave-m/static/js/app.a791210258bbbe3c2fa5.js></script></body></html>
+
+        function setRem() {
+          win.rem = docElem.getBoundingClientRect().width / 10;
+          docElem.style.fontSize = win.rem + "px";
+        }
+
+        setRem();
+        docElem.setAttribute("data-dpr", win.devicePixelRatio);
+        win[on]("resize", delaySetRem);
+        win[on]("pageshow", function(e) {
+          if (e.persisted) {
+            delaySetRem();
+          }
+        });
+      })();</script><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no"><meta name=apple-mobile-web-app-capable content=yes><meta name=apple-mobile-web-app-status-bar-style content=black><meta name=format-detection content="telephone=no"><meta name=screen-orientation content=portrait><meta http-equiv=Cache-Control content="no-cache, no-store, must-revalidate"><meta http-equiv=Pragma content=no-cache><meta http-equiv=Expires content=0><title>我的小盒盒</title><link href=//s.musixise.com/octave-m/static/css/app.c6f32d4ecc61899997e8feb4fe03db49.css rel=stylesheet></head><body><div id=app></div><script type=text/javascript src=//s.musixise.com/octave-m/static/js/manifest.6dff273db37200bab124.js></script><script type=text/javascript src=//s.musixise.com/octave-m/static/js/vendor.4796e52451d2f5579e9c.js></script><script type=text/javascript src=//s.musixise.com/octave-m/static/js/app.73b51ed4f73991e6d613.js></script></body></html>
