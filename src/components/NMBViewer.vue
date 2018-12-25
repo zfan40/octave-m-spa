@@ -133,13 +133,22 @@ export default {
     purchaseItem() {
       console.log(`you are about to purchase ${this.projectInfo.id}`);
       // this.$toast('尚未开发购买功能');
-      WxShare.makeWxOrder({ pid: 1, wid: this.projectInfo.id, amount: 1 })
-        .then(res => {
+      // WxShare.makeWxOrder({ pid: 1, wid: this.projectInfo.id, amount: 1 })
+      //   .then(res => {
+      //     console.log("pay succeed");
+      //   })
+      //   .catch(err => {
+      //     console.log("pay fail");
+      //   });
+      WxShare.newMakeWxOrder(
+        { pid: 1, wid: this.projectInfo.id, amount: 1 },
+        () => {
           console.log("pay succeed");
-        })
-        .catch(err => {
+        },
+        () => {
           console.log("pay fail");
-        });
+        }
+      );
     }
   },
   beforeRouteLeave(to, from, next) {

@@ -129,6 +129,45 @@ export const makeWxOrder = ({ pid, wid, amount }) =>
   });
 
 // address
+export const newMakeWxOrder = ({ pid, wid, amount }, cb1, cb2) => {
+  wx.openAddress({
+    success(res) {
+      console.log(res);
+      createOrder({ pid, wid, amount, address: res }).then((res) => {
+        const orderId = res.data.data;
+        payOrder({ orderId }).then((res) => {
+          // alert(JSON.stringify(res));
+          const params = res.data.data;
+          alert(JSON.stringify(params));
+          console.log(params.nonceStr);
+          console.log(params.signType);
+          console.log(params.package);
+          console.log(params.timeStamp);
+          console.log(params.appId);
+          console.log(params.paySign);
+          console.log('1234');
+          wx.chooseWXPay({
+            // ...params,
+            appId: params.appId,
+            timestamp: params.timeStamp,
+            nonceStr: params.nonceStr,
+            package: params.package,
+            signType: params.signType,
+            paySign: params.paySign,
+            success(res) {
+              console.log(res);
+              cb1(res);
+            },
+          });
+        });
+      });
+    },
+    cancel() {
+      cb2();
+    },
+  });
+};
+
 export const getAddress = () => {
   new Promise((resolve, reject) => {
     wx.openAddress({
