@@ -65,6 +65,21 @@ export function getUserInfo(wxcode) {
 
 export function uploadRecord(record, info) {
   return new Promise((resolve, reject) => {
+    // create a new midi file
+    const midi = MidiConvert.create();
+    // add a track
+    midi
+      .track()
+      // select an instrument by its MIDI patch number
+      .patch(32)
+      // chain note events: note, time, duration
+      .note(60, 0, 2)
+      .note(63, 1, 2)
+      .note(60, 2, 2);
+    // TODO: reduce midi here
+    // write the output
+    // fs.writeFileSync("output.mid", midi.encode(), "binary")
+
     const formReqConfig = {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -72,11 +87,23 @@ export function uploadRecord(record, info) {
         Authorization: reqConfig.headers.Authorization,
       },
     };
-    const blob = new Blob([JSON.stringify(record)]);
+    // const blob = new Blob([JSON.stringify(record)]);
+    // const blob = new Blob([JSON.stringify(midi.encode())]);
+
+    const binaryString = midi.encode();
+    // write the output
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    const blob = new Blob([bytes], {
+      type: 'audio/midi;charset=binary',
+    });
     const reader = new FileReader();
     reader.onload = async (event) => {
       const fd = new FormData();
-      fd.append('fname', 'test.txt');
+      // fd.append('fname', 'test.txt');
+      fd.append('fname', 'output.mid');
       fd.append('data', event.target.result);
       // fd.append('access_token', tokenObj.access_token);
       let postFix = '';

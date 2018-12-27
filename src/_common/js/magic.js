@@ -50,21 +50,24 @@ let oncePlayed = false;
 //   baseUrl: '/static/audio/',
 // }).toMaster();
 
-const mbox = new Tone.Sampler({
-  B3: 'B3.[mp3|ogg]',
-  E4: 'E4.[mp3|ogg]',
-  G4: 'G4.[mp3|ogg]',
-  B4: 'B4.[mp3|ogg]',
-  'C#5': 'Cs5.[mp3|ogg]',
-  E5: 'E5.[mp3|ogg]',
-  G5: 'G5.[mp3|ogg]',
-  B5: 'B5.[mp3|ogg]',
-  'C#6': 'Cs6.[mp3|ogg]',
-}, {
-  release: 1,
-  // baseUrl: '/static/audio/mbox/',
-  baseUrl: '//cnbj1.fds.api.xiaomi.com/mbox/audio/mbox/',
-}).toMaster();
+const mbox = new Tone.Sampler(
+  {
+    B3: 'B3.[mp3|ogg]',
+    E4: 'E4.[mp3|ogg]',
+    G4: 'G4.[mp3|ogg]',
+    B4: 'B4.[mp3|ogg]',
+    'C#5': 'Cs5.[mp3|ogg]',
+    E5: 'E5.[mp3|ogg]',
+    G5: 'G5.[mp3|ogg]',
+    B5: 'B5.[mp3|ogg]',
+    'C#6': 'Cs6.[mp3|ogg]',
+  },
+  {
+    release: 1,
+    // baseUrl: '/static/audio/mbox/',
+    baseUrl: '//cnbj1.fds.api.xiaomi.com/mbox/audio/mbox/',
+  },
+).toMaster();
 
 export function RealMagic(items) {
   console.log('== Enter RealMagic ==');
@@ -73,7 +76,9 @@ export function RealMagic(items) {
   items.forEach((item) => {
     //* 2 cuz print mbox need 1 octave higher.
     const itemNoteFreq = parseInt(Tone.Frequency(item.note).toFrequency() * 2, 10);
-    if (!tasksObj[itemNoteFreq]) { tasksObj[itemNoteFreq] = []; }
+    if (!tasksObj[itemNoteFreq]) {
+      tasksObj[itemNoteFreq] = [];
+    }
     tasksObj[itemNoteFreq].push(item.time);
   });
   // tasksObj is like {784:[1.0295,1.39,2.6713],659:[2.66],...}
@@ -99,10 +104,13 @@ export function RealMagic(items) {
         final.push(1); // 给第1组的第一个任务分配第一个机器
       } else {
         let counter = j;
-        while (counter >= 1 && !allPreviousOccupied) { // TODO: -1 or 0
+        while (counter >= 1 && !allPreviousOccupied) {
+          // TODO: -1 or 0
           counter -= 1;
-          if ((time - timeArray[counter] >= SAME_NOTE_INTERVAL)
-            && test.indexOf(final[counter]) === -1) {
+          if (
+            time - timeArray[counter] >= SAME_NOTE_INTERVAL &&
+            test.indexOf(final[counter]) === -1
+          ) {
             final.push(final[counter]);
             successFound = true;
             break;
@@ -189,13 +197,17 @@ export function mapNoteTimeToColor(time) {
   if (time < 0 || time > TIME_MAX) {
     // console.warn('we don\'t allow time above 20. from \'mapNoteTimeToColor\' util function');
   } else if (time <= 10) {
-    rgb = [COLOR1[0] + ((time * (COLOR2[0] - COLOR1[0])) / (TIME_MAX / 2)),
-      COLOR1[1] + ((time * (COLOR2[1] - COLOR1[1])) / (TIME_MAX / 2)),
-      COLOR1[2] + ((time * (COLOR2[2] - COLOR1[2])) / (TIME_MAX / 2))];
+    rgb = [
+      COLOR1[0] + time * (COLOR2[0] - COLOR1[0]) / (TIME_MAX / 2),
+      COLOR1[1] + time * (COLOR2[1] - COLOR1[1]) / (TIME_MAX / 2),
+      COLOR1[2] + time * (COLOR2[2] - COLOR1[2]) / (TIME_MAX / 2),
+    ];
   }
-  rgb = [COLOR2[0] + ((time * (COLOR3[0] - COLOR2[0])) / (TIME_MAX / 2)),
-    COLOR2[1] + ((time * (COLOR3[1] - COLOR2[1])) / (TIME_MAX / 2)),
-    COLOR2[2] + ((time * (COLOR3[2] - COLOR2[2])) / (TIME_MAX / 2))];
+  rgb = [
+    COLOR2[0] + time * (COLOR3[0] - COLOR2[0]) / (TIME_MAX / 2),
+    COLOR2[1] + time * (COLOR3[1] - COLOR2[1]) / (TIME_MAX / 2),
+    COLOR2[2] + time * (COLOR3[2] - COLOR2[2]) / (TIME_MAX / 2),
+  ];
   // console.log(`rgb(${Math.floor(rgb[0])},${Math.floor(rgb[1])},${Math.floor(rgb[2])})`);
   return `rgb(${Math.floor(rgb[0])},${Math.floor(rgb[1])},${Math.floor(rgb[2])})`;
 }
@@ -204,7 +216,7 @@ export function mapNoteMidiToLength(noteName) {
   // 75 is rem to px
   // return `${(75 * 0.8 * ((Tone.Frequency(noteName).toMidi() - 60) / (84 - 40))) + 0.2}`;
   // 50 - 110
-  return `${(75 * 0.8 * ((Tone.Frequency(noteName).toMidi() - 50) / (110 - 40))) + 0.2}`; // 75 is rem to px
+  return `${75 * 0.8 * ((Tone.Frequency(noteName).toMidi() - 50) / (110 - 40)) + 0.2}`; // 75 is rem to px
 }
 
 export function clearTone(parts) {
@@ -215,7 +227,7 @@ export function clearTone(parts) {
       try {
         part.dispose();
       } catch (e) {
-      //
+        //
       }
     });
   }
@@ -234,7 +246,10 @@ export function preview(items, start) {
   if (start) {
     // TODO: this is weird...but you need to play something to make sure it works
     // trigger to avoid no sound
-    if (!oncePlayed) { mbox.triggerAttack('E6', 0, 0); oncePlayed = true; }
+    if (!oncePlayed) {
+      mbox.triggerAttack('E6', 0, 0);
+      oncePlayed = true;
+    }
     if (musicPreview) {
       try {
         musicPreview.dispose();
@@ -242,91 +257,44 @@ export function preview(items, start) {
         //
       }
     }
-    musicPreview = new Tone.Part(((time, value) => {
+    musicPreview = new Tone.Part((time, value) => {
       mbox.triggerAttackRelease(value.note, '4n', time);
-    }), items).start(0, 0);
+    }, items).start(0, 0);
     musicPreview.loop = true;
     musicPreview.loopEnd = 21; // 20s一个循环
     Tone.Transport.start('+0.01', 0);
   } else {
     Tone.Transport.stop(0);
   }
-  // try {
-  //   Tone.Transport.stop(0);
-  //   console.log(1);
-  //   // Tone.Part.removeAll();
-  //   Tone.Transport.clear();
-  //   console.log(2);
-  //   music.dispose();
-  //   music = undefined;
-  //   console.log(3);
-  // } catch (e) {
-  //   //
-  // } finally {
-  //   music = new Tone.Part(((time, value) => {
-  //     mbox.triggerAttackRelease(value.note, '8n', time);
-  //   }), items).start(0, 0);
-  //   Tone.Transport.start('+0.01', 0);
-  // }
 }
 
-// back up version 1 maker script
-// export function generateFreqs(notesInfo) {
-//   notesObj = {};
-//   notesArray = [];
-//   FreqsResult = [];
-//   console.log(notesInfo);
-//   notesInfo.forEach((item) => {
-//     // console.log(item.note)
-//     // console.log(notesObj)
-//     if (!(item.note in notesObj)) {
-//       console.log('!!');
-//       notesObj[item.note] = 1;
-//       notesArray.push({
-//         note: item.note,
-//         freq: Tone.Frequency(item.note).toFrequency(),
-//       });
-//     }
-//   });
-//   notesArray.sort((a, b) => (a.freq - b.freq));
-//   console.log(`本首作品共有${notesArray.length}种音符`);
-//   notesArray.forEach((item, index) => {
-//     FreqsResult.push(item.freq * 2);
-//     notesObj[item.note] = index + 1;
-//   });
-//   console.log('它们的频率是', FreqsResult);
-//   return FreqsResult;
-// }
-//
-// export function generateJSCadCode(notesInfo) {
-//   let musicboxPins = [];
-//   // norm timing to 15 second
-//   const lastNoteTime = notesInfo[notesInfo.length - 1].time;
-//   if (lastNoteTime > 15) {
-//     notesInfo.forEach((item) => {
-//       item.time = (item.time * 15) / lastNoteTime;
-//     });
-//   }
-//
-//   generateFreqs(notesInfo);
-//   musicboxPins = notesInfo.map(item => `generatePin(${item.time},${notesObj[item.note]})`);
-//   console.log(`
-//   const DOT_WIDTH = 0.6
-//   const RATIO = 0.98
-//   const OFFSET = 2.2 //1.95 is center
-//   const OUTER_RADIUS = 6.6
-//   const INNER_RADIUS = 5.9
-//   function generatePin(noteSec, noteNo) {
-//     return rotate(90, [1, 0, 4 * noteSec * RATIO / 15], cylinder({
-//       h: 1,
-//       r: DOT_WIDTH / 2,
-//       center: true
-//     })).translate([sin(360 * noteSec * RATIO / 15) * OUTER_RADIUS, -cos(360 * noteSec * RATIO / 15) * OUTER_RADIUS, -9.95 + OFFSET + 0.4 + (noteNo - 1) * .9])
-//   }
-//
-//   function main() {
-//     let cylinderBody = difference(cylinder({h: 19.9,r: OUTER_RADIUS,center: true}),cylinder({h: 19.9,r: INNER_RADIUS,center: true}))
-//     let holes = union(${musicboxPins})
-//     return union(cylinderBody,holes).translate([0, 0, 0]).scale(1);
-//   }`);
-// }
+export function previewMidi(url, start) {
+  console.log('current state', Tone.Transport.state);
+  // if (Tone.Transport.state === 'stopped') {
+  if (start) {
+    // TODO: this is weird...but you need to play something to make sure it works
+    // trigger to avoid no sound
+    if (!oncePlayed) {
+      mbox.triggerAttack('E6', 0, 0);
+      oncePlayed = true;
+    }
+    if (musicPreview) {
+      try {
+        musicPreview.dispose();
+      } catch (e) {
+        //
+      }
+    }
+    MidiConvert.load(url, (midi) => {
+      //这个load放到外头，整个函数还是以notes作为入参
+      musicPreview = new Tone.Part((time, value) => {
+        mbox.triggerAttackRelease(value.note, '4n', time);
+      }, midi.tracks[0].notes).start(0, 0);
+      musicPreview.loop = true;
+      musicPreview.loopEnd = 21; // 20s一个循环
+      Tone.Transport.start('+0.01', 0);
+    });
+  } else {
+    Tone.Transport.stop(0);
+  }
+}

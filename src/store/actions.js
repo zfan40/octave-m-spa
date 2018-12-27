@@ -31,21 +31,29 @@ export default {
         fetchMusixiser(project.data.data.userId).then((musixiser) => {
           console.log('work musixiser info: ', musixiser.data.data);
           project.data.data.userVO = musixiser.data.data; // 拼接口。
-          const request = new XMLHttpRequest();
-          request.open('GET', project.data.data.url, true);
-          request.send(null);
-          request.onreadystatechange = function () {
-            if (request.readyState === 4 && request.status === 200) {
-              const type = request.getResponseHeader('Content-Type');
-              if (type.indexOf('text') !== -1) {
-                commit('SET_ID_PROJECT', {
-                  record: JSON.parse(request.responseText),
-                  info: project.data.data,
-                });
-                resolve();
-              }
-            }
-          };
+          // load music notes/ midi notes
+          MidiConvert.load(project.data.data.url, (midi) => {
+            commit('SET_ID_PROJECT', {
+              record: midi.tracks[0].notes,
+              info: project.data.data,
+            });
+            resolve();
+          });
+          // const request = new XMLHttpRequest();
+          // request.open('GET', project.data.data.url, true);
+          // request.send(null);
+          // request.onreadystatechange = function () {
+          //   if (request.readyState === 4 && request.status === 200) {
+          //     const type = request.getResponseHeader('Content-Type');
+          //     if (type.indexOf('text') !== -1) {
+          //       commit('SET_ID_PROJECT', {
+          //         record: JSON.parse(request.responseText),
+          //         info: project.data.data,
+          //       });
+          //       resolve();
+          //     }
+          //   }
+          // };
         });
       });
     }),
