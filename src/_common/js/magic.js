@@ -258,10 +258,13 @@ export function preview(items, start) {
       }
     }
     musicPreview = new Tone.Part((time, value) => {
-      mbox.triggerAttackRelease(value.note, '4n', time);
+      // mbox.triggerAttackRelease(value.note, '4n', time);
+      mbox.triggerAttackRelease(Tone.Frequency(value.midi, 'midi'), '4n', time);
     }, items).start(0, 0);
     musicPreview.loop = true;
-    musicPreview.loopEnd = 21; // 20s一个循环
+    // musicPreview.loopEnd = 21; // 20s一个循环
+    const lastNote = items[items.length-1]
+    musicPreview.loopEnd = lastNote.time + lastNote.duration + 2
     Tone.Transport.start('+0.01', 0);
   } else {
     Tone.Transport.stop(0);
@@ -269,32 +272,7 @@ export function preview(items, start) {
 }
 
 export function previewMidi(url, start) {
-  console.log('current state', Tone.Transport.state);
-  // if (Tone.Transport.state === 'stopped') {
-  if (start) {
-    // TODO: this is weird...but you need to play something to make sure it works
-    // trigger to avoid no sound
-    if (!oncePlayed) {
-      mbox.triggerAttack('E6', 0, 0);
-      oncePlayed = true;
-    }
-    if (musicPreview) {
-      try {
-        musicPreview.dispose();
-      } catch (e) {
-        //
-      }
-    }
     MidiConvert.load(url, (midi) => {
-      //这个load放到外头，整个函数还是以notes作为入参
-      musicPreview = new Tone.Part((time, value) => {
-        mbox.triggerAttackRelease(value.note, '4n', time);
-      }, midi.tracks[0].notes).start(0, 0);
-      musicPreview.loop = true;
-      musicPreview.loopEnd = 21; // 20s一个循环
-      Tone.Transport.start('+0.01', 0);
-    });
-  } else {
-    Tone.Transport.stop(0);
-  }
+      preview(midi.tracks[1].notes, start) //TODO: should merge all tracks actually...
+  })
 }

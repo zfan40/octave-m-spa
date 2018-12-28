@@ -65,13 +65,13 @@ export default {
         });
       } else {
         // 不会出现这个情况
-        this.$store.dispatch("FETCH_MBOX", { id: 50 }).then(() => {
-          console.log("workPart", this.project);
-          console.log("work info", this.projectInfo);
-          this.favStatus = this.projectInfo.favStatus;
-          // alert('load complete');
-          // this.togglePlay();
-        });
+        // this.$store.dispatch("FETCH_MBOX", { id: 50 }).then(() => {
+        //   console.log("workPart", this.project);
+        //   console.log("work info", this.projectInfo);
+        //   this.favStatus = this.projectInfo.favStatus;
+        //   // alert('load complete');
+        //   // this.togglePlay();
+        // });
       }
     },
     togglePlay() {

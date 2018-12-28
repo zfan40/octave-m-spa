@@ -22,7 +22,22 @@ export default {
   //   // 可以在组建直接跳链接，不commit 存store一道
   // });
 
-  FETCH_MBOX: ({ commit, state }, { id }) =>
+  FETCH_MBOX: async ({ commit, state }, { id }) =>
+    // {
+    //   const project = await fetchMbox(id);
+    //   console.log('xxi', project.data.data.url);
+    //   console.log('xxi', project.data.data.userId);
+    //   const musixiser = await fetchMusixiser(project.data.data.userId);
+    //   console.log('work musixiser info: ', musixiser.data.data);
+    //   project.data.data.userVO = musixiser.data.data; // 拼接口。
+    //   // MidiConvert.load(project.data.data.url, (midi) => {
+    //   MidiConvert.load('//cdn.cnbj1.fds.api.mi-img.com/lftemp/silent_night_easy.mid', (midi) => {
+    //     commit('SET_ID_PROJECT', {
+    //       record: midi.tracks[0].notes,
+    //       info: project.data.data,
+    //     });
+    //   });
+    // },
     new Promise((resolve, reject) => {
       // 获取某id的音乐盒音乐内容
       fetchMbox(id).then((project) => {
@@ -32,9 +47,13 @@ export default {
           console.log('work musixiser info: ', musixiser.data.data);
           project.data.data.userVO = musixiser.data.data; // 拼接口。
           // load music notes/ midi notes
+          // '//cdn.cnbj1.fds.api.mi-img.com/lftemp/silent_night_easy.mid' => test url
+
           MidiConvert.load(project.data.data.url, (midi) => {
+            console.log('midi', midi);
+            const mergeNotes = midi.tracks.reduce((a, b) => a.concat(b.notes), []);
             commit('SET_ID_PROJECT', {
-              record: midi.tracks[0].notes,
+              record: mergeNotes, // midi.tracks[1].notes, // TODO:稍后要改成0
               info: project.data.data,
             });
             resolve();
