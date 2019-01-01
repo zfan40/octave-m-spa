@@ -153,42 +153,9 @@ export function RealMagic(items) {
     return false;
   }
   return true;
-  // console.log(machines);
-  // // then we merge all the tasks
-  //
-  // // test1: [[1],[1,2,1]] => [1,2,3,2]
-  // // test2: [[1,2,1],[1,2,3]] => [1,2,1,3,4,5]
-  // const finalBins = groups.reduce((a, b) => a.concat(b.map(item => item + Math.max(...a))));
-  // let finalTimings = taskTimeArrays.reduce((a, b) => a.concat(b)); // just flatten it
-  // finalTimings = finalTimings.map(item => (item * 15) / 20); // normalize from 20s to 15s
-  // const musicboxPins = finalBins.map((bin, index) => `generatePin(${finalTimings[index]},${bin})`);
-  // console.log(`
-  //   //底下低音,上面高音
-  // const DOT_WIDTH = 0.6
-  // const RATIO = 0.98
-  // const OFFSET = 2.2 //1.95 is center
-  // const OUTER_RADIUS = 6.6
-  // const INNER_RADIUS = 5.9
-  // function generatePin(noteSec, noteNo) {
-  //   return rotate(90, [1, 0, 4 * noteSec * RATIO / 15], cylinder({
-  //     h: 1,
-  //     r: DOT_WIDTH / 2,
-  //     center: true
-  //   })).translate([sin(360 * noteSec * RATIO / 15) * OUTER_RADIUS, -cos(360 * noteSec * RATIO / 15) * OUTER_RADIUS, -9.95 + OFFSET + 0.4 + (noteNo - 1) * .9])
-  // }
-  //
-  // function main() {
-  //   let cylinderBody = difference(cylinder({h: 19.9,r: OUTER_RADIUS,center: true}),cylinder({h: 19.9,r: INNER_RADIUS,center: true}))
-  //   let holes = union(${musicboxPins})
-  //   return union(cylinderBody,holes).translate([0, 0, 0]).scale(1);
-  // }`);
 }
 
 export function mapNoteTimeToColor(time) {
-  // let rgb = [0, 0, 0];
-  // const COLOR1 = [151, 255, 241];
-  // const COLOR2 = [98, 166, 223];
-  // const COLOR3 = [154, 124, 255];
   const COLOR1 = [151, 255, 241];
   const COLOR2 = [137, 228, 217];
   const COLOR3 = [143, 123, 242];
@@ -272,7 +239,17 @@ export function preview(items, start) {
 }
 
 export function previewMidi(url, start) {
-    MidiConvert.load(url, (midi) => {
-      preview(midi.tracks[1].notes, start) //TODO: should merge all tracks actually...
-  })
+  MidiConvert.load(url, (midi) => {
+    const mergeNotes = midi.tracks.reduce((a, b) => a.concat(b.notes), []);
+    preview(mergeNotes, start)
+  });
+}
+
+export function canMakePaper30(items) {
+  const paper30Notes = [48,50,55,57,59,60,62,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,86,88]
+  return items.every(item=>paper30Notes.indexOf(item)>=0)
+}
+export function canMakePaper15(items) {
+  const paper15Notes = [48,50,52,53,55,57,59,60,62,64,65,67,69,71,72]
+  return items.every(item=>paper15Notes.indexOf(item)>=0)
 }
