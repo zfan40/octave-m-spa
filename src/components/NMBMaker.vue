@@ -1,14 +1,14 @@
 <script>
-import 'swiper/dist/css/swiper.css';
-import * as Util from '../_common/js/util';
-import * as Api from '../_common/js/api';
-import * as Cookies from 'js-cookie';
-import * as Magic from '../_common/js/magic';
-import * as WxShare from '../_common/js/wx_share';
-import vueSlider from 'vue-slider-component';
-import { swiper, swiperSlide } from 'vue-awesome-swiper';
+import "swiper/dist/css/swiper.css";
+import * as Util from "../_common/js/util";
+import * as Api from "../_common/js/api";
+import * as Cookies from "js-cookie";
+import * as Magic from "../_common/js/magic";
+import * as WxShare from "../_common/js/wx_share";
+import vueSlider from "vue-slider-component";
+import { swiper, swiperSlide } from "vue-awesome-swiper";
 
-const Tone = require('tone');
+const Tone = require("tone");
 const touchIdKeyMap = {}; // touch move can have several threads, each thread only activate one note at most
 // e.g. {0:a4,1:b5}
 
@@ -17,27 +17,30 @@ let extendBtnsTimeout;
 
 let piano = new Tone.Sampler(
   {
-    C4: 'C4.[mp3|ogg]',
-    'D#4': 'Ds4.[mp3|ogg]',
-    'F#4': 'Fs4.[mp3|ogg]',
-    A4: 'A4.[mp3|ogg]',
-    C5: 'C5.[mp3|ogg]',
-    'D#5': 'Ds5.[mp3|ogg]',
-    'F#5': 'Fs5.[mp3|ogg]',
-    A5: 'A5.[mp3|ogg]',
-    C6: 'C6.[mp3|ogg]',
+    C4: "C4.[mp3|ogg]",
+    "D#4": "Ds4.[mp3|ogg]",
+    "F#4": "Fs4.[mp3|ogg]",
+    A4: "A4.[mp3|ogg]",
+    C5: "C5.[mp3|ogg]",
+    "D#5": "Ds5.[mp3|ogg]",
+    "F#5": "Fs5.[mp3|ogg]",
+    A5: "A5.[mp3|ogg]",
+    C6: "C6.[mp3|ogg]"
   },
   {
     release: 1,
     // 'baseUrl': '/static/audio/'
-    baseUrl: '//cnbj1.fds.api.xiaomi.com/mbox/audio/',
-  },
+    baseUrl: "//cnbj1.fds.api.xiaomi.com/mbox/audio/"
+  }
 ).toMaster();
 
 // var plucky = new Tone.PluckSynth().toMaster()
 
 const SCREEN_WIDTH = document.documentElement.getBoundingClientRect().width;
-const SCREEN_HEIGHT = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+const SCREEN_HEIGHT = Math.max(
+  document.documentElement.clientHeight,
+  window.innerHeight || 0
+);
 
 let tonepart = []; // store all the music parts. (ummm,that's why it's named part...)
 let bouncepart = [];
@@ -55,8 +58,9 @@ export default {
   components: {
     swiper,
     swiperSlide,
-    vueSlider,
+    vueSlider
   },
+  props: ["screenOrientation"],
   data() {
     return {
       portraitMode: true,
@@ -72,59 +76,59 @@ export default {
       alertAppear: false,
       bouncing: false,
       tutorSession: 0,
-      handClass: '', // hand or clickhand
-      tutorClass: '', // hand positioning in different session
+      handClass: "", // hand or clickhand
+      tutorClass: "", // hand positioning in different session
       timelineConfig: {
         value: 0,
         width: 8,
-        height: '90%',
-        padding: '0',
+        height: `${window.screen.height*0.9-20}px`,
+        padding: "0",
         dotSize: 20,
-        eventType: 'auto',
+        eventType: "auto",
         min: 0,
         max: 200,
         interval: 1,
         disabled: false,
         show: true,
-        tooltip: 'always',
+        tooltip: "always",
         // tooltip: 'hidden',
         piecewise: false,
         reverse: true,
         style: {
-          display: 'inline-block',
+          display: "inline-block"
         },
-        class: 'star-slider',
-        direction: 'vertical',
+        class: "star-slider",
+        direction: "vertical",
         speed: PROGRESS_INTERVAL_TIME,
         bgStyle: {
-          backgroundColor: 'rgb(110,113,158)',
-          boxShadow: 'inset 0.5px 0.5px 3px 1px rgba(0,0,0,.36)',
+          backgroundColor: "rgb(110,113,158)",
+          boxShadow: "inset 0.5px 0.5px 3px 1px rgba(0,0,0,.36)"
         },
-        tooltipDir: 'left',
+        tooltipDir: "left",
         tooltipStyle: {
-          backgroundColor: 'rgb(69, 106, 255)',
-          borderColor: 'rgb(69, 106, 255)',
-          transform: 'rotate(90deg)',
-          transformOrigin: 'right',
-          position: 'relative',
-          left: '-.2rem',
-          top: '0.9rem',
+          backgroundColor: "rgb(69, 106, 255)",
+          borderColor: "rgb(69, 106, 255)",
+          transform: "rotate(90deg)",
+          transformOrigin: "right",
+          position: "relative",
+          left: "-.2rem",
+          top: "0.9rem"
         },
         formatter(value) {
           if (value) {
             return `${(value / 10).toFixed(1)}s/20s`;
           }
-          return '0.0s/20s';
+          return "0.0s/20s";
         },
         processStyle: {
-          backgroundColor: 'rgb(69,106,255)',
-        },
-      },
+          backgroundColor: "rgb(69,106,255)"
+        }
+      }
     };
   },
   watch: {
     playing(val) {
-      console.log('playing status', val);
+      console.log("playing status", val);
       if (val) {
         //start progress bar
         replayInterval = setInterval(() => {
@@ -139,6 +143,10 @@ export default {
         clearInterval(replayInterval);
       }
     },
+    screenOrientation() {
+      console.log('update')
+      this.$nextTick(() => this.$refs.timeline.refresh());
+    }
   },
   computed: {
     swiper() {
@@ -149,7 +157,7 @@ export default {
     },
     lastActivePartIndex() {
       return this.PARTNUM - this.lastActiveSwiperIndex - 1;
-    },
+    }
   },
   methods: {
     load() {},
@@ -162,14 +170,14 @@ export default {
         }
         // this.confirmRecordPart(!isLinger)
         playOffset = performance.now() - this.vuetimeline * 100;
-        console.log('播放开始');
+        console.log("播放开始");
         this.confirmRecordPart(0);
-        console.log('kokokoko');
+        console.log("kokokoko");
         recordStartTime = performance.now();
         console.log(`activeOffsetTime${this.vuetimeline * 100}`);
-        Tone.Transport.start('+0.01', this.vuetimeline * 100 / 1000); // TODO:有问题in case < context.currentTime
+        Tone.Transport.start("+0.01", (this.vuetimeline * 100) / 1000); // TODO:有问题in case < context.currentTime
       } else {
-        console.log('播放停了');
+        console.log("播放停了");
         Tone.Transport.stop(0); // TODO：必须stop才能start。。。有没有自动stop啊..
         // recordStartTime = performance.now()
       }
@@ -194,14 +202,14 @@ export default {
         // console.log('2', performance.now() - recordStartTime + this.vuetimeline*100)
       }
       if (noteTime < 20000) {
-        this.vuetimeline = 10 * noteTime / 1000;
+        this.vuetimeline = (10 * noteTime) / 1000;
         this.recordPart.push({
           note: noteId,
-          time: +(noteTime / 1000).toFixed(4),
+          time: +(noteTime / 1000).toFixed(4)
         });
       } else {
         this.vuetimeline = 20 * 10; // 颗粒度是0.1s => 200份
-        console.log('cannot record more than 20 seconds');
+        console.log("cannot record more than 20 seconds");
       }
     },
     handleNoteEnd(noteId) {
@@ -220,13 +228,15 @@ export default {
     },
     confirmRecordPart(shouldClearTime) {
       if (this.recordPart.length) {
-        console.log('processing track: ', this.lastActivePartIndex);
+        console.log("processing track: ", this.lastActivePartIndex);
         if (
           this.recordParts[this.lastActivePartIndex] &&
           this.recordParts[this.lastActivePartIndex].length
         ) {
           // 已在该track录过,merge both
-          this.recordPart = this.recordPart.concat(this.recordParts[this.lastActivePartIndex]);
+          this.recordPart = this.recordPart.concat(
+            this.recordParts[this.lastActivePartIndex]
+          );
         }
         if (tonepart[this.lastActivePartIndex]) {
           try {
@@ -235,12 +245,12 @@ export default {
         }
         tonepart[this.lastActivePartIndex] = new Tone.Part((time, value) => {
           // 不能老这new啊，要每次一个数组，每次改动最后一个
-          piano.triggerAttackRelease(value.note, '8n', time);
+          piano.triggerAttackRelease(value.note, "8n", time);
         }, this.recordPart).start(0);
         this.recordParts[this.lastActivePartIndex] = this.recordPart;
         this.recordPart = [];
       } else {
-        console.log('啥也没录');
+        console.log("啥也没录");
       }
       this.lastActiveSwiperIndex = this.activeSwiperIndex;
       // reinit time
@@ -304,31 +314,31 @@ export default {
         // TODO, semi done
         this.bouncing = true;
         this.$store
-          .dispatch('BOUNCE_PROJECT', {
+          .dispatch("BOUNCE_PROJECT", {
             record: bouncepart,
             info: {
-              title: '尚未起名',
-              content: 'default',
-              cover: 'default',
-            },
+              title: "尚未起名",
+              content: "default",
+              cover: "default"
+            }
           })
           .then(id => {
-            console.log('successfully bounced');
+            console.log("successfully bounced");
             this.bouncing = false;
-            this.$toast('作品已为您存储');
+            this.$toast("作品已为您存储");
             this.$router.push({
-              path: '/new-music-box-viewer',
+              path: "/new-music-box-viewer",
               query: {
-                id,
-              },
+                id
+              }
             });
           })
           .catch(err => {
             this.bouncing = false;
-            this.$toast('非常抱歉，上传作品失败了');
+            this.$toast("非常抱歉，上传作品失败了");
           });
       } else {
-        this.$toast('什么都没录呢');
+        this.$toast("什么都没录呢");
       }
     },
     mapNoteTimeToColor(t) {
@@ -339,7 +349,7 @@ export default {
     },
     adjustTimeline(e) {
       if (this.playing) {
-        console.log('ccccccccc');
+        console.log("ccccccccc");
         this.toggleReplay(); // 现在播放中拉条，直接停，涉及到ref读不到最新值貌似，无法直接继续播放 this is TODO
       } else {
         isLinger = true; // 你拉条了肯定是
@@ -358,28 +368,33 @@ export default {
       for (let i = 0; i <= e.changedTouches.length - 1; i++) {
         const a = document.elementFromPoint(
           e.changedTouches[i].clientX,
-          e.changedTouches[i].clientY,
+          e.changedTouches[i].clientY
         );
-        if (a.classList.contains('white') || a.classList.contains('black')) {
+        if (a.classList.contains("white") || a.classList.contains("black")) {
           if (
             touchIdKeyMap[e.changedTouches[i].identifier] &&
-            touchIdKeyMap[e.changedTouches[i].identifier] != a.getAttribute('id')
+            touchIdKeyMap[e.changedTouches[i].identifier] !=
+              a.getAttribute("id")
           ) {
             // 这个touch已经触发，且和当前不一致
             console.log(touchIdKeyMap);
-            this.handleNoteStart(a.getAttribute('id'));
+            this.handleNoteStart(a.getAttribute("id"));
             this.handleNoteEnd(touchIdKeyMap[e.changedTouches[i].identifier]);
-            touchIdKeyMap[e.changedTouches[i].identifier] = a.getAttribute('id');
+            touchIdKeyMap[e.changedTouches[i].identifier] = a.getAttribute(
+              "id"
+            );
           } else if (!touchIdKeyMap[e.changedTouches[i].identifier]) {
             console.log(2);
-            this.handleNoteStart(a.getAttribute('id'));
-            touchIdKeyMap[e.changedTouches[i].identifier] = a.getAttribute('id');
+            this.handleNoteStart(a.getAttribute("id"));
+            touchIdKeyMap[e.changedTouches[i].identifier] = a.getAttribute(
+              "id"
+            );
           } else {
             console.log(3);
             // 新旧相同什么都不做
           }
         } else {
-          console.log('外边');
+          console.log("外边");
           if (touchIdKeyMap[e.changedTouches[i].identifier]) {
             this.handleNoteEnd(touchIdKeyMap[e.changedTouches[i].identifier]);
           }
@@ -397,20 +412,29 @@ export default {
     btnEnd(e) {
       // console.log(e)
       clearTimeout(extendBtnsTimeout);
-      const a = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+      const a = document.elementFromPoint(
+        e.changedTouches[0].clientX,
+        e.changedTouches[0].clientY
+      );
       console.log(a);
-      if (a && a.classList.contains('bounceBtn')) {
+      if (a && a.classList.contains("bounceBtn")) {
         // 导出
         if (this.checkBouncibility()) {
           this.bounceProject();
         } else {
           this.alertAppear = true;
         }
-      } else if (a && (a.classList.contains('playBtn') || a.classList.contains('pauseBtn'))) {
+      } else if (
+        a &&
+        (a.classList.contains("playBtn") || a.classList.contains("pauseBtn"))
+      ) {
         // 播放
         this.toggleReplay();
         this.showExtendBtns = false;
-      } else if (a && (a.classList.contains('playBtn') || a.classList.contains('cancelBtn'))) {
+      } else if (
+        a &&
+        (a.classList.contains("playBtn") || a.classList.contains("cancelBtn"))
+      ) {
         // hide extend buttons
         this.showExtendBtns = false;
       }
@@ -418,7 +442,7 @@ export default {
     tutorStart() {
       // 0未开始，1黑屏,2键盘，3track，4时间线，5播放,
       this.tutorSession = 1;
-      this.$toast('请锁住竖屏使用');
+      this.$toast("请锁住竖屏使用");
       tutorOnceEnter = setTimeout(this.tutorProgress, 3000);
       // setTimeout(()=>{this.tutorSession=2},3000)
       // setTimeout(()=>{this.tutorSession=3;this.swiper.slidePrev()},5000)
@@ -433,129 +457,129 @@ export default {
     },
     tutorProgress() {
       clearTimeout(tutorOnceEnter);
-      console.log('??????????');
+      console.log("??????????");
       this.tutorSession += 1;
       console.log(this.tutorSession);
       switch (this.tutorSession) {
         case 1:
           this.clearTutorTimeout();
-          this.$toast('请锁住竖屏使用,长按播放按钮保存作品');
+          this.$toast("请锁住竖屏使用,长按播放按钮保存作品");
           break;
         case 2:
           this.clearTutorTimeout();
-          this.handClass = 'hand'; // clickhand
-          this.tutorClass = 'tutor2start';
+          this.handClass = "hand"; // clickhand
+          this.tutorClass = "tutor2start";
           tutorTimeout.push(
             setTimeout(() => {
-              this.handClass = 'clickhand'; // clickhand
-              this.tutorClass = 'tutor2end';
-            }, 500),
+              this.handClass = "clickhand"; // clickhand
+              this.tutorClass = "tutor2end";
+            }, 500)
           );
           tutorTimeout.push(
             setTimeout(() => {
               this.vuetimeline = 120;
-              this.handClass = 'hand';
-            }, 1500),
+              this.handClass = "hand";
+            }, 1500)
           );
           tutorTimeout.push(
             setTimeout(() => {
               this.vuetimeline = 0;
-              this.handClass = 'hidehand';
-            }, 2500),
+              this.handClass = "hidehand";
+            }, 2500)
           );
           break;
         case 3:
           this.clearTutorTimeout();
-          this.handClass = 'hand'; // clickhand
-          this.tutorClass = 'tutor3start';
+          this.handClass = "hand"; // clickhand
+          this.tutorClass = "tutor3start";
           tutorTimeout.push(
             setTimeout(() => {
-              this.handClass = 'clickhand'; // clickhand
-              this.tutorClass = 'tutor3end';
-            }, 500),
+              this.handClass = "clickhand"; // clickhand
+              this.tutorClass = "tutor3end";
+            }, 500)
           );
           tutorTimeout.push(
             setTimeout(() => {
-              this.handClass = 'hand'; // clickhand
-              this.tutorClass = 'tutor3end';
-            }, 800),
+              this.handClass = "hand"; // clickhand
+              this.tutorClass = "tutor3end";
+            }, 800)
           );
           tutorTimeout.push(
             setTimeout(() => {
-              this.handClass = 'hidehand';
-            }, 1000),
+              this.handClass = "hidehand";
+            }, 1000)
           );
           break;
         case 4:
           this.clearTutorTimeout();
-          this.handClass = 'hand'; // clickhand
-          this.tutorClass = 'tutor4start';
+          this.handClass = "hand"; // clickhand
+          this.tutorClass = "tutor4start";
           tutorTimeout.push(
             setTimeout(() => {
-              this.handClass = 'clickhand'; // clickhand
-              this.tutorClass = 'tutor4end';
-            }, 500),
+              this.handClass = "clickhand"; // clickhand
+              this.tutorClass = "tutor4end";
+            }, 500)
           );
           tutorTimeout.push(
             setTimeout(() => {
-              this.handClass = 'hand'; // clickhand
-              this.tutorClass = 'tutor4start';
+              this.handClass = "hand"; // clickhand
+              this.tutorClass = "tutor4start";
               this.showExtendBtns = true;
-            }, 1500),
+            }, 1500)
           );
           tutorTimeout.push(
             setTimeout(() => {
-              this.handClass = 'hidehand';
-            }, 2500),
+              this.handClass = "hidehand";
+            }, 2500)
           );
           tutorTimeout.push(
             setTimeout(() => {
               this.showExtendBtns = false;
-            }, 3000),
+            }, 3000)
           );
           break;
         case 5:
           this.clearTutorTimeout();
-          this.handClass = 'hand'; // clickhand
-          this.tutorClass = 'tutor5start';
+          this.handClass = "hand"; // clickhand
+          this.tutorClass = "tutor5start";
           tutorTimeout.push(
             setTimeout(() => {
-              this.handClass = 'clickhand'; // clickhand
-              this.tutorClass = 'tutor5end';
-            }, 1200),
+              this.handClass = "clickhand"; // clickhand
+              this.tutorClass = "tutor5end";
+            }, 1200)
           );
           tutorTimeout.push(
             setTimeout(() => {
               this.swiper.slidePrev();
-            }, 1500),
+            }, 1500)
           );
           tutorTimeout.push(
             setTimeout(() => {
               this.swiper.slideNext();
-              this.handClass = 'hidehand';
-            }, 2500),
+              this.handClass = "hidehand";
+            }, 2500)
           );
           break;
         case 6:
           this.clearTutorTimeout();
-          this.handClass = 'hand'; // clickhand
-          this.tutorClass = 'tutor6start';
+          this.handClass = "hand"; // clickhand
+          this.tutorClass = "tutor6start";
           tutorTimeout.push(
             setTimeout(() => {
-              this.handClass = 'clickhand'; // clickhand
-              this.tutorClass = 'tutor6end';
-            }, 500),
+              this.handClass = "clickhand"; // clickhand
+              this.tutorClass = "tutor6end";
+            }, 500)
           );
           tutorTimeout.push(
             setTimeout(() => {
-              this.handClass = 'hand'; // clickhand
-              this.tutorClass = 'tutor6end';
-            }, 800),
+              this.handClass = "hand"; // clickhand
+              this.tutorClass = "tutor6end";
+            }, 800)
           );
           tutorTimeout.push(
             setTimeout(() => {
-              this.handClass = 'hidehand';
-            }, 1500),
+              this.handClass = "hidehand";
+            }, 1500)
           );
           break;
         default:
@@ -567,7 +591,7 @@ export default {
       this.showExtendBtns = false;
       tutorTimeout.forEach(v => clearTimeout(v));
       tutorTimeout = [];
-    },
+    }
   },
   created() {
     // check cookie to get serviceToken first
@@ -595,50 +619,50 @@ export default {
         //   console.log('2',e)
         // },
         transitionEnd(e) {
-          console.log('3', this.activeIndex); // THIS!!! within swiper...scope.....
+          console.log("3", this.activeIndex); // THIS!!! within swiper...scope.....
           self.activeSwiperIndex = this.activeIndex;
           self.confirmRecordPart(!isLinger);
-        },
-      },
+        }
+      }
     };
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase());
     if (!inWechat) return;
     // alert(Cookies.get('serviceToken'))
     WxShare.prepareShareConfig().then(() => {
       WxShare.prepareShareContent({
-        title: 'MUSIXISE',
-        desc: '寻找你自己的八音盒',
+        title: "MUSIXISE",
+        desc: "寻找你自己的八音盒",
         fullPath: `${location.origin}${location.pathname}#/new-music-box-maker`,
-        imgUrl: 'http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png',
+        imgUrl: "http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png"
       });
     });
-    if (Util.getUrlParam('code') || Cookies.get('serviceToken')) {
+    if (Util.getUrlParam("code") || Cookies.get("serviceToken")) {
       // TODO:ajax call to get info
-      Api.getUserInfo(Util.getUrlParam('code'))
+      Api.getUserInfo(Util.getUrlParam("code"))
         .then(res => {
           if (res.data.errcode >= 20000) {
             // 网页内cookie失效，需要重新验证
-            Cookies.remove('serviceToken');
+            Cookies.remove("serviceToken");
             location.replace(
               // will publish to node project m-musixise, under '/music-box' path
               // 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx353a60a8b049d366&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect'
               // `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx353a60a8b049d366&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
               `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx353a60a8b049d366&redirect_uri=${encodeURIComponent(
-                `${location.origin + location.pathname}#/new-music-box-maker`,
-              )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`,
+                `${location.origin + location.pathname}#/new-music-box-maker`
+              )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
             );
           }
           // alert(`welcome${res.data.data.realname}`)
-          console.log('get user info success', res.data.data);
+          console.log("get user info success", res.data.data);
         })
         .catch(err => {
-          Cookies.remove('serviceToken');
+          Cookies.remove("serviceToken");
           location.replace(
             // 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx353a60a8b049d366&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect'
             // `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx353a60a8b049d366&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
             `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx353a60a8b049d366&redirect_uri=${encodeURIComponent(
-              `${location.origin + location.pathname}#/new-music-box-maker`,
-            )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`,
+              `${location.origin + location.pathname}#/new-music-box-maker`
+            )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
           );
         });
     } else {
@@ -647,8 +671,8 @@ export default {
         // 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx353a60a8b049d366&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect'
         // `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx353a60a8b049d366&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
         `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx353a60a8b049d366&redirect_uri=${encodeURIComponent(
-          `${location.origin + location.pathname}#/new-music-box-maker`,
-        )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`,
+          `${location.origin + location.pathname}#/new-music-box-maker`
+        )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
       );
     }
   },
@@ -661,145 +685,185 @@ export default {
     // pointer events以后可以使用
     this.tutorStart();
   },
-  updated() {},
+  updated() {}
 };
 </script>
 
 <template>
-<div id="container">
-  <!-- <v-touch @pan="onPan"> -->
-  <div :class="['keys',tutorSession===8?'tutorial-highlight':'']" @touchmove="keng" @touchstart.stop.prevent="touchNoteStartHandler" @touchend.stop.event="touchNoteEndHandler">
-    <!-- using sharp sign => '#' as object key cause syntax error... -->
-    <!-- <div :class="['white', 'a', activeNote.A3?'active-note':'']" id="A3"></div>
+  <div id="container">
+    <!-- <v-touch @pan="onPan"> -->
+    <div
+      :class="['keys',tutorSession===8?'tutorial-highlight':'']"
+      @touchmove="keng"
+      @touchstart.stop.prevent="touchNoteStartHandler"
+      @touchend.stop.event="touchNoteEndHandler"
+    >
+      <!-- using sharp sign => '#' as object key cause syntax error... -->
+      <!-- <div :class="['white', 'a', activeNote.A3?'active-note':'']" id="A3"></div>
       <div :class="['black', 'b-minor', activeNote.Bb3?'active-note':'']" id="Bb3"></div>
-      <div :class="['white', 'b', activeNote.B3?'active-note':'']" id="B3"></div> -->
-    <div :class="['white', 'c', activeNote.C4?'active-note':'']" id="C4"></div>
-    <div :class="['black', 'd-minor', activeNote.Db4?'active-note':'']" id="Db4"></div>
-    <div :class="['white', 'd', activeNote.D4?'active-note':'']" id="D4"></div>
-    <div :class="['black', 'e-minor', activeNote.Eb4?'active-note':'']" id="Eb4"></div>
-    <div :class="['white', 'e', activeNote.E4?'active-note':'']" id="E4"></div>
-    <div :class="['white', 'f', activeNote.F4?'active-note':'']" id="F4"></div>
-    <div :class="['black', 'f-sharp', activeNote.Gb4?'active-note':'']" id="Gb4"></div>
-    <div :class="['white', 'g', activeNote.G4?'active-note':'']" id="G4"></div>
-    <div :class="['black', 'a-minor', activeNote.Ab4?'active-note':'']" id="Ab4"></div>
-    <div :class="['white', 'a', activeNote.A4?'active-note':'']" id="A4"></div>
-    <div :class="['black', 'b-minor', activeNote.Bb4?'active-note':'']" id="Bb4"></div>
-    <div :class="['white', 'b', activeNote.B4?'active-note':'']" id="B4"></div>
-    <div :class="['white', 'c', activeNote.C5?'active-note':'']" id="C5"></div>
-    <div :class="['black', 'd-minor', activeNote.Db5?'active-note':'']" id="Db5"></div>
-    <div :class="['white', 'd', activeNote.D5?'active-note':'']" id="D5"></div>
-    <div :class="['black', 'e-minor', activeNote.Eb5?'active-note':'']" id="Eb5"></div>
-    <div :class="['white', 'e', activeNote.E5?'active-note':'']" id="E5"></div>
-    <div :class="['white', 'f', activeNote.F5?'active-note':'']" id="F5"></div>
-    <div :class="['black', 'f-sharp', activeNote.Gb5?'active-note':'']" id="Gb5"></div>
-    <div :class="['white', 'g', activeNote.G5?'active-note':'']" id="G5"></div>
-    <div :class="['black', 'a-minor', activeNote.Ab5?'active-note':'']" id="Ab5"></div>
-    <div :class="['white', 'a', activeNote.A5?'active-note':'']" id="A5"></div>
-    <div :class="['black', 'b-minor', activeNote.Bb5?'active-note':'']" id="Bb5"></div>
-    <div :class="['white', 'b', activeNote.B5?'active-note':'']" id="B5"></div>
-    <div :class="['white', 'c', activeNote.C6?'active-note':'']" id="C6"></div>
-    <div :class="['black', 'd-minor', activeNote.Db6?'active-note':'']" id="Db6"></div>
-    <div :class="['white', 'd', activeNote.D6?'active-note':'']" id="D6"></div>
-    <div :class="['black', 'e-minor', activeNote.Eb6?'active-note':'']" id="Eb6"></div>
-    <div :class="['white', 'e', activeNote.E6?'active-note':'']" id="E6"></div>
-    <div :class="['white', 'f', activeNote.F6?'active-note':'']" id="F6"></div>
-  </div>
-  <div :class="['keyshadow',tutorSession===8?'tutorial-highlight':'']"></div>
-  <div class="scroll-container"></div>
-  <div class="semi-piano-roll" :class="[(tutorSession===5||tutorSession===6)?'tutorial-highlight':'']" @touchmove.stop.prevent>
-    <swiper :options="pianoRollSwiperOption" ref="pianoRoll">
-      <!-- slides -->
-      <swiper-slide v-for="n in PARTNUM">
-        <div class="current-piano-roll">
-          <svg :style="{height:'90%',padding:timelineConfig.dotSize/2+'px 0'}">
-            <defs>
-              	<filter id="glowing" height="400%" width="130%" x="-10%" y="-130%">
-              		<!-- Thicken out the original shape -->
-              		<feMorphology operator="dilate" radius="1" in="SourceAlpha" result="thicken" />
+      <div :class="['white', 'b', activeNote.B3?'active-note':'']" id="B3"></div>-->
+      <div :class="['white', 'c', activeNote.C4?'active-note':'']" id="C4"></div>
+      <div :class="['black', 'd-minor', activeNote.Db4?'active-note':'']" id="Db4"></div>
+      <div :class="['white', 'd', activeNote.D4?'active-note':'']" id="D4"></div>
+      <div :class="['black', 'e-minor', activeNote.Eb4?'active-note':'']" id="Eb4"></div>
+      <div :class="['white', 'e', activeNote.E4?'active-note':'']" id="E4"></div>
+      <div :class="['white', 'f', activeNote.F4?'active-note':'']" id="F4"></div>
+      <div :class="['black', 'f-sharp', activeNote.Gb4?'active-note':'']" id="Gb4"></div>
+      <div :class="['white', 'g', activeNote.G4?'active-note':'']" id="G4"></div>
+      <div :class="['black', 'a-minor', activeNote.Ab4?'active-note':'']" id="Ab4"></div>
+      <div :class="['white', 'a', activeNote.A4?'active-note':'']" id="A4"></div>
+      <div :class="['black', 'b-minor', activeNote.Bb4?'active-note':'']" id="Bb4"></div>
+      <div :class="['white', 'b', activeNote.B4?'active-note':'']" id="B4"></div>
+      <div :class="['white', 'c', activeNote.C5?'active-note':'']" id="C5"></div>
+      <div :class="['black', 'd-minor', activeNote.Db5?'active-note':'']" id="Db5"></div>
+      <div :class="['white', 'd', activeNote.D5?'active-note':'']" id="D5"></div>
+      <div :class="['black', 'e-minor', activeNote.Eb5?'active-note':'']" id="Eb5"></div>
+      <div :class="['white', 'e', activeNote.E5?'active-note':'']" id="E5"></div>
+      <div :class="['white', 'f', activeNote.F5?'active-note':'']" id="F5"></div>
+      <div :class="['black', 'f-sharp', activeNote.Gb5?'active-note':'']" id="Gb5"></div>
+      <div :class="['white', 'g', activeNote.G5?'active-note':'']" id="G5"></div>
+      <div :class="['black', 'a-minor', activeNote.Ab5?'active-note':'']" id="Ab5"></div>
+      <div :class="['white', 'a', activeNote.A5?'active-note':'']" id="A5"></div>
+      <div :class="['black', 'b-minor', activeNote.Bb5?'active-note':'']" id="Bb5"></div>
+      <div :class="['white', 'b', activeNote.B5?'active-note':'']" id="B5"></div>
+      <div :class="['white', 'c', activeNote.C6?'active-note':'']" id="C6"></div>
+      <div :class="['black', 'd-minor', activeNote.Db6?'active-note':'']" id="Db6"></div>
+      <div :class="['white', 'd', activeNote.D6?'active-note':'']" id="D6"></div>
+      <div :class="['black', 'e-minor', activeNote.Eb6?'active-note':'']" id="Eb6"></div>
+      <div :class="['white', 'e', activeNote.E6?'active-note':'']" id="E6"></div>
+      <div :class="['white', 'f', activeNote.F6?'active-note':'']" id="F6"></div>
+    </div>
+    <div :class="['keyshadow',tutorSession===8?'tutorial-highlight':'']"></div>
+    <div class="scroll-container"></div>
+    <div
+      class="semi-piano-roll"
+      :class="[(tutorSession===5||tutorSession===6)?'tutorial-highlight':'']"
+      @touchmove.stop.prevent
+    >
+      <swiper :options="pianoRollSwiperOption" ref="pianoRoll">
+        <!-- slides -->
+        <swiper-slide v-for="n in PARTNUM">
+          <div class="current-piano-roll">
+            <svg :style="{height:'90%',padding:timelineConfig.dotSize/2+'px 0'}">
+              <defs>
+                <filter id="glowing" height="400%" width="130%" x="-10%" y="-130%">
+                  <!-- Thicken out the original shape -->
+                  <feMorphology operator="dilate" radius="1" in="SourceAlpha" result="thicken"></feMorphology>
 
-              		<!-- Use a gaussian blur to create the soft blurriness of the glow -->
-              		<feGaussianBlur in="thicken" stdDeviation="2" result="blurred" />
+                  <!-- Use a gaussian blur to create the soft blurriness of the glow -->
+                  <feGaussianBlur in="thicken" stdDeviation="2" result="blurred"></feGaussianBlur>
 
-              		<!-- Change the colour -->
-              		<feFlood flood-color="rgb(200,200,255)" result="glowColor" />
+                  <!-- Change the colour -->
+                  <feFlood flood-color="rgb(200,200,255)" result="glowColor"></feFlood>
 
-              		<!-- Color in the glows -->
-              		<feComposite in="glowColor" in2="blurred" operator="in" result="softGlow_colored" />
+                  <!-- Color in the glows -->
+                  <feComposite in="glowColor" in2="blurred" operator="in" result="softGlow_colored"></feComposite>
 
-              		<!--	Layer the effects together -->
-              		<feMerge>
-              			<feMergeNode in="softGlow_colored"/>
-              			<feMergeNode in="SourceGraphic"/>
-              		</feMerge>
-              	</filter>
-            </defs>
-            <rect v-if="activePartIndex===(PARTNUM-n)" v-for="(item,index) in recordPart"
-              :x="2"
-              :y="100*item.time/20 + '%'"
-              :width="mapNoteMidiToLength(item.note)"
-              height="3"
-              rx="2"
-              ry="2"
-              :fill="mapNoteTimeToColor(item.time)"
-              filter="url(#glowing)" />
-            <rect v-for="(item,index) in recordParts[PARTNUM-n]"
-              :x="2"
-              :y="100*item.time/20 + '%'"
-              :width="mapNoteMidiToLength(item.note)"
-              height="3"
-              rx="2"
-              ry="2"
-              :fill="activePartIndex===(PARTNUM-n)?mapNoteTimeToColor(item.time):'rgb(120,120,120)'"
-              :filter="activePartIndex===(PARTNUM-n)?'url(#glowing)':''" />
-          </svg>
-          <div class="temp" @click="clearRecordPart(PARTNUM-n)"></div>
+                  <!--	Layer the effects together -->
+                  <feMerge>
+                    <feMergeNode in="softGlow_colored"></feMergeNode>
+                    <feMergeNode in="SourceGraphic"></feMergeNode>
+                  </feMerge>
+                </filter>
+              </defs>
+              <rect
+                v-if="activePartIndex===(PARTNUM-n)"
+                v-for="(item,index) in recordPart"
+                :x="2"
+                :y="100*item.time/20 + '%'"
+                :width="mapNoteMidiToLength(item.note)"
+                height="3"
+                rx="2"
+                ry="2"
+                :fill="mapNoteTimeToColor(item.time)"
+                filter="url(#glowing)"
+              ></rect>
+              <rect
+                v-for="(item,index) in recordParts[PARTNUM-n]"
+                :x="2"
+                :y="100*item.time/20 + '%'"
+                :width="mapNoteMidiToLength(item.note)"
+                height="3"
+                rx="2"
+                ry="2"
+                :fill="activePartIndex===(PARTNUM-n)?mapNoteTimeToColor(item.time):'rgb(120,120,120)'"
+                :filter="activePartIndex===(PARTNUM-n)?'url(#glowing)':''"
+              ></rect>
+            </svg>
+            <div class="temp" @click="clearRecordPart(PARTNUM-n)"></div>
+          </div>
+        </swiper-slide>
+        <!-- need the bottom two empty slides to fill whole swiper -->
+        <swiper-slide></swiper-slide>
+        <swiper-slide></swiper-slide>
+      </swiper>
+    </div>
+
+    <div class="g-controller">
+      <vue-slider
+        ref="timeline"
+        :class="[tutorSession===2?'tutorial-highlight':'']"
+        :show="screenOrientation==='portrait'"
+        v-model="vuetimeline"
+        v-bind="timelineConfig"
+        @callback="adjustTimeline"
+        @drag-end
+      ></vue-slider>
+      <div
+        class="btnContainer"
+        :class="[(tutorSession===3||tutorSession===4)?'tutorial-highlight':'']"
+        @touchstart.stop.prevent="btnStart"
+        @touchend.stop.event="btnEnd"
+      >
+        <div :class="[playing?'pauseBtn':'playBtn', 'rotate']" @click="toggleReplay"></div>
+        <div :class="[showExtendBtns?'extendBtnsShow':'extendBtnsHide','extendBtns']">
+          <div class="bounceBtn rotate"></div>
+          <div class="cancelBtn"></div>
         </div>
-      </swiper-slide>
-      <!-- need the bottom two empty slides to fill whole swiper -->
-      <swiper-slide></swiper-slide>
-      <swiper-slide></swiper-slide>
-    </swiper>
-  </div>
-
-  <div class="g-controller">
-    <vue-slider :class="[tutorSession===2?'tutorial-highlight':'']" v-model="vuetimeline" v-bind="timelineConfig" @callback="adjustTimeline" @drag-end=""></vue-slider>
-    <div class="btnContainer" :class="[(tutorSession===3||tutorSession===4)?'tutorial-highlight':'']" @touchstart.stop.prevent="btnStart" @touchend.stop.event="btnEnd">
-      <div :class="[playing?'pauseBtn':'playBtn', 'rotate']" @click="toggleReplay"></div>
-      <div :class="[showExtendBtns?'extendBtnsShow':'extendBtnsHide','extendBtns']">
-        <div class='bounceBtn rotate'></div>
-        <div class='cancelBtn'></div>
       </div>
     </div>
-  </div>
-  <transition name="fade">
-    <div id="alert-mask" v-show="alertAppear">
-      <div class="mb-dialog">
-        <div class="title">
-          减少些音符才能做成音乐盒，是否继续上传
-        </div>
-        <div class="btns">
-          <span class="btn cancel" @click="alertAppear=false">再调整</span>
-          <span class="btn confirm" @click="bounceProject">任性上传</span>
+    <transition name="fade">
+      <div id="alert-mask" v-show="alertAppear">
+        <div class="mb-dialog">
+          <div class="title">减少些音符才能做成音乐盒，是否继续上传</div>
+          <div class="btns">
+            <span class="btn cancel" @click="alertAppear=false">再调整</span>
+            <span class="btn confirm" @click="bounceProject">任性上传</span>
+          </div>
         </div>
       </div>
+    </transition>
+    <!-- </v-touch> -->
+    <div class="mask" v-show="bouncing">
+      <p>存储中...</p>
     </div>
-  </transition>
-  <!-- </v-touch> -->
-  <div class="mask" v-show="bouncing">
-    <p>存储中...</p>
+    <div class="hint-mask" id="tutorial-mask" v-show="tutorSession>0" @touchend="tutorProgress">
+      <!-- <transition name="tutor1"><div></div></transition> -->
+      <div v-show="tutorSession===2" class="hint-text" id="timeline-hint">
+        <h3>进度条</h3>
+        <p>拖动原点改变时间</p>
+      </div>
+      <div v-show="tutorSession===3" class="hint-text" id="play-hint">
+        <h3>功能按钮</h3>
+        <p>点击播放/暂停</p>
+      </div>
+      <div v-show="tutorSession===4" class="hint-text" id="longpress-hint">
+        <h3>功能按钮</h3>
+        <p>长按后点击：保存/取消</p>
+      </div>
+      <div v-show="tutorSession===5" class="hint-text" id="swipe-hint">
+        <h3>多轨编曲</h3>
+        <p>上下滑动切换轨道编曲</p>
+      </div>
+      <div v-show="tutorSession===6" class="hint-text" id="clear-hint">
+        <h3>多轨编曲</h3>
+        <p>清空轨道</p>
+      </div>
+    </div>
+    <div id="tutorhand" :class="[tutorClass]" v-show="handClass!='hidehand'">
+      <div :class="[handClass]"></div>
+    </div>
   </div>
-  <div class="hint-mask" id="tutorial-mask" v-show="tutorSession>0" @touchend="tutorProgress">
-    <!-- <transition name="tutor1"><div></div></transition> -->
-    <div v-show="tutorSession===2" class="hint-text" id="timeline-hint"><h3>进度条</h3><p>拖动原点改变时间</p></div>
-    <div v-show="tutorSession===3" class="hint-text" id="play-hint"><h3>功能按钮</h3><p>点击播放/暂停</p></div>
-    <div v-show="tutorSession===4" class="hint-text" id="longpress-hint"><h3>功能按钮</h3><p>长按后点击：保存/取消</p></div>
-    <div v-show="tutorSession===5" class="hint-text" id="swipe-hint"><h3>多轨编曲</h3><p>上下滑动切换轨道编曲</p></div>
-    <div v-show="tutorSession===6" class="hint-text" id="clear-hint"><h3>多轨编曲</h3><p>清空轨道</p></div>
-  </div>
-  <div id="tutorhand" :class="[tutorClass]" v-show="handClass!='hidehand'">
-    <div :class="[handClass]"></div>
-  </div>
-</div>
 </template>
 
 <style lang="scss" scoped>

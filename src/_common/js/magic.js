@@ -229,9 +229,13 @@ export function preview(items, start) {
       mbox.triggerAttackRelease(Tone.Frequency(value.midi, 'midi'), '4n', time);
     }, items).start(0, 0);
     musicPreview.loop = true;
-    // musicPreview.loopEnd = 21; // 20s一个循环
+    
     const lastNote = items[items.length-1]
-    musicPreview.loopEnd = lastNote.time + lastNote.duration + 2
+    if (lastNote.time>=20) {
+      musicPreview.loopEnd = lastNote.time + lastNote.duration + 2
+    } else {
+      musicPreview.loopEnd = 21; // 20s的作品，多一秒喘息
+    }
     Tone.Transport.start('+0.01', 0);
   } else {
     Tone.Transport.stop(0);

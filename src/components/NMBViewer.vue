@@ -131,24 +131,24 @@ export default {
       }
     },
     purchaseItem() {
+      // TODO: router push with workId
       console.log(`you are about to purchase ${this.projectInfo.id}`);
-      // this.$toast('尚未开发购买功能');
-      // WxShare.makeWxOrder({ pid: 1, wid: this.projectInfo.id, amount: 1 })
-      //   .then(res => {
-      //     console.log("pay succeed");
-      //   })
-      //   .catch(err => {
-      //     console.log("pay fail");
-      //   });
-      WxShare.newMakeWxOrder(
-        { pid: 1, wid: this.projectInfo.id, amount: 1 },
-        () => {
-          console.log("pay succeed");
-        },
-        () => {
-          console.log("pay fail");
+      this.$store.commit("SAVE_ORDER_INFO", { wid: this.projectInfo.id }); // store current workId
+      this.$router.push({
+        path: "/product-list",
+        query: {
+          // id
         }
-      );
+      });
+      // WxShare.newMakeWxOrder(
+      //   { pid: 1, wid: this.projectInfo.id, amount: 1 },
+      //   () => {
+      //     console.log("pay succeed");
+      //   },
+      //   () => {
+      //     console.log("pay fail");
+      //   }
+      // );
     }
   },
   beforeRouteLeave(to, from, next) {
@@ -326,6 +326,7 @@ export default {
         </div>
       </div>
     </transition>
+    <div></div>
   </div>
 </template>
 
