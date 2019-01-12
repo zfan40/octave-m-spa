@@ -11,6 +11,8 @@ import MBRoll from '@/components/MBRollMaker';
 import MusixiserDetail from '@/components/MusixiserDetail';
 import MyFav from '@/components/MyFav';
 import Recommend from '@/components/Recommend';
+import ProductList from '@/components/ProductList';
+import OrderConfirm from '@/components/OrderConfirm';
 
 Vue.use(Router);
 
@@ -37,6 +39,16 @@ export default new Router({
       name: 'NMBViewer',
       component: NMBViewer,
     },
+    {
+      path: '/product-list',
+      name: 'productList',
+      component: ProductList,
+    },
+    {
+      path: '/order-confirm',
+      name: 'OrderConfirm',
+      component: OrderConfirm,
+    },    
     {
       path: '/musixiser',
       name: 'MusixiserDetail',

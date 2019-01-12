@@ -11,10 +11,16 @@ export function createStore() {
     state: {
       activeType: null,
       itemsPerPage: 20,
-      items: {/* [id: number]: Item */},
-      users: {/* [id: string]: User */},
+      items: {
+        /* [id: number]: Item */
+      },
+      users: {
+        /* [id: string]: User */
+      },
       lists: {
-        top: [/* number */],
+        top: [
+          /* number */
+        ],
         new: [],
         show: [],
         ask: [],
@@ -26,6 +32,13 @@ export function createStore() {
       musixiserInfo: {},
       musixiserWorksObj: { content: [] },
       favWorksObj: { content: [] },
+      productList: [], // ProductList.vue
+      orderToCreate: {
+        // OrderConfirm.vue & createOrder
+        wid: '',
+        pid: '',
+        address: '',
+      },
     },
     actions,
     mutations,
