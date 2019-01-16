@@ -61,19 +61,23 @@ export default {
 <template>
   <div class="container">
     <div class="productPage" @click="viewProductDetail">
-      <img class="preview">
+      <div class="preview"/>
       <div class="desc">
-        <div>童趣童年</div>
+        <div style="color:#a3a4a8;font-size:18px;">童趣童年</div>
         <div style="display:flex">
-          <div style="flex:1">
+          <div style="flex:1;color:#6d6e75;font-size:12px;">
             <p>大小:20*30*40 (cm)</p>
             <p>材料: 水泥, 金属, 塑料</p>
           </div>
-          <div style="width:3rem;">¥120</div>
+          <div style="width:3rem;font-size:24px;color:#a3a4a8;">¥120</div>
         </div>
       </div>
     </div>
-    <div class="purchaseBtn" @click="toConfirmOrder">购买</div>
+    <div
+      style="position:absolute;bottom:40px;width:100%;display: flex;align-items: center;justify-content: center;"
+    >
+      <div class="purchaseBtn" @click="toConfirmOrder">购买</div>
+    </div>
   </div>
 </template>
 
@@ -89,8 +93,36 @@ export default {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background-color: #1a1c1e;
 }
 .productPage {
+  position: relative;
+  width: getRem(638);
+  height: getRem(744);
+  border-radius: 20px;
+  margin: 80px auto;
+  .preview {
+    position: relative;
+    width: 100%;
+    height: getRem(456);
+    background-color: #d8d8d8;
+  }
+  .desc {
+    position: relative;
+    width: 100%;
+    height: getRem(288);
+    background-color: #2c2d30;
+  }
+}
+.purchaseBtn {
+  background-color: #4564d7;
+  width: getRem(640);
+  height: getRem(92);
+  font-size: 16px;
+  color: white;
+  text-align: center;
+  line-height: getRem(92);
+  border-radius: getRem(46);
 }
 .btnContainer {
   position: relative;
