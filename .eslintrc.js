@@ -9,9 +9,11 @@ module.exports = {
   env: {
     browser: true,
   },
-  extends: 'airbnb-base',
+  extends: ['airbnb-base', 'prettier'],
   // required to lint *.vue files
-  plugins: ['html'],
+  plugins: [
+    //'html'
+    'prettier'],
   // check if imports actually resolve
   settings: {
     'import/resolver': {
