@@ -13,6 +13,7 @@ import MyFav from '@/components/MyFav';
 import Recommend from '@/components/Recommend';
 import ProductList from '@/components/ProductList';
 import OrderConfirm from '@/components/OrderConfirm';
+import MyOrders from '@/components/MyOrders';
 
 Vue.use(Router);
 
@@ -48,7 +49,7 @@ export default new Router({
       path: '/order-confirm',
       name: 'OrderConfirm',
       component: OrderConfirm,
-    },    
+    },
     {
       path: '/musixiser',
       name: 'MusixiserDetail',
@@ -64,5 +65,10 @@ export default new Router({
       name: 'Recommend',
       component: Recommend,
     },
+    {
+      path: '/my-orders',
+      name: 'MyOrders',
+      component: MyOrders,
+    }
   ],
 });

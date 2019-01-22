@@ -64,9 +64,15 @@ export default {
   // SET_USER: (state, { id, user }) => {
   //   Vue.set(state.users, id, user || false); /* false means user not found */
   // },
-  SAVE_ORDER_INFO: (state, { wid, pid, address }) => {
-    state.orderToCreate.wid = wid || state.orderToCreate.wid;
-    state.orderToCreate.pid = pid || state.orderToCreate.pid;
+  SAVE_ORDER_INFO: (state, { work, product, address }) => {
+    state.orderToCreate.wid = work ? work.id : state.orderToCreate.wid;
+    state.orderToCreate.pid = product ? product.id : state.orderToCreate.pid;
     state.orderToCreate.address = address || state.orderToCreate.address;
+    state.targetProduct = product || state.targetProduct
+    state.targetWork = work || state.targetWork
   },
+  PUSH_PRODUCTLIST: (state, { productList }) => {
+    state.productList = productList
+    state.targetProduct = productList[0]
+  }
 };

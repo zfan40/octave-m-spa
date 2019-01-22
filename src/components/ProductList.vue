@@ -1,4 +1,5 @@
 <script>
+import { swiper, swiperSlide } from "vue-awesome-swiper";
 export default {
   // https://vuejs.org/v2/guide/components.html#Props
   props: {
@@ -14,39 +15,48 @@ export default {
       }
     }
   },
+  components: {
+    swiper,
+    swiperSlide
+  },
   computed: {
     style() {
       // return 'background-color: ' + this.hovering ? this.color: 'red';
+    },
+    productList() {
+      return this.$store.state.productList;
     }
   },
   data() {
-    return {
-      currentActiveCount: 0,
-      currentActive: false
-    };
+    return {};
   },
   watch: {},
   created() {
-    this.currentActive = this.initActive;
-    this.currentActiveCount = this.currentActive
-      ? this.initCount
-      : this.initCount + 1;
+    const self = this;
+    this.productListOption = {
+      loop: true,
+      // spaceBetween: 30,
+      centeredSlides: true,
+      slidesPerView: 1,
+      // slidesPerView: "auto",
+      on: {
+        transitionEnd(e) {
+          // console.log("3", this.activeIndex); // THIS!!! within swiper...scope.....
+          console.log(this.realIndex);
+          self.targetProduct = self.productList[this.realIndex];
+        }
+      }
+    };
   },
   mounted() {},
   updated() {},
   methods: {
-    updateButton() {
-      // if (this.currentActive) {
-      //   this.currentActiveCount -= 1;
-      // } else {
-      //   this.currentActiveCount += 1;
-      // }
-      this.currentActive = !this.currentActive;
-      this.onClickCall();
-    },
     viewProductDetail() {},
     toConfirmOrder() {
-      this.$store.commit("SAVE_ORDER_INFO", { pid: 1 }); // store current workId
+      console.log(123321);
+      this.$store.commit("SAVE_ORDER_INFO", {
+        product: this.targetProduct
+      }); // store current workId
       this.$router.push({
         path: "/order-confirm",
         query: {
@@ -60,19 +70,30 @@ export default {
 
 <template>
   <div class="container">
-    <div class="productPage" @click="viewProductDetail">
-      <div class="preview"/>
-      <div class="desc">
-        <div style="color:#a3a4a8;font-size:18px;">童趣童年</div>
-        <div style="display:flex">
-          <div style="flex:1;color:#6d6e75;font-size:12px;">
-            <p>大小:20*30*40 (cm)</p>
-            <p>材料: 水泥, 金属, 塑料</p>
+    <swiper :options="productListOption" ref="productList">
+      <!-- slides -->
+      <swiper-slide v-for="product in productList">
+        <div class="productPage" @click="viewProductDetail">
+          <div class="preview" :style="{background:`url()`}">
+            <img
+              style="width:100%;height:100%;position:relative;display:block;"
+              :src="product.previewImg||'https://cdn4.buysellads.net/uu/1/3386/1525189887-61450.png'"
+              alt
+            >
           </div>
-          <div style="width:3rem;font-size:24px;color:#a3a4a8;">¥120</div>
+          <div class="desc">
+            <div class="desc-title">{{product.name}}</div>
+            <div style="display:flex">
+              <div style="flex:1;color:#6d6e75;font-size:12px;">
+                <p>大小:20*30*40 (cm)</p>
+                <p>{{product.intro}}</p>
+              </div>
+              <div class="price">¥{{product.price}}</div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      </swiper-slide>
+    </swiper>
     <div
       style="position:absolute;bottom:40px;width:100%;display: flex;align-items: center;justify-content: center;"
     >
@@ -94,6 +115,9 @@ export default {
   flex-direction: column;
   overflow: hidden;
   background-color: #1a1c1e;
+  .swiper-slide div {
+    // position: absolute;
+  }
 }
 .productPage {
   position: relative;
@@ -104,6 +128,7 @@ export default {
   .preview {
     position: relative;
     width: 100%;
+    border-radius: 20px 20px 0 0;
     height: getRem(456);
     background-color: #d8d8d8;
   }
@@ -112,6 +137,21 @@ export default {
     width: 100%;
     height: getRem(288);
     background-color: #2c2d30;
+    border-radius: 0 0 20px 20px;
+    text-align: left;
+    padding-left: getRem(48);
+    .desc-title {
+      color: #a3a4a8;
+      font-size: 18px;
+      line-height: getRem(144);
+    }
+    .price {
+      width: 3rem;
+      font-size: 24px;
+      color: #a3a4a8;
+      text-align: right;
+      padding-right: getRem(48);
+    }
   }
 }
 .purchaseBtn {
@@ -123,111 +163,5 @@ export default {
   text-align: center;
   line-height: getRem(92);
   border-radius: getRem(46);
-}
-.btnContainer {
-  position: relative;
-  width: getRem(92);
-  height: getRem(92);
-  border: 1px solid #7d839e;
-  border-radius: 50%;
-  overflow: hidden;
-  // -webkit-mask-image: -webkit-radial-gradient(circle, white, black);
-  .active-btn-background {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-color: #7d839e;
-    border-radius: 50%;
-    border: none;
-    overflow: hidden;
-  }
-  .active {
-    // background-color:#7D839E;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    border-radius: 50%;
-    display: flex;
-    flex-direction: column;
-    color: white;
-    align-items: center;
-    justify-content: space-around;
-    div {
-      width: getRem(34);
-      height: getRem(24);
-      margin-top: 0.2rem;
-      background: url("../assets/viewer/icon-like.png") center center no-repeat;
-      background-size: cover;
-    }
-    p {
-      font-size: 0.37rem;
-      margin: 0 0 0.1rem 0;
-      line-height: 0.37rem;
-      color: white;
-    }
-  }
-  .inactive {
-    // background-color:blue;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    border-radius: 50%;
-    display: flex;
-    flex-direction: column;
-    color: white;
-    align-items: center;
-    justify-content: space-around;
-    div {
-      width: getRem(34);
-      height: getRem(24);
-      margin-top: 0.2rem;
-      background: url("../assets/viewer/icon-like-gray.png") center center
-        no-repeat;
-      background-size: cover;
-    }
-    p {
-      font-size: 0.37rem;
-      margin: 0 0 0.1rem 0;
-      line-height: 0.37rem;
-      color: #7d839e;
-    }
-  }
-}
-//
-.slideDown-enter-active {
-  transition: all 0.3s ease-out;
-}
-.slideDown-leave-active {
-  transition: all 0.3s ease-out;
-}
-.slideDown-enter,.slideDown-leave-to
-/* .slide-fade-leave-active below version 2.1.8 */ {
-  transform: translateY(100%);
-  opacity: 0;
-}
-.slideUp-enter-active {
-  transition: all 0.3s ease-out;
-}
-.slideUp-leave-active {
-  transition: all 0.3s ease-out;
-}
-.slideUp-enter,.slideUp-leave-to
-/* .slide-fade-leave-active below version 2.1.8 */ {
-  transform: translateY(-100%);
-  opacity: 0;
-}
-.fade-enter-active {
-  transition: all 0.3s ease-out;
-}
-.fade-leave-active {
-  transition: all 0.3s ease-out;
-}
-.fade-enter, .fade-leave-to
-/* .slide-fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
 }
 </style>

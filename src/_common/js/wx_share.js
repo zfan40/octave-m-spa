@@ -1,6 +1,7 @@
 import axios from 'axios';
 import wx from 'weixin-js-sdk';
-import { createOrder, payOrder } from './api';
+import { createOrder, payOrder, sendAddress } from './api';
+import { fail } from 'assert';
 
 const reqConfig = {
   headers: {
@@ -57,116 +58,125 @@ export const prepareShareContent = ({ title, desc, fullPath, imgUrl }) => {
     title,
     link,
     imgUrl,
-    success() {},
-    cancel() {},
+    success() { },
+    cancel() { },
   });
   wx.onMenuShareAppMessage({
     title,
     desc,
     link,
     imgUrl,
-    success() {},
-    cancel() {},
+    success() { },
+    cancel() { },
   });
 };
 
 // order pay
-export const makeWxOrder = ({ pid, wid, amount }) =>
-  new Promise((resolve, reject) => {
-    getAddress().then((address) => {
-      console.log('234', address);
-      createOrder({ pid, wid, amount }).then((res) => {
-        // 得到返回的支付参数
-        alert(JSON.stringify(res));
-        const orderId = res.data.data;
-        // params.success = (res) => {
-        //   // 支付成功
-        // };
-        payOrder({ orderId }).then((res) => {
-          // alert(JSON.stringify(res));
-          const params = res.data.data;
-          alert(JSON.stringify(params));
-          console.log(params.nonceStr);
-          console.log(params.signType);
-          console.log(params.package);
-          console.log(params.timeStamp);
-          console.log(params.appId);
-          console.log(params.paySign);
-          console.log('sdsd');
-          // WeixinJSBridge.invoke(
-          //   'getBrandWCPayRequest',
-          //   {
-          //     nonceStr: params.nonceStr || 'e3bcr07pOMTlSmo8xEtbjzCkhRQzUuEX',
-          //     signType: params.signType || 'MD5',
-          //     package: params.package || 'prepay_id=wx23170809963259d77f75f3450235551609',
-          //     timeStamp: params.timeStamp || '1545556090',
-          //     appId: params.appId || 'wx353a60a8b049d366',
-          //     paySign: params.paySign || '1855DBE80F3E3EF13A956D87802CD52E',
-          //   },
-          //   (res) => {
-          //     if (res.err_msg == 'get_brand_wcpay_request:ok') {
-          //       // 使用以上方式判断前端返回,微信团队郑重提示：
-          //       // res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
-          //     }
-          //   },
-          // );
-          wx.chooseWXPay({
-            // ...params,
-            appId: params.appId,
-            timestamp: params.timeStamp,
-            nonceStr: params.nonceStr,
-            package: params.package,
-            signType: params.signType,
-            paySign: params.paySign,
-            success(res) {
-              console.log(res);
-              resolve(res);
-            },
-          });
-        });
-      });
-    });
-  });
-
-// address
-export const newMakeWxOrder = ({ pid, wid, amount }, cb1, cb2) => {
-  wx.openAddress({
+export const makeWxOrder = async ({ pid, wid, amount, address }, successCallback, failCalback) => {
+  // new Promise((resolve, reject) => {
+  //address is 
+  //     {
+  //   "userName": "string",
+  //   "postalCode": "string",
+  //   "provinceName": "string",
+  //   "cityName": "string",
+  //   "countryName": "string",
+  //   "detailInfo": "string",
+  //   "nationalCode": "string",
+  //   "telNumber": "string"
+  // }
+  console.log('------------')
+  const addressObj = await sendAddress(address)
+  console.log('===========')
+  console.log(addressObj)
+  // return
+  const res = await createOrder({ pid, wid, amount, addressId: addressObj.data.data })
+  // 得到返回的支付参数
+  // alert(JSON.stringify(res));
+  const orderId = res.data.data;
+  const payResult = await payOrder({ orderId })
+  // alert(JSON.stringify(res));
+  const params = payResult.data.data;
+  // alert(JSON.stringify(params));
+  console.log(params.nonceStr);
+  console.log(params.signType);
+  console.log(params.package);
+  console.log(params.timeStamp);
+  console.log(params.appId);
+  console.log(params.paySign);
+  console.log('sdsd');
+  wx.chooseWXPay({
+    // ...params,
+    appId: params.appId,
+    timestamp: params.timeStamp,
+    nonceStr: params.nonceStr,
+    package: params.package,
+    signType: params.signType,
+    paySign: params.paySign,
     success(res) {
       console.log(res);
-      createOrder({ pid, wid, amount, address: res }).then((res) => {
-        const orderId = res.data.data;
-        payOrder({ orderId }).then((res) => {
-          // alert(JSON.stringify(res));
-          const params = res.data.data;
-          alert(JSON.stringify(params));
-          console.log(params.nonceStr);
-          console.log(params.signType);
-          console.log(params.package);
-          console.log(params.timeStamp);
-          console.log(params.appId);
-          console.log(params.paySign);
-          console.log('1234');
-          wx.chooseWXPay({
-            // ...params,
-            appId: params.appId,
-            timestamp: params.timeStamp,
-            nonceStr: params.nonceStr,
-            package: params.package,
-            signType: params.signType,
-            paySign: params.paySign,
-            success(res) {
-              console.log(res);
-              cb1(res);
-            },
-          });
-        });
-      });
+      // resolve(res);
+      successCallback(res)
+    },
+    fail() {
+      failCalback();
+    },
+    cancel() {
+      failCalback();
+    }
+  });
+}
+
+// });
+
+export const createAddress = (cb1, cb2) => {
+  wx.openAddress({
+    success(res) {
+      cb1(res);
     },
     cancel() {
       cb2();
     },
   });
-};
+}
+// address
+export const newMakeWxOrder = ({ pid, wid, amount }, cb1, cb2) => {
+  console.log(res);
+  createOrder({ pid, wid, amount, address: res }).then((res) => {
+    const orderId = res.data.data;
+    payOrder({ orderId }).then((res) => {
+      // alert(JSON.stringify(res));
+      const params = res.data.data;
+      alert(JSON.stringify(params));
+      console.log(params.nonceStr);
+      console.log(params.signType);
+      console.log(params.package);
+      console.log(params.timeStamp);
+      console.log(params.appId);
+      console.log(params.paySign);
+      console.log('1234');
+      wx.chooseWXPay({
+        // ...params,
+        appId: params.appId,
+        timestamp: params.timeStamp,
+        nonceStr: params.nonceStr,
+        package: params.package,
+        signType: params.signType,
+        paySign: params.paySign,
+        success(res) {
+          console.log(res);
+          cb1(res);
+        },
+        fail() {
+          cb2();
+        },
+        cancel() {
+          cb2();
+        }
+      });
+    });
+  });
+}
 
 export const getAddress = () => {
   new Promise((resolve, reject) => {

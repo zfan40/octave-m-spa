@@ -14,12 +14,21 @@ export default {
     },
     orderToCreate() {
       return this.$store.state.orderToCreate;
+    },
+    targetProduct() {
+      return this.$store.state.targetProduct;
+    },
+    targetWork() {
+      return this.$store.state.targetWork;
     }
   },
   data() {
     return {
       currentActiveCount: 0,
-      currentActive: false
+      currentActive: false,
+      userName: "",
+      telNum: "",
+      address: ""
     };
   },
   watch: {},
@@ -31,16 +40,38 @@ export default {
   },
   mounted() {},
   updated() {},
+  beforeRouteEnter(to, from, next) {
+    // i think need check here, e.g. cookie address
+    next();
+  },
   methods: {
-    createOrder() {
-      WxShare.newMakeWxOrder(
-        { pid: 1, wid: this.projectInfo.id, amount: 1 },
-        () => {
-          console.log("pay succeed");
+    toConfirmOrder() {
+      // passin orderToCreate TODO
+      if (!this.address) {
+        alert("请先填入地址");
+      } else {
+        console.log(this.orderToCreate);
+        WxShare.makeWxOrder(
+          { ...this.orderToCreate, amount: 1 },
+          () => {
+            console.log("pay succeed");
+          },
+          () => {
+            console.log("pay fail");
+          }
+        );
+      }
+    },
+    editAddress() {
+      //都是同步操作
+      WxShare.createAddress(
+        address => {
+          this.address = address.detailInfo;
+          this.userName = address.userName;
+          this.telNum = address.telNumber;
+          this.$store.commit("SAVE_ORDER_INFO", { address });
         },
-        () => {
-          console.log("pay fail");
-        }
+        () => {}
       );
     }
   }
@@ -48,18 +79,57 @@ export default {
 </script>
 
 <template>
-  <div class="orderConfirm" @click="viewProductDetail">
-    <div class="address">
-      收件人：
-      <span>小白</span>
-      <span>178888821283</span>
-      收件地址：
+  <div class="container">
+    <div class="order-confirm">
+      <div class="address" @click="editAddress">
+        <div id="basic-info">
+          收件人：
+          <span>{{userName}}</span>
+          <span style="flex:1">{{telNum}}</span>
+        </div>
+        <div id="address-info">
+          收件地址：
+          <span>{{address}}</span>
+          <div class="address-underline" id="underline1"></div>
+          <div class="address-underline" id="underline2"></div>
+        </div>
+      </div>
     </div>
-    <div class="item"></div>
-    <div class="item-list"></div>
-    <div class="msg"></div>
-    <div class="readme"></div>
-    <button @click="createOrder">买起</button>
+    <div class="item">
+      <img src alt>
+      <div>
+        <p>趣味童年</p>
+        <p>{{this.targetWork.title}}</p>
+      </div>
+      <div class="amount">
+        <span>-</span>
+        <input v-model="amount" type="text">
+        <span>+</span>
+      </div>
+    </div>
+    <div class="item-list">
+      <p>商品清单</p>
+      <div>
+        <p>八音盒 x 1</p>
+        <p>包装盒 x 1</p>
+        <p>礼品卡 x 1</p>
+      </div>
+    </div>
+    <div class="msg">
+      <input v-model="giftMsg" type="text" placeholder="默认祝福语：「在乐音相伴的梦里，世界一片白银」">
+    </div>
+    <div class="readme">购买说明
+      <ul>
+        <li>此商品的制作周期约为7天，您可以在【我的-八音盒】页面查看进度</li>
+        <li>定制商品非质量问题不得退换货，如需退货请在公众号页面提交申请</li>
+        <li>如有其他疑问可在公众号的【留言】版块留言，我们将尽快为您解答</li>
+      </ul>
+    </div>
+    <div
+      style="position:absolute;bottom:40px;width:100%;display: flex;align-items: center;justify-content: center;"
+    >
+      <div class="purchaseBtn" @click="toConfirmOrder">购买</div>
+    </div>
   </div>
 </template>
 
@@ -68,6 +138,70 @@ export default {
 @import "../_common/style/_variables.scss";
 @import "../_common/style/_mixins.scss";
 @import "../_common/style/_reboot.scss";
+.container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: $darker-gray;
+}
+.order-confirm {
+  position: relative;
+}
+.address {
+  position: relative;
+  width: getRem(654);
+  height: getRem(264);
+  background-color: #2c2d30;
+  margin: getRem(32) auto;
+  text-align: left;
+  padding-left: getRem(24);
+  #basic-info {
+    position: relative;
+    color: #8c8c92;
+    display: flex;
+    font-size: 14px;
+    width: 100%;
+    height: getRem(100);
+    padding-top: getRem(32);
+  }
+  #address-info {
+    position: relative;
+    color: #6d6e75;
+    font-size: 12px;
+    width: 100%;
+    height: getRem(100);
+    .address-underline {
+      position: absolute;
+      width: getRem(400);
+      height: 1px;
+      transform: scaleY(0.5);
+      background-color: white;
+    }
+    #underline1 {
+      left: getRem(144);
+      top: 0.5rem;
+    }
+    #underline2 {
+      left: getRem(144);
+      top: 1.5rem;
+    }
+  }
+}
+.item {
+  position: relative;
+  width: getRem(644);
+  height: getRem(128);
+  display: flex;
+  .product-img {
+  }
+  .desc {
+  }
+  .amount {
+  }
+}
 .productPage {
   position: absolute;
   width: 100%;
@@ -75,110 +209,14 @@ export default {
   top: 0;
   left: 0;
 }
-.btnContainer {
-  position: relative;
-  width: getRem(92);
+.purchaseBtn {
+  background-color: #4564d7;
+  width: getRem(640);
   height: getRem(92);
-  border: 1px solid #7d839e;
-  border-radius: 50%;
-  overflow: hidden;
-  // -webkit-mask-image: -webkit-radial-gradient(circle, white, black);
-  .active-btn-background {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-color: #7d839e;
-    border-radius: 50%;
-    border: none;
-    overflow: hidden;
-  }
-  .active {
-    // background-color:#7D839E;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    border-radius: 50%;
-    display: flex;
-    flex-direction: column;
-    color: white;
-    align-items: center;
-    justify-content: space-around;
-    div {
-      width: getRem(34);
-      height: getRem(24);
-      margin-top: 0.2rem;
-      background: url("../assets/viewer/icon-like.png") center center no-repeat;
-      background-size: cover;
-    }
-    p {
-      font-size: 0.37rem;
-      margin: 0 0 0.1rem 0;
-      line-height: 0.37rem;
-      color: white;
-    }
-  }
-  .inactive {
-    // background-color:blue;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    border-radius: 50%;
-    display: flex;
-    flex-direction: column;
-    color: white;
-    align-items: center;
-    justify-content: space-around;
-    div {
-      width: getRem(34);
-      height: getRem(24);
-      margin-top: 0.2rem;
-      background: url("../assets/viewer/icon-like-gray.png") center center
-        no-repeat;
-      background-size: cover;
-    }
-    p {
-      font-size: 0.37rem;
-      margin: 0 0 0.1rem 0;
-      line-height: 0.37rem;
-      color: #7d839e;
-    }
-  }
-}
-//
-.slideDown-enter-active {
-  transition: all 0.3s ease-out;
-}
-.slideDown-leave-active {
-  transition: all 0.3s ease-out;
-}
-.slideDown-enter,.slideDown-leave-to
-/* .slide-fade-leave-active below version 2.1.8 */ {
-  transform: translateY(100%);
-  opacity: 0;
-}
-.slideUp-enter-active {
-  transition: all 0.3s ease-out;
-}
-.slideUp-leave-active {
-  transition: all 0.3s ease-out;
-}
-.slideUp-enter,.slideUp-leave-to
-/* .slide-fade-leave-active below version 2.1.8 */ {
-  transform: translateY(-100%);
-  opacity: 0;
-}
-.fade-enter-active {
-  transition: all 0.3s ease-out;
-}
-.fade-leave-active {
-  transition: all 0.3s ease-out;
-}
-.fade-enter, .fade-leave-to
-/* .slide-fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
+  font-size: 16px;
+  color: white;
+  text-align: center;
+  line-height: getRem(92);
+  border-radius: getRem(46);
 }
 </style>

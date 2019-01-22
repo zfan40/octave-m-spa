@@ -61,6 +61,8 @@ export default {
         this.screenOrientation = "landscape";
       }
     });
+
+    this.$store.dispatch("FETCH_PRODUCTLIST", {});
   },
   beforeRouteUpdate(to, from, next) {
     // const toPage = to.indexOf('make')
