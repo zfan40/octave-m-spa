@@ -97,8 +97,8 @@ export default {
     </div>
     <div class="item">
       <img src alt>
-      <div>
-        <p>趣味童年</p>
+      <div class="goods">
+        <p class="sub-title">趣味童年</p>
         <p>{{this.targetWork.title}}</p>
       </div>
       <div class="amount">
@@ -108,8 +108,8 @@ export default {
       </div>
     </div>
     <div class="item-list">
-      <p>商品清单</p>
-      <div>
+      <p class="sub-title">商品清单</p>
+      <div class="sub-detail">
         <p>八音盒 x 1</p>
         <p>包装盒 x 1</p>
         <p>礼品卡 x 1</p>
@@ -220,6 +220,7 @@ export default {
   border-radius: getRem(46);
 }
 .readme{
+  margin:0 getRem(48);
   color:#6D6E75;
   text-align:left;
   font-size:getRem(32);
@@ -235,5 +236,32 @@ input{
   margin:getRem(16) getRem(48) getRem(72);
   border:1px solid #979797;
   font-size:getRem(24);
+  input{
+    width:100%;
+    text-align:center;
+  }
+}
+.item-list{
+  margin-top:getRem(18);
+  text-align:left;
+  margin-left:getRem(48);
+  .sub-title{
+    color:#6D6E75;
+    font-size:getRem(24);
+  }
+  .sub-detail{
+    color:#6D6E76;
+    font-size:getRem(28);
+  }
+}
+.item{
+  margin:0 getRem(48);
+  border-bottom:1px solid #D8D8D8;
+}
+.goods{
+  color:#8C8C92;
+  .sub-title{
+    font-size:getRem(36);
+  }
 }
 </style>
