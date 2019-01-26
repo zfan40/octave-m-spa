@@ -219,4 +219,21 @@ export default {
   line-height: getRem(92);
   border-radius: getRem(46);
 }
+.readme{
+  color:#6D6E75;
+  text-align:left;
+  font-size:getRem(32);
+}
+// reset
+input{
+  -webkit-appearance: none; -moz-appearance: none; -o-appearance: none; appearance: none;
+  background:none;
+  border:0;
+}
+.msg{
+  padding:getRem(22) 0;
+  margin:getRem(16) getRem(48) getRem(72);
+  border:1px solid #979797;
+  font-size:getRem(24);
+}
 </style>

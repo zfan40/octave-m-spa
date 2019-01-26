@@ -38,7 +38,7 @@ export default {
   methods: {
     load() {},
     loadMusicById() {
-      alert(1);
+      alert(2);
       console.log("hehe", this.$store.state);
       const { id } = this.$store.state.route.query;
       if (id) {
