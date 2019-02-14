@@ -60,7 +60,7 @@ export default {
             }`,
             // fullPath:location.href.split('#')[0],
             fullPath,
-            imgUrl: "http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png"
+            imgUrl: "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
           });
         });
       } else {
@@ -106,7 +106,7 @@ export default {
         }`,
         // fullPath:location.href.split('#')[0],
         fullPath,
-        imgUrl: "http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png"
+        imgUrl: "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
       });
       setTimeout(() => {
         this.titleUpdateAppear = false;
@@ -179,7 +179,7 @@ export default {
         desc: "分享一个八音盒",
         // fullPath:location.href.split('#')[0],
         fullPath,
-        imgUrl: "https://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png"
+        imgUrl: "https://img.musixise.com/Ocrg2srw_icon33@2x.png"
       });
     });
     // alert(Cookies.get('serviceToken'))

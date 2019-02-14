@@ -58,6 +58,11 @@ export default {
 <template>
   <div class="order-container">
     <div class="preview-bg">
+      <img
+        class="cover"
+        :src="info.product.product.previewImg||'https://cdn4.buysellads.net/uu/1/3386/1525189887-61450.png'"
+        alt
+      >
       <div class="shipment">
         <img v-if="info.status===1" class="statusProcess" src="../../assets/123-1.png" alt>
         <p v-if="info.status===1" class="statusText">制作中...</p>
@@ -99,6 +104,11 @@ export default {
     position: relative;
     width: 100%;
     height: getRem(208);
+    .cover {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
     .shipment {
       position: absolute;
       background-color: $img-mask;

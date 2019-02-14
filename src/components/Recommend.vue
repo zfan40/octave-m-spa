@@ -54,7 +54,7 @@ export default {
         desc: "分享一个八音盒",
         // fullPath:location.href.split('#')[0],
         fullPath,
-        imgUrl: "https://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png"
+        imgUrl: "https://img.musixise.com/Ocrg2srw_icon33@2x.png"
       });
     });
     // alert(Cookies.get('serviceToken'))

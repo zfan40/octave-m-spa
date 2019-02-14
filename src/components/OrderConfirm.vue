@@ -24,6 +24,8 @@ export default {
   },
   data() {
     return {
+      amount: 1,
+      giftMsg: "",
       currentActiveCount: 0,
       currentActive: false,
       userName: "",
@@ -52,7 +54,7 @@ export default {
       } else {
         console.log(this.orderToCreate);
         WxShare.makeWxOrder(
-          { ...this.orderToCreate, amount: 1 },
+          { ...this.orderToCreate, amount: this.amount },
           () => {
             console.log("pay succeed");
           },
@@ -73,6 +75,12 @@ export default {
         },
         () => {}
       );
+    },
+    addAmount() {
+      this.amount < 9 ? (this.amount += 1) : "";
+    },
+    reduceAmount() {
+      this.amount > 1 ? (this.amount -= 1) : "";
     }
   }
 };
@@ -96,17 +104,25 @@ export default {
       </div>
     </div>
     <div class="item">
-      <img src alt>
+      <img
+        class="product-img"
+        :src="targetProduct.previewImg||'https://cdn4.buysellads.net/uu/1/3386/1525189887-61450.png'"
+        alt
+      >
       <div class="goods">
-        <p class="sub-title">趣味童年</p>
-        <p>{{this.targetWork.title}}</p>
+        <p class="sub-title">{{targetProduct.name}}</p>
+        <p class="work-title">{{targetWork.title}}</p>
       </div>
       <div class="amount">
-        <span>-</span>
-        <input v-model="amount" type="text">
-        <span>+</span>
+        <span @click="reduceAmount">-</span>
+        <input v-model.number="amount" type="number">
+        <span @click="addAmount">+</span>
       </div>
     </div>
+    <div style="margin: 0 0.64rem;">
+      <div class="thinline"></div>
+    </div>
+
     <div class="item-list">
       <p class="sub-title">商品清单</p>
       <div class="sub-detail">
@@ -120,15 +136,15 @@ export default {
     </div>
     <div class="readme">购买说明
       <ul>
-        <li>此商品的制作周期约为7天，您可以在【我的-八音盒】页面查看进度</li>
-        <li>定制商品非质量问题不得退换货，如需退货请在公众号页面提交申请</li>
-        <li>如有其他疑问可在公众号的【留言】版块留言，我们将尽快为您解答</li>
+        <li>· 此商品的制作周期约为7天，您可以在【我的-八音盒】页面查看进度</li>
+        <li>· 定制商品非质量问题不得退换货，如需退货请在公众号页面提交申请</li>
+        <li>· 如有其他疑问可在公众号的【留言】版块留言，我们将尽快为您解答</li>
       </ul>
     </div>
     <div
       style="position:absolute;bottom:40px;width:100%;display: flex;align-items: center;justify-content: center;"
     >
-      <div class="purchaseBtn" @click="toConfirmOrder">购买</div>
+      <div class="purchaseBtn" @click="toConfirmOrder">付款 ¥{{amount*targetProduct.price}}</div>
     </div>
   </div>
 </template>
@@ -155,7 +171,7 @@ export default {
   width: getRem(654);
   height: getRem(264);
   background-color: #2c2d30;
-  margin: getRem(32) auto;
+  margin: getRem(32) auto getRem(24);
   text-align: left;
   padding-left: getRem(24);
   #basic-info {
@@ -178,7 +194,7 @@ export default {
       width: getRem(400);
       height: 1px;
       transform: scaleY(0.5);
-      background-color: white;
+      background-color: #d8d8d8;
     }
     #underline1 {
       left: getRem(144);
@@ -190,16 +206,55 @@ export default {
     }
   }
 }
+.thinline {
+  position: relative;
+  width: 100%;
+  height: 1px;
+  transform: scaleY(0.5);
+  background-color: #d8d8d8;
+}
 .item {
   position: relative;
   width: getRem(644);
   height: getRem(128);
   display: flex;
+  margin: getRem(24) getRem(48) getRem(32);
+  align-items: center;
+  // border-bottom: 1px solid #d8d8d8;
   .product-img {
+    width: getRem(128);
+    height: getRem(128);
+    margin-right: getRem(42);
   }
-  .desc {
+  .goods {
+    flex: 1;
+    text-align: left;
+    color: #8c8c92;
+    .sub-title {
+      font-size: getRem(36);
+      margin-bottom: getRem(32);
+    }
+    .work-title {
+      font-size: getRem(24);
+    }
   }
   .amount {
+    color: #8c8c92;
+    width: getRem(150);
+    height: getRem(50);
+    line-height: getRem(50);
+    border: 1px solid #8c8c92;
+    border-radius: getRem(25);
+    font-size: getRem(20);
+    display: flex;
+    span {
+      width: getRem(30);
+    }
+    input {
+      width: getRem(90);
+      color: #8c8c92;
+      text-align: center;
+    }
   }
 }
 .productPage {
@@ -219,49 +274,55 @@ export default {
   line-height: getRem(92);
   border-radius: getRem(46);
 }
-.readme{
-  margin:0 getRem(48);
-  color:#6D6E75;
-  text-align:left;
-  font-size:getRem(32);
+.readme {
+  margin: 0 getRem(48);
+  color: #6d6e75;
+  text-align: left;
+  font-size: getRem(20);
+  ul {
+    list-style: none;
+    padding: 0;
+  }
 }
 // reset
-input{
-  -webkit-appearance: none; -moz-appearance: none; -o-appearance: none; appearance: none;
-  background:none;
-  border:0;
+input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -o-appearance: none;
+  appearance: none;
+  background: none;
+  border: 0;
 }
-.msg{
-  padding:getRem(22) 0;
-  margin:getRem(16) getRem(48) getRem(72);
-  border:1px solid #979797;
-  font-size:getRem(24);
-  input{
-    width:100%;
-    text-align:center;
+.msg {
+  padding: getRem(22) 0;
+  margin: getRem(16) getRem(48) getRem(72);
+  border: 1px solid #979797;
+  font-size: getRem(24);
+  // transform: scale(0.5);
+  // position: absolute;
+  // top: -50%;
+  // right: -50%;
+  // bottom: -50%;
+  // left: -50%;
+  input {
+    width: 100%;
+    text-align: left;
+    padding-left: getRem(22);
+    color: white;
   }
 }
-.item-list{
-  margin-top:getRem(18);
-  text-align:left;
-  margin-left:getRem(48);
-  .sub-title{
-    color:#6D6E75;
-    font-size:getRem(24);
+.item-list {
+  margin-top: getRem(18);
+  text-align: left;
+  margin-left: getRem(48);
+  .sub-title {
+    color: #6d6e75;
+    font-size: getRem(24);
+    margin-bottom: getRem(32);
   }
-  .sub-detail{
-    color:#6D6E76;
-    font-size:getRem(28);
-  }
-}
-.item{
-  margin:0 getRem(48);
-  border-bottom:1px solid #D8D8D8;
-}
-.goods{
-  color:#8C8C92;
-  .sub-title{
-    font-size:getRem(36);
+  .sub-detail {
+    color: #6d6e76;
+    font-size: getRem(28);
   }
 }
 </style>

@@ -113,6 +113,15 @@ export default {
         resolve();
       });
     }),
+  FETCH_ORDERS: ({ commit, state }, { id, page }) =>
+    new Promise((resolve, reject) => {
+      // 获取某id的音乐盒音乐内容
+      fetchProductList().then((products) => {
+        console.log('product list: ', products.data.data.list);
+        commit('PUSH_PRODUCTLIST', { productList: products.data.data.list });
+        resolve();
+      });
+    }),
   //   // ensure data for rendering given list type
   //   FETCH_LIST_DATA: ({ commit, dispatch, state }, { type }) => {
   //     commit('SET_ACTIVE_TYPE', { type });

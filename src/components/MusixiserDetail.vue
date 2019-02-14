@@ -121,7 +121,7 @@ export default {
         desc: "我的地盘你就dê听我的",
         // fullPath:location.href.split('#')[0],
         fullPath,
-        imgUrl: "http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png"
+        imgUrl: "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
       });
     });
     // alert(Cookies.get('serviceToken'))

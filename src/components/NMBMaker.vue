@@ -633,7 +633,7 @@ export default {
         title: "MUSIXISE",
         desc: "寻找你自己的八音盒",
         fullPath: `${location.origin}${location.pathname}#/new-music-box-maker`,
-        imgUrl: "http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png"
+        imgUrl: "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
       });
     });
     if (Util.getUrlParam("code") || Cookies.get("serviceToken")) {

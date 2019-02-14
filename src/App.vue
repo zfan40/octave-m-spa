@@ -74,6 +74,10 @@ export default {
 </script>
 
 <style>
+textarea:focus,
+input:focus {
+  outline: none;
+}
 .lx-toast {
   rotate: 90deg;
   transform-origin: left;

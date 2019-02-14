@@ -2,23 +2,61 @@
 // TODO: IMPORTANT MEMO: reschedule(clear then schedule, might lead to jump/click)
 // activeJ那块 现找播放行不行
 
-import * as Util from '../_common/js/util';
-import * as Api from '../_common/js/api';
-import * as Cookies from 'js-cookie';
-import * as Magic from '../_common/js/magic';
-import * as WxShare from '../_common/js/wx_share';
-import pieProgress from './common/pieProgress';
-import Vue from 'vue';
-import VueKonva from 'vue-konva';
+import * as Util from "../_common/js/util";
+import * as Api from "../_common/js/api";
+import * as Cookies from "js-cookie";
+import * as Magic from "../_common/js/magic";
+import * as WxShare from "../_common/js/wx_share";
+import pieProgress from "./common/pieProgress";
+import Vue from "vue";
+import VueKonva from "vue-konva";
 
-window.Tone = require('tone');
+window.Tone = require("tone");
 const musicPart = undefined;
-const musicScale = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24, 26, 28, 29];
+const musicScale = [
+  0,
+  2,
+  4,
+  5,
+  7,
+  9,
+  11,
+  12,
+  14,
+  16,
+  17,
+  19,
+  21,
+  23,
+  24,
+  26,
+  28,
+  29
+];
 // const colors = ['#8fd3c7', '#95c631', '#edda28', '#f7943d', '#e43159', '#bf4ea8', '#4d61d9', '#45b5a1', '#8fd3c7', '#95c631', '#edda28', '#f7943d', '#e43159', '#bf4ea8', '#4d61d9', '#45b5a1', '#edda28', '#f7943d']
 const colors = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
-colors.fill('#9FB2CF', 0, 18);
-const invalidColors = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
-invalidColors.fill('#7D90AD', 0, 18);
+colors.fill("#9FB2CF", 0, 18);
+const invalidColors = [
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18
+];
+invalidColors.fill("#7D90AD", 0, 18);
 let last_i = -1;
 let last_j = -1;
 window.cursorSchedules = [];
@@ -35,36 +73,36 @@ const MAX_TEMPO = 180;
 Vue.use(VueKonva);
 var synth = new Tone.Sampler(
   {
-    C4: 'C4.[mp3|ogg]',
-    'D#4': 'Ds4.[mp3|ogg]',
-    'F#4': 'Fs4.[mp3|ogg]',
-    A4: 'A4.[mp3|ogg]',
-    C5: 'C5.[mp3|ogg]',
-    'D#5': 'Ds5.[mp3|ogg]',
-    'F#5': 'Fs5.[mp3|ogg]',
-    A5: 'A5.[mp3|ogg]',
-    C6: 'C6.[mp3|ogg]',
+    C4: "C4.[mp3|ogg]",
+    "D#4": "Ds4.[mp3|ogg]",
+    "F#4": "Fs4.[mp3|ogg]",
+    A4: "A4.[mp3|ogg]",
+    C5: "C5.[mp3|ogg]",
+    "D#5": "Ds5.[mp3|ogg]",
+    "F#5": "Fs5.[mp3|ogg]",
+    A5: "A5.[mp3|ogg]",
+    C6: "C6.[mp3|ogg]"
   },
   {
     release: 1,
     // 'baseUrl': '/static/audio/'
-    baseUrl: '//cnbj1.fds.api.xiaomi.com/mbox/audio/',
-  },
+    baseUrl: "//cnbj1.fds.api.xiaomi.com/mbox/audio/"
+  }
 ).toMaster();
 
 var pulseOptions = {
   oscillator: {
-    type: 'triangle',
+    type: "triangle"
   },
   envelope: {
-    release: 0.07,
-  },
+    release: 0.07
+  }
 };
 const piano = new Tone.PolySynth(18, Tone.Synth, pulseOptions).toMaster();
 export default {
   components: {
     // countButton,
-    pieProgress,
+    pieProgress
   },
   data() {
     return {
@@ -74,49 +112,71 @@ export default {
       tempo: 80,
       configKonva: {
         width: 0,
-        height: 0,
+        height: 0
       },
       configNoteRect: {},
       activeJ: -1, // highlight timeline
       sector: 1, // 2*4-1,可以滚动7次，营造处4页的氛围
-      rectArray: [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []],
+      rectArray: [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
       alertAppear: false,
       showExtendBtns: false,
       playing: false,
-      currentTime: 0,
+      currentTime: 0
     };
   },
   filters: {
     intTime: floatTime => {
       return Math.floor(floatTime) % 20;
       // return floatTime
-    },
+    }
   },
   computed: {
     tempoLength() {
       const k = 100 / (MAX_TEMPO - MIN_TEMPO);
       const b = -(MIN_TEMPO * k);
       return { height: `${k * this.tempo + b}%` };
-    },
+    }
   },
   methods: {
     setupCanvas() {
       const docElem = document.documentElement;
       this.configKonva = {
         width: docElem.getBoundingClientRect().width - 50,
-        height: window.innerHeight,
+        height: window.innerHeight
       };
       this.configNoteRect = {
-        width: (docElem.getBoundingClientRect().width - 50) / this.NOTE_CATEGORY,
+        width:
+          (docElem.getBoundingClientRect().width - 50) / this.NOTE_CATEGORY,
         height: window.innerHeight / this.ONE_PAGE_NOTE_NUM,
-        fill: '#fff',
-        stroke: '#000',
-        strokeWidth: 0.5,
+        fill: "#fff",
+        stroke: "#000",
+        strokeWidth: 0.5
       };
       this.scheduleCursor();
     },
     scheduleCursor() {
-      const fullNoteNumWithinDur = Math.ceil(MB_DUR / (TIME_PER_NOTE * 120 / this.tempo));
+      const fullNoteNumWithinDur = Math.ceil(
+        MB_DUR / ((TIME_PER_NOTE * 120) / this.tempo)
+      );
       // const fullNoteNumWithinDur = 10;
       // console.log('full note num', fullNoteNumWithinDur);
       // let lastTiming = 0;
@@ -127,27 +187,27 @@ export default {
           cursorSchedules[i] = Tone.Transport.scheduleRepeat(
             time => {
               this.activeJ = i;
-              this.currentTime = i * TIME_PER_NOTE * 120 / this.tempo;
+              this.currentTime = (i * TIME_PER_NOTE * 120) / this.tempo;
               // const now = performance.now();
               // console.log(now - lastTiming);
               // lastTiming = now;
               this.rectArray.forEach((noteSeq, noteIndex) => {
                 if (noteSeq[i]) {
                   synth.triggerAttackRelease(
-                    Tone.Frequency(60 + musicScale[noteIndex], 'midi'),
-                    0.25,
+                    Tone.Frequency(60 + musicScale[noteIndex], "midi"),
+                    0.25
                   );
                 }
               });
               // synth.triggerAttackRelease(Tone.Frequency(60, 'midi'), 0.1);
             },
-            fullNoteNumWithinDur * TIME_PER_NOTE * 120 / this.tempo,
-            i * TIME_PER_NOTE * 120 / this.tempo,
+            (fullNoteNumWithinDur * TIME_PER_NOTE * 120) / this.tempo,
+            (i * TIME_PER_NOTE * 120) / this.tempo
           );
         } else if (i > fullNoteNumWithinDur - 1 && cursorSchedules[i]) {
           // 不在有效范围，已规划 => 不清除，但禁掉
           Tone.Transport.clear(cursorSchedules[i]);
-          cursorSchedules[i] = '';
+          cursorSchedules[i] = "";
         } else {
           // 不在有效范围，未规划 => 储存，但不规划
         }
@@ -156,34 +216,40 @@ export default {
       console.log(Tone.Transport._scheduledEvents);
     },
     setupRect(i, j, sector) {
-      let fill = '';
+      let fill = "";
       // split NOTE_NUM_PER_SECTOR and this.NOTE_NUM_PER_SECTOR for ANIMATION!!!
-      const index = j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR;
-      const withinDur = index * TIME_PER_NOTE * 120 / this.tempo < MB_DUR;
+      const index =
+        j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR;
+      const withinDur = (index * TIME_PER_NOTE * 120) / this.tempo < MB_DUR;
       if (index == this.activeJ && this.rectArray[i][index]) {
         // active current note: lighter color
-        fill = withinDur ? '#6477b1' : '#A9B9FF';
+        fill = withinDur ? "#6477b1" : "#A9B9FF";
       } else if (index == this.activeJ && !this.rectArray[i][index]) {
         // inactive current light blue
-        fill = withinDur ? '#292B3A' : '#2B2E3D';
+        fill = withinDur ? "#292B3A" : "#2B2E3D";
       } else if (this.rectArray[i][index]) {
         // active non-current note
-        fill = withinDur ? colors[i] : '#333740';
+        fill = withinDur ? colors[i] : "#333740";
       } else {
         // incative non-current note
-        fill = withinDur ? `rgba(0,0,0,${0.98 - i * 0.3 / this.NOTE_CATEGORY})` : '#131315';
+        fill = withinDur
+          ? `rgba(0,0,0,${0.98 - (i * 0.3) / this.NOTE_CATEGORY})`
+          : "#131315";
       }
       return {
         ...this.configNoteRect,
-        x: i * this.configKonva.width / this.NOTE_CATEGORY,
-        y: j * this.configKonva.height / this.ONE_PAGE_NOTE_NUM,
-        fill,
+        x: (i * this.configKonva.width) / this.NOTE_CATEGORY,
+        y: (j * this.configKonva.height) / this.ONE_PAGE_NOTE_NUM,
+        fill
       };
     },
     handleTouchRect(i, j, sector) {
       // console.log(`trigger ${i},${j+(sector-1)*this.NOTE_NUM_PER_SECTOR}`)
       // make sound
-      synth.triggerAttackRelease(Tone.Frequency(60 + musicScale[i], 'midi'), 0.25);
+      synth.triggerAttackRelease(
+        Tone.Frequency(60 + musicScale[i], "midi"),
+        0.25
+      );
       // this.rectArray[i][j] = !this.rectArray[i][j] // this is how to assign a two dim array in vue 2.0...
       const newRow = this.rectArray[i].slice(0);
       newRow[j + (sector - 1) * this.NOTE_NUM_PER_SECTOR] = !newRow[
@@ -204,7 +270,10 @@ export default {
       } else if (i != last_i && j == last_j) {
         // take this as testing note, no store, no arrange
         // make sound
-        synth.triggerAttackRelease(Tone.Frequency(60 + musicScale[i], 'midi'), 0.25);
+        synth.triggerAttackRelease(
+          Tone.Frequency(60 + musicScale[i], "midi"),
+          0.25
+        );
         // operate current note view
         const newRow = this.rectArray[i].slice(0);
         newRow[fullJ] = !newRow[fullJ];
@@ -223,7 +292,7 @@ export default {
       }
     },
     startloop() {
-      Tone.Transport.start('+0.1');
+      Tone.Transport.start("+0.1");
       this.playing = true;
     },
     stoploop() {
@@ -237,7 +306,8 @@ export default {
     minusTempo() {
       if (this.tempo > MIN_TEMPO) {
         this.tempo -= 5;
-        Tone.Transport.seconds = this.activeJ * TIME_PER_NOTE * 120 / this.tempo;
+        Tone.Transport.seconds =
+          (this.activeJ * TIME_PER_NOTE * 120) / this.tempo;
         Tone.Transport.bpm.rampTo(this.tempo, 0.01);
         setTimeout(() => {
           // bpm ramp to, so need a settimeout
@@ -248,7 +318,8 @@ export default {
     addTempo() {
       if (this.tempo < MAX_TEMPO) {
         this.tempo += 5;
-        Tone.Transport.seconds = this.activeJ * TIME_PER_NOTE * 120 / this.tempo;
+        Tone.Transport.seconds =
+          (this.activeJ * TIME_PER_NOTE * 120) / this.tempo;
         Tone.Transport.bpm.rampTo(this.tempo, 0.01);
         setTimeout(() => {
           this.scheduleCursor();
@@ -260,7 +331,9 @@ export default {
       this.sector == FULL_NOTE_NUM / NOTE_NUM_PER_SECTOR - 1
         ? (this.NOTE_NUM_PER_SECTOR = NOTE_NUM_PER_SECTOR - 2)
         : (this.NOTE_NUM_PER_SECTOR = 1); // for animation,
-      this.sector <= FULL_NOTE_NUM / NOTE_NUM_PER_SECTOR - 2 ? (this.sector += 1) : ''; // this line is real scroll down
+      this.sector <= FULL_NOTE_NUM / NOTE_NUM_PER_SECTOR - 2
+        ? (this.sector += 1)
+        : ""; // this line is real scroll down
       // below is for animation
       aInterval = setInterval(() => {
         this.NOTE_NUM_PER_SECTOR += 1;
@@ -274,7 +347,7 @@ export default {
       this.sector == 1
         ? (this.NOTE_NUM_PER_SECTOR = NOTE_NUM_PER_SECTOR + 2)
         : (this.NOTE_NUM_PER_SECTOR = 20); // for animation,
-      this.sector >= 2 ? (this.sector -= 1) : '';
+      this.sector >= 2 ? (this.sector -= 1) : "";
       aInterval = setInterval(() => {
         this.NOTE_NUM_PER_SECTOR -= 1;
         if (this.NOTE_NUM_PER_SECTOR == 10) {
@@ -288,8 +361,8 @@ export default {
         for (let j = 0; j <= FULL_NOTE_NUM - 1; j++) {
           if (this.rectArray[i][j]) {
             result.push({
-              note: Tone.Frequency(60 + musicScale[i], 'midi').toNote(),
-              time: j * TIME_PER_NOTE * 120 / this.tempo,
+              note: Tone.Frequency(60 + musicScale[i], "midi").toNote(),
+              time: (j * TIME_PER_NOTE * 120) / this.tempo
             });
           }
         }
@@ -304,35 +377,35 @@ export default {
         for (let j = 0; j <= FULL_NOTE_NUM - 1; j++) {
           if (this.rectArray[i][j]) {
             result.push({
-              note: Tone.Frequency(60 + musicScale[i], 'midi').toNote(),
-              time: j * TIME_PER_NOTE * 120 / this.tempo,
+              note: Tone.Frequency(60 + musicScale[i], "midi").toNote(),
+              time: (j * TIME_PER_NOTE * 120) / this.tempo
             });
           }
         }
       }
       this.$store
-        .dispatch('BOUNCE_PROJECT', {
+        .dispatch("BOUNCE_PROJECT", {
           record: result,
           info: {
-            title: '尚未起名',
-            content: 'default',
-            cover: 'default',
-          },
+            title: "尚未起名",
+            content: "default",
+            cover: "default"
+          }
         })
         .then(id => {
-          console.log('successfully bounced');
+          console.log("successfully bounced");
           this.bouncing = false;
-          this.$toast('作品已为您存储');
+          this.$toast("作品已为您存储");
           this.$router.push({
-            path: '/new-music-box-viewer',
+            path: "/new-music-box-viewer",
             query: {
-              id,
-            },
+              id
+            }
           });
         })
         .catch(err => {
           this.bouncing = false;
-          this.$toast('非常抱歉，上传作品失败了');
+          this.$toast("非常抱歉，上传作品失败了");
         });
     },
     submitProject() {
@@ -355,20 +428,29 @@ export default {
     btnEnd(e) {
       // console.log(e)
       clearTimeout(extendBtnsTimeout);
-      const a = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+      const a = document.elementFromPoint(
+        e.changedTouches[0].clientX,
+        e.changedTouches[0].clientY
+      );
       console.log(a);
-      if (a && a.classList.contains('bounceBtn')) {
+      if (a && a.classList.contains("bounceBtn")) {
         this.submitProject();
-      } else if (a && (a.classList.contains('playBtn') || a.classList.contains('pauseBtn'))) {
+      } else if (
+        a &&
+        (a.classList.contains("playBtn") || a.classList.contains("pauseBtn"))
+      ) {
         //播放
         // console.log(Tone.Transport.state)
         this.toggleReplay();
         this.showExtendBtns = false;
-      } else if (a && (a.classList.contains('playBtn') || a.classList.contains('cancelBtn'))) {
+      } else if (
+        a &&
+        (a.classList.contains("playBtn") || a.classList.contains("cancelBtn"))
+      ) {
         //hide extend buttons
         this.showExtendBtns = false;
       }
-    },
+    }
   },
   beforeRouteLeave(to, from, next) {
     Magic.clearTone();
@@ -383,112 +465,114 @@ export default {
     // this is very important
     var docElem = document.documentElement;
     window.rem = docElem.getBoundingClientRect().width / 10;
-    docElem.style.fontSize = window.rem + 'px';
+    docElem.style.fontSize = window.rem + "px";
 
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase());
     if (!inWechat) return;
     // alert(Cookies.get('serviceToken'))
     WxShare.prepareShareConfig().then(() => {
       WxShare.prepareShareContent({
-        title: 'MUSIXISE',
-        desc: '划拉划拉八音盒',
+        title: "MUSIXISE",
+        desc: "划拉划拉八音盒",
         fullPath: `${location.origin}${location.pathname}#/new-music-box-roll`,
-        imgUrl: 'http://oaeyej2ty.bkt.clouddn.com/Ocrg2srw_icon33@2x.png',
+        imgUrl: "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
       });
     });
-    if (Util.getUrlParam('code') || Cookies.get('serviceToken')) {
-      Api.getUserInfo(Util.getUrlParam('code'))
+    if (Util.getUrlParam("code") || Cookies.get("serviceToken")) {
+      Api.getUserInfo(Util.getUrlParam("code"))
         .then(res => {
           if (res.data.errcode >= 20000) {
             // 网页内cookie失效，需要重新验证
-            Cookies.remove('serviceToken');
+            Cookies.remove("serviceToken");
             location.replace(
               // will publish to node project m-musixise, under '/music-box' path
               `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx353a60a8b049d366&redirect_uri=${encodeURIComponent(
-                location.origin + location.pathname + '#/new-music-box-roll',
-              )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`,
+                location.origin + location.pathname + "#/new-music-box-roll"
+              )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
             );
           }
-          console.log('get user info success', res.data.data);
+          console.log("get user info success", res.data.data);
         })
         .catch(err => {
-          Cookies.remove('serviceToken');
+          Cookies.remove("serviceToken");
           location.replace(
             `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx353a60a8b049d366&redirect_uri=${encodeURIComponent(
-              location.origin + location.pathname + '#/new-music-box-roll',
-            )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`,
+              location.origin + location.pathname + "#/new-music-box-roll"
+            )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
           );
         });
     } else {
       //又没有微信给的auth code又没有token存在cookie，只得验证
       location.replace(
         `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx353a60a8b049d366&redirect_uri=${encodeURIComponent(
-          location.origin + location.pathname + '#/new-music-box-roll',
-        )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`,
+          location.origin + location.pathname + "#/new-music-box-roll"
+        )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
       );
     }
   },
   mounted() {},
-  updated() {},
+  updated() {}
 };
 </script>
 
 <template>
-<div class="">
-  <div class="roll">
-    <v-stage :config="configKonva">
-      <v-layer>
-        <template v-for='i in NOTE_CATEGORY'>
-            <v-rect v-for='j in ONE_PAGE_NOTE_NUM'
-            :key="`${i}${j}`"
-            @touchstart="handleTouchRect(i-1,j-1,sector)"
-            @touchmove="handleMoveRect(i-1,j-1,sector)"
-            :config="setupRect(i-1,j-1,sector)" />
+  <div class>
+    <div class="roll">
+      <v-stage :config="configKonva">
+        <v-layer>
+          <template v-for="i in NOTE_CATEGORY">
+            <v-rect
+              v-for="j in ONE_PAGE_NOTE_NUM"
+              :key="`${i}${j}`"
+              @touchstart="handleTouchRect(i-1,j-1,sector)"
+              @touchmove="handleMoveRect(i-1,j-1,sector)"
+              :config="setupRect(i-1,j-1,sector)"
+            />
           </template>
-      </v-layer>
-    </v-stage>
-  </div>
+        </v-layer>
+      </v-stage>
+    </div>
 
-  <div class="control-panal">
-    <div>    
-      <div @touchstart="scrollup" id="scrollup" class="rotate"></div>
-      <div @touchstart="scrolldown" id="scrolldown"></div>
-    </div>
-    <div>
-      <div @touchstart="minusTempo" id="minustempo" class="rotate"></div>
-      <div id="tempo-indicator">
-        <div id="tempo-progress" :style="tempoLength"></div>
-        <p id="tempo-num">{{this.tempo}} bpm</p>
+    <div class="control-panal">
+      <div>
+        <div @touchstart="scrollup" id="scrollup" class="rotate"></div>
+        <div @touchstart="scrolldown" id="scrolldown"></div>
       </div>
-      <div @touchstart="addTempo" id="addtempo" class="rotate"></div>
-    </div>
-    <div style="position:relative;display:flex;align-items:center;justify-content:center;transform:rotate(90deg);">
-      <pie-progress :progress="100*currentTime/5" />
-      <p style="position:absolute;font-size:12px;">{{currentTime|intTime}}</p>
+      <div>
+        <div @touchstart="minusTempo" id="minustempo" class="rotate"></div>
+        <div id="tempo-indicator">
+          <div id="tempo-progress" :style="tempoLength"></div>
+          <p id="tempo-num">{{this.tempo}} bpm</p>
+        </div>
+        <div @touchstart="addTempo" id="addtempo" class="rotate"></div>
       </div>
-    <div class="btnContainer" @touchstart.stop.prevent="btnStart" @touchend.stop.prevent="btnEnd">
-      <div :class="[playing?'pauseBtn':'playBtn', 'rotate']" @click="toggleReplay"></div>
-      <div :class="[showExtendBtns?'extendBtnsShow':'extendBtnsHide','extendBtns']">
-        <div class='bounceBtn rotate'></div>
-        <div class='cancelBtn'></div>
+      <div
+        style="position:relative;display:flex;align-items:center;justify-content:center;transform:rotate(90deg);"
+      >
+        <pie-progress :progress="100*currentTime/5"/>
+        <p style="position:absolute;font-size:12px;">{{currentTime|intTime}}</p>
+      </div>
+      <div class="btnContainer" @touchstart.stop.prevent="btnStart" @touchend.stop.prevent="btnEnd">
+        <div :class="[playing?'pauseBtn':'playBtn', 'rotate']" @click="toggleReplay"></div>
+        <div :class="[showExtendBtns?'extendBtnsShow':'extendBtnsHide','extendBtns']">
+          <div class="bounceBtn rotate"></div>
+          <div class="cancelBtn"></div>
+        </div>
       </div>
     </div>
+
+    <transition name="fade">
+      <div id="alert-mask" v-show="alertAppear">
+        <div class="mb-dialog">
+          <div class="title">减少些音符才能做成音乐盒，是否继续上传</div>
+          <div class="btns">
+            <span class="btn cancel" @click="alertAppear=false">再调整</span>
+            <span class="btn confirm" @click="bounceProject">任性上传</span>
+          </div>
+        </div>
+      </div>
+    </transition>
   </div>
-  
-  <transition name="fade">
-    <div id="alert-mask" v-show="alertAppear">
-      <div class="mb-dialog">
-        <div class="title">
-          减少些音符才能做成音乐盒，是否继续上传
-        </div>
-        <div class="btns">
-          <span class="btn cancel" @click="alertAppear=false">再调整</span>
-          <span class="btn confirm" @click="bounceProject">任性上传</span>
-        </div>
-      </div>
-    </div>
-  </transition>
-</div>
 </template>
 
 <style lang="scss" scoped>

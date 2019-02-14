@@ -29,6 +29,8 @@ export default {
               name: "产品名01",
               intro: "八音盒",
               price: 0.01,
+              previewPic: "//img.musixise.com/BP32nt9X_5.jpg",
+              previewVideo: "",
               status: 0,
               createdDate: 1545545048000
             },
@@ -65,6 +67,8 @@ export default {
               name: "产品名01",
               intro: "八音盒",
               price: 0.01,
+              previewPic: "//img.musixise.com/BP32nt9X_5.jpg",
+              previewVideo: "",
               status: 0,
               createdDate: 1545545048000
             },
