@@ -82,6 +82,8 @@ export function createStore() {
         pid: '',
         address: {},
       },
+      operatingWorkId: -1,
+      playingWorkId: -1,
     },
     actions,
     mutations,

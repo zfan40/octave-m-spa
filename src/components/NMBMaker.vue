@@ -81,7 +81,8 @@ export default {
       timelineConfig: {
         value: 0,
         width: 8,
-        height: `${window.screen.height*0.9-20}px`,
+        // height: `${window.screen.height*0.9-20}px`,
+        height: "90%",
         padding: "0",
         dotSize: 20,
         eventType: "auto",
@@ -144,7 +145,7 @@ export default {
       }
     },
     screenOrientation() {
-      console.log('update')
+      console.log("update");
       this.$nextTick(() => this.$refs.timeline.refresh());
     }
   },

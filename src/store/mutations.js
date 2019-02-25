@@ -74,5 +74,11 @@ export default {
   PUSH_PRODUCTLIST: (state, { productList }) => {
     state.productList = productList
     state.targetProduct = productList[0]
+  },
+  OPERATE_WORK: (state, { work }) => {
+    state.operatingWorkId = work.id
+  },
+  PLAY_WORK: (state, { work }) => {
+    state.playingWorkId = work.id
   }
 };

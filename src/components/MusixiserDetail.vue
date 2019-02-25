@@ -4,7 +4,7 @@ import * as Util from "../_common/js/util";
 import * as Api from "../_common/js/api";
 import * as Cookies from "js-cookie";
 import * as Magic from "../_common/js/magic";
-import countButton from "./common/countButton";
+import workCard from "./common/workCard";
 import * as WxShare from "../_common/js/wx_share";
 import infiniteScroll from "vue-infinite-scroll";
 
@@ -15,7 +15,7 @@ export default {
     infiniteScroll
   },
   components: {
-    countButton
+    workCard
   },
   data() {
     return {
@@ -36,6 +36,12 @@ export default {
     },
     musixiserWorksObj() {
       return this.$store.state.musixiserWorksObj;
+    },
+    operatingWorkId() {
+      return this.$store.state.operatingWorkId;
+    },
+    playingWorkId() {
+      return this.$store.state.playingWorkId;
     }
   },
   methods: {
@@ -73,26 +79,72 @@ export default {
           }
         });
     },
-    togglePlay() {
-      // alert('111')
-      Magic.preview(this.project);
-      this.playing = !this.playing;
+    playWork(work) {
+      console.log("work going to play: ", work);
+      if (work.id != this.playingWorkId) {
+        this.playing = true;
+        Magic.previewMidi(work.url, this.playing);
+
+        this.$store.commit("PLAY_WORK", { work });
+      } else {
+        //操作的同一个
+        if (this.playing) {
+          //正播着这个呢
+          this.playing = false;
+          Magic.previewMidi(work.url, this.playing);
+          this.$store.commit("PLAY_WORK", { work: { id: -1 } });
+        } else {
+          //这个已经被停了
+          this.playing = true;
+          Magic.previewMidi(work.url, 1);
+          this.$store.commit("PLAY_WORK", { work });
+        }
+      }
     },
-    toggleFav() {
-      // this.favStatus = +!this.favStatus;
-      Api.toggleFavSong({
-        workId: this.$store.state.route.query.id,
-        status: this.favStatus
-      });
+    operateWork(work) {
+      console.log("operate in");
+      this.$store.commit("OPERATE_WORK", { work });
     },
-    redirectToWork(id) {
+    cancelOperate() {
+      this.$store.commit("OPERATE_WORK", { work: { id: -1 } });
+    },
+    purchaseWork(work) {
+      console.log("purchase in");
+      this.$store.commit("SAVE_ORDER_INFO", { work }); // store current workId
       this.$router.push({
-        path: "/new-music-box-viewer",
+        path: "/product-list",
         query: {
-          id
+          // id
         }
       });
-    }
+    },
+    shareWork() {
+      console.log("share in");
+    },
+    hideWork() {
+      console.log("hide in");
+    },
+    deleteWork() {}
+    // togglePlay() {
+    //   // alert('111')
+    //   Magic.preview(this.project);
+    //   this.playing = !this.playing;
+    // },
+    // toggleFav() {
+    //   // this.favStatus = +!this.favStatus;
+    //   Api.toggleFavSong({
+    //     workId: this.$store.state.route.query.id,
+    //     status: this.favStatus
+    //   });
+    // },
+    // redirectToWork(id) {
+    //   this.$router.push({
+    //     path: "/new-music-box-viewer",
+    //     query: {
+    //       id
+    //     }
+    //   });
+    // }
   },
   beforeRouteLeave(to, from, next) {
     Magic.clearTone();
@@ -180,32 +232,32 @@ export default {
     {{musixiserInfo.realname}}
     </div>-->
     <div
-      class="worklist"
       v-infinite-scroll="loadMore"
       infinite-scroll-disabled="busy"
       infinite-scroll-distance="10"
+      class="worklist"
     >
-      <div class="work" v-for="item in musixiserWorksObj.content" @click="redirectToWork(item.id)">
-        <img class="cover" :src="item.cover=='default'?item.userVO.smallAvatar:item.cover" alt>
-        <div class="detail">
-          <div class="hairline"></div>
-          <div class="line line1">
-            <p class="title">{{ item.title }}</p>
-            <p class="date">{{ item.createdDate }}</p>
-          </div>
-          <div class="line line2">
-            <p class="creator">{{ item.userVO.realname }}</p>
-            <p class="likes">收藏人数: {{item.collectNum}}</p>
-          </div>
-        </div>
-      </div>
+      <work-card
+        v-for="item in musixiserWorksObj.content"
+        :workInfo="item"
+        :key="item.id"
+        :playingStatus="item.id==playingWorkId"
+        :maskOn="item.id==operatingWorkId"
+        :onLongPress="()=>operateWork(item)"
+        :onPlayWork="()=>playWork(item)"
+        :onPurchaseWork="()=>purchaseWork(item)"
+        :onShareWork="shareWork"
+        :onHideWork="hideWork"
+        :onDeleteWork="deleteWork"
+        :onTapMask="cancelOperate"
+      />
     </div>
-    <div class="emptysection" v-show="!loading && musixiserWorksObj.content.length==0">
+    <!-- <div class="emptysection" v-show="!loading && musixiserWorksObj.content.length==0">
       <div>
         <p class="emptytitle">暂无作品</p>
         <img src="../assets/oops.png" style="width:6rem;" alt>
       </div>
-    </div>
+    </div>-->
   </div>
 </template>
 
@@ -223,6 +275,10 @@ export default {
 }
 .worklist {
   position: relative;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
   padding: getRem(20);
   background-color: #404249;
 }
