@@ -314,7 +314,12 @@ export default {
       }
     },
     startloop() {
-      Tone.Transport.start("+0.1");
+      // start from the current sector start(start,offset)
+      Tone.Transport.start(
+        "+0.1",
+        ((this.sector - 1) * this.NOTE_NUM_PER_SECTOR * TIME_PER_NOTE * 120) /
+          this.tempo
+      );
       this.playing = true;
     },
     stoploop() {
@@ -380,6 +385,10 @@ export default {
     updateLoop() {
       this.fullloop = !this.fullloop;
       this.scheduleCursor();
+      if (this.playing) {
+        this.stoploop();
+        this.startloop();
+      }
     },
     checkBouncibility() {
       const result = [];
