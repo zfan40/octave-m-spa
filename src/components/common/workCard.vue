@@ -91,21 +91,33 @@ export default {
 <template>
   <div class="work-container" v-longpress="onLongPress">
     <transition name="fade">
-      <div v-show="maskOn" class="mask" @touchstart="onTapMask">
+      <div v-show="maskOn" class="mask" @touchstart.self="onTapMask">
         <div class="circle-btn pink" @click="onPurchaseWork">购买</div>
         <div class="circle-btn purple" @click="onShareWork">分享</div>
         <div class="circle-btn blue" @click="onHideWork">私密</div>
         <div class="circle-btn gray" @click="onDeleteWork">删除</div>
       </div>
     </transition>
-    <div class="preview-bg" @touchend="onPlayWork">
+    <div class="preview-bg">
       <img
         class="cover"
         :src="workInfo.cover=='default'?workInfo.userVO.smallAvatar:'https://cdn4.buysellads.net/uu/1/3386/1525189887-61450.png'"
         alt
       >
-      <img class="playBtn" v-if="!playingStatus" src="../../assets/viewer/trans-play.png" alt>
-      <img class="playBtn" v-if="playingStatus" src="../../assets/stop.svg" alt>
+      <img
+        class="playBtn"
+        @touchend="onPlayWork"
+        v-if="!playingStatus"
+        src="../../assets/viewer/trans-play.png"
+        alt
+      >
+      <img
+        class="playBtn"
+        @touchend="onPlayWork"
+        v-if="playingStatus"
+        src="../../assets/stop.svg"
+        alt
+      >
     </div>
     <div class="detail">
       <p class="title">{{workInfo.title}}</p>
@@ -132,7 +144,7 @@ export default {
 .work-container {
   display: inline-block;
   position: relative;
-  width: getRem(302);
+  width: getRem(342);
   margin-bottom: getRem(16);
   // margin-right: getRem(16);
   .mask {
@@ -178,6 +190,14 @@ export default {
       position: relative;
       width: getRem(30);
       height: getRem(42);
+    }
+    .playBtn:after {
+      content: "";
+      position: absolute;
+      top: -10px;
+      bottom: -10px;
+      left: -10px;
+      right: -10px;
     }
     .cover {
       position: absolute;

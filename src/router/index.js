@@ -10,7 +10,6 @@ import NMBViewer from '@/components/NMBViewer';
 import MBRoll from '@/components/MBRollMaker';
 import MusixiserDetail from '@/components/MusixiserDetail';
 import MyFav from '@/components/MyFav';
-import MyMusic from '@/components/MyMusic';
 import Recommend from '@/components/Recommend';
 import ProductList from '@/components/ProductList';
 import OrderConfirm from '@/components/OrderConfirm';
@@ -61,11 +60,7 @@ export default new Router({
       name: 'MyFav',
       component: MyFav,
     },
-    {
-      path: '/mymusic',
-      name: 'MyMusic',
-      component: MyMusic,
-    },
+
     {
       path: '/recommend',
       name: 'Recommend',

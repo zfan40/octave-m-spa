@@ -47,7 +47,7 @@ export default {
   methods: {
     loadMusixiserById() {
       console.log("my id: ", this.userId);
-      const id = this.userId;
+      const id = this.userId; // this.userId手传参id或当前用户id
       this.$store.dispatch("FETCH_MUSIXISER", {
         id
       });
@@ -75,6 +75,7 @@ export default {
           if (
             this.musixiserWorksObj.content.length < this.musixiserWorksObj.total
           ) {
+            //otherwise no more content
             this.busy = false;
           }
         });
@@ -281,6 +282,7 @@ export default {
   flex-wrap: wrap;
   padding: getRem(20);
   background-color: #404249;
+  overflow: scroll;
 }
 .hairline {
   height: 1px;

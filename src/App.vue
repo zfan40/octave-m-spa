@@ -74,6 +74,9 @@ export default {
 </script>
 
 <style>
+* {
+  user-select: none;
+}
 textarea:focus,
 input:focus {
   outline: none;

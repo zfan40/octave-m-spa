@@ -26,7 +26,7 @@ export const longpress = {
         pressTimer = setTimeout(() => {
           // Run function
           handler()
-        }, 500)
+        }, 600)
       }
     }
 
