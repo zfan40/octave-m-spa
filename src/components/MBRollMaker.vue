@@ -64,10 +64,9 @@ let aInterval = undefined;
 let extendBtnsTimeout = undefined;
 const TIME_PER_NOTE = 0.25;
 // const FULL_NOTE_NUM = 40; //80 notes, then if set 20 per page, it would be 4 pages
-const FULL_NOTE_NUM = 30; // tempo 180, 20seconds => 120 notes
-const NOTE_NUM_PER_SECTOR = 10;
-// const MB_DUR = 5; // 20 seconds length
-const MB_DUR = 5; // 20 seconds length
+const FULL_NOTE_NUM = 120; // tempo 180, 20seconds => 120 notes, :test 30.
+const NOTE_NUM_PER_SECTOR = 10; // :test 10
+const MB_DUR = 20; // 20 seconds length // :test 5
 const MIN_TEMPO = 60;
 const MAX_TEMPO = 180;
 Vue.use(VueKonva);
@@ -109,7 +108,8 @@ export default {
       NOTE_CATEGORY: 18,
       ONE_PAGE_NOTE_NUM: 20,
       NOTE_NUM_PER_SECTOR,
-      tempo: 80,
+      MB_DUR,
+      tempo: 140,
       configKonva: {
         width: 0,
         height: 0
@@ -140,6 +140,7 @@ export default {
       alertAppear: false,
       showExtendBtns: false,
       playing: false,
+      fullloop: true,
       currentTime: 0
     };
   },
@@ -180,8 +181,21 @@ export default {
       // const fullNoteNumWithinDur = 10;
       // console.log('full note num', fullNoteNumWithinDur);
       // let lastTiming = 0;
+
+      const partNoteNumStart = (this.sector - 1) * this.NOTE_NUM_PER_SECTOR;
+      const partNoteNumEnd =
+        partNoteNumStart + this.ONE_PAGE_NOTE_NUM <= fullNoteNumWithinDur
+          ? partNoteNumStart + this.ONE_PAGE_NOTE_NUM
+          : fullNoteNumWithinDur;
+      console.log(fullNoteNumWithinDur);
+      console.log(partNoteNumStart, partNoteNumEnd);
       for (let i = 0; i <= FULL_NOTE_NUM - 1; i++) {
-        if (i <= fullNoteNumWithinDur - 1) {
+        if (
+          (this.fullloop && i <= fullNoteNumWithinDur - 1) || //under fullloop
+          (!this.fullloop && //under part loop
+          i >= partNoteNumStart && //within available parts
+            i <= partNoteNumEnd - 1)
+        ) {
           // 在有效范围，已规划 => 要修改
           Tone.Transport.clear(cursorSchedules[i]);
           cursorSchedules[i] = Tone.Transport.scheduleRepeat(
@@ -201,10 +215,18 @@ export default {
               });
               // synth.triggerAttackRelease(Tone.Frequency(60, 'midi'), 0.1);
             },
-            (fullNoteNumWithinDur * TIME_PER_NOTE * 120) / this.tempo,
+            this.fullloop
+              ? (fullNoteNumWithinDur * TIME_PER_NOTE * 120) / this.tempo
+              : ((partNoteNumEnd - partNoteNumStart) * TIME_PER_NOTE * 120) /
+                  this.tempo,
             (i * TIME_PER_NOTE * 120) / this.tempo
           );
-        } else if (i > fullNoteNumWithinDur - 1 && cursorSchedules[i]) {
+        } else if (
+          cursorSchedules[i] && //for the notes that have been schedule
+          ((this.fullloop && i > fullNoteNumWithinDur - 1) || //if under fullloop, for those outside fullNote
+            (!this.fullloop &&
+              (i < partNoteNumStart || i > partNoteNumEnd - 1))) // if under partloop, for those outside availablecurrentpage
+        ) {
           // 不在有效范围，已规划 => 不清除，但禁掉
           Tone.Transport.clear(cursorSchedules[i]);
           cursorSchedules[i] = "";
@@ -354,6 +376,10 @@ export default {
           clearInterval(aInterval);
         }
       }, 50);
+    },
+    updateLoop() {
+      this.fullloop = !this.fullloop;
+      this.scheduleCursor();
     },
     checkBouncibility() {
       const result = [];
@@ -523,7 +549,7 @@ export default {
           <template v-for="i in NOTE_CATEGORY">
             <v-rect
               v-for="j in ONE_PAGE_NOTE_NUM"
-              :key="`${i}${j}`"
+              :key="`i${i}j${j}`"
               @touchstart="handleTouchRect(i-1,j-1,sector)"
               @touchmove="handleMoveRect(i-1,j-1,sector)"
               :config="setupRect(i-1,j-1,sector)"
@@ -538,6 +564,12 @@ export default {
         <div @touchstart="scrollup" id="scrollup" class="rotate"></div>
         <div @touchstart="scrolldown" id="scrolldown"></div>
       </div>
+      <div
+        style="position:relative;display:flex;align-items:center;justify-content:center;transform:rotate(90deg);"
+      >
+        <pie-progress :progress="100*currentTime/MB_DUR"/>
+        <p style="position:absolute;font-size:12px;">{{currentTime|intTime}}</p>
+      </div>
       <div>
         <div @touchstart="minusTempo" id="minustempo" class="rotate"></div>
         <div id="tempo-indicator">
@@ -546,11 +578,8 @@ export default {
         </div>
         <div @touchstart="addTempo" id="addtempo" class="rotate"></div>
       </div>
-      <div
-        style="position:relative;display:flex;align-items:center;justify-content:center;transform:rotate(90deg);"
-      >
-        <pie-progress :progress="100*currentTime/5"/>
-        <p style="position:absolute;font-size:12px;">{{currentTime|intTime}}</p>
+      <div style="position:relative;display:flex;align-items:center;justify-content:center;">
+        <div @touchstart="updateLoop" :id="fullloop?'fullloop':'partloop'" class="rotate"></div>
       </div>
       <div class="btnContainer" @touchstart.stop.prevent="btnStart" @touchend.stop.prevent="btnEnd">
         <div :class="[playing?'pauseBtn':'playBtn', 'rotate']" @click="toggleReplay"></div>
@@ -609,6 +638,18 @@ export default {
     background: url("../assets/left.png") center center;
     background-size: contain;
     transform: rotate(270deg);
+  }
+  #partloop {
+    width: 34px;
+    height: 34px;
+    background: url("../assets/viewer/partloop.png") center center;
+    background-size: contain;
+  }
+  #fullloop {
+    width: 34px;
+    height: 34px;
+    background: url("../assets/viewer/fullloop.png") center center;
+    background-size: contain;
   }
   #tempo-indicator {
     position: relative;
