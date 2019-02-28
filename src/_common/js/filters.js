@@ -1,3 +1,4 @@
+
 export function getDateDiff(dateTimeStamp) {
   let result = ''
   const newdateTimeStamp = + new Date(`${dateTimeStamp}`)
@@ -32,4 +33,6 @@ export function getDateDiff(dateTimeStamp) {
     result = "刚刚";
   return result;
 }
-export function another() { }
+export function toMidi(midiNum) {
+  return Tone.Frequency(midiNum, "midi").toNote()
+}

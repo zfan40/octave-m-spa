@@ -7,70 +7,28 @@ import * as Api from "../_common/js/api";
 import * as Cookies from "js-cookie";
 import * as Magic from "../_common/js/magic";
 import * as WxShare from "../_common/js/wx_share";
+import { scales } from "../_common/js/seqModes";
 import pieProgress from "./common/pieProgress";
 import Vue from "vue";
 import VueKonva from "vue-konva";
 
+Vue.use(VueKonva);
 window.Tone = require("tone");
 const musicPart = undefined;
-const musicScale = [
-  0,
-  2,
-  4,
-  5,
-  7,
-  9,
-  11,
-  12,
-  14,
-  16,
-  17,
-  19,
-  21,
-  23,
-  24,
-  26,
-  28,
-  29
-];
-// const colors = ['#8fd3c7', '#95c631', '#edda28', '#f7943d', '#e43159', '#bf4ea8', '#4d61d9', '#45b5a1', '#8fd3c7', '#95c631', '#edda28', '#f7943d', '#e43159', '#bf4ea8', '#4d61d9', '#45b5a1', '#edda28', '#f7943d']
-const colors = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
-colors.fill("#9FB2CF", 0, 18);
-const invalidColors = [
-  1,
-  2,
-  3,
-  4,
-  5,
-  6,
-  7,
-  8,
-  9,
-  10,
-  11,
-  12,
-  13,
-  14,
-  15,
-  16,
-  17,
-  18
-];
-invalidColors.fill("#7D90AD", 0, 18);
 let last_i = -1;
 let last_j = -1;
 window.cursorSchedules = [];
 let aInterval = undefined;
 let extendBtnsTimeout = undefined;
-const TIME_PER_NOTE = 0.25;
-// const FULL_NOTE_NUM = 40; //80 notes, then if set 20 per page, it would be 4 pages
+const TIME_PER_NOTE = 0.25; // quarter note seemingly
 const FULL_NOTE_NUM = 120; // tempo 180, 20seconds => 120 notes, :test 30.
 const NOTE_NUM_PER_SECTOR = 10; // :test 10
 const MB_DUR = 20; // 20 seconds length // :test 5
 const MIN_TEMPO = 60;
 const MAX_TEMPO = 180;
-Vue.use(VueKonva);
-var synth = new Tone.Sampler(
+const NOTE_CATEGORY_PAGE_LIMIT = 18; // above this, will have scroll
+const DEFAULT_KEYBOARD_MODE = "whitekey";
+const synth = new Tone.Sampler(
   {
     C4: "C4.[mp3|ogg]",
     "D#4": "Ds4.[mp3|ogg]",
@@ -89,27 +47,28 @@ var synth = new Tone.Sampler(
   }
 ).toMaster();
 
-var pulseOptions = {
-  oscillator: {
-    type: "triangle"
-  },
-  envelope: {
-    release: 0.07
-  }
-};
-const piano = new Tone.PolySynth(18, Tone.Synth, pulseOptions).toMaster();
+// var pulseOptions = {
+//   oscillator: {
+//     type: "triangle"
+//   },
+//   envelope: {
+//     release: 0.07
+//   }
+// };
+// const piano = new Tone.PolySynth(18, Tone.Synth, pulseOptions).toMaster();
 export default {
   components: {
-    // countButton,
     pieProgress
   },
   data() {
     return {
-      NOTE_CATEGORY: 18,
+      scales,
+      NOTE_CATEGORY: scales[DEFAULT_KEYBOARD_MODE].musicScale.length,
       ONE_PAGE_NOTE_NUM: 20,
       NOTE_NUM_PER_SECTOR,
       MB_DUR,
       tempo: 140,
+      controlWidth: 0, // will be whole width - 50(left bar)
       configKonva: {
         width: 0,
         height: 0
@@ -117,30 +76,12 @@ export default {
       configNoteRect: {},
       activeJ: -1, // highlight timeline
       sector: 1, // 2*4-1,可以滚动7次，营造处4页的氛围
-      rectArray: [
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        []
-      ],
+      rectArray: Array(18).fill([]),
       alertAppear: false,
       showExtendBtns: false,
       playing: false,
       fullloop: true,
+      keyboardMode: DEFAULT_KEYBOARD_MODE,
       currentTime: 0
     };
   },
@@ -148,7 +89,8 @@ export default {
     intTime: floatTime => {
       return Math.floor(floatTime) % 20;
       // return floatTime
-    }
+    },
+    toNote: midiNum => Tone.Frequency(midiNum, "midi").toNote()
   },
   computed: {
     tempoLength() {
@@ -160,13 +102,19 @@ export default {
   methods: {
     setupCanvas() {
       const docElem = document.documentElement;
+      this.controlWidth = docElem.getBoundingClientRect().width - 50;
       this.configKonva = {
-        width: docElem.getBoundingClientRect().width - 50,
+        width:
+          this.NOTE_CATEGORY <= NOTE_CATEGORY_PAGE_LIMIT
+            ? this.controlWidth
+            : this.NOTE_CATEGORY * 36,
         height: window.innerHeight
       };
       this.configNoteRect = {
         width:
-          (docElem.getBoundingClientRect().width - 50) / this.NOTE_CATEGORY,
+          this.NOTE_CATEGORY <= NOTE_CATEGORY_PAGE_LIMIT
+            ? this.controlWidth / this.NOTE_CATEGORY
+            : 36,
         height: window.innerHeight / this.ONE_PAGE_NOTE_NUM,
         fill: "#fff",
         stroke: "#000",
@@ -208,7 +156,11 @@ export default {
               this.rectArray.forEach((noteSeq, noteIndex) => {
                 if (noteSeq[i]) {
                   synth.triggerAttackRelease(
-                    Tone.Frequency(60 + musicScale[noteIndex], "midi"),
+                    Tone.Frequency(
+                      scales[this.keyboardMode].initKey +
+                        scales[this.keyboardMode].musicScale[noteIndex],
+                      "midi"
+                    ),
                     0.25
                   );
                 }
@@ -251,11 +203,11 @@ export default {
         fill = withinDur ? "#292B3A" : "#2B2E3D";
       } else if (this.rectArray[i][index]) {
         // active non-current note
-        fill = withinDur ? colors[i] : "#333740";
+        fill = withinDur ? "#9FB2CF" : "#333740";
       } else {
         // incative non-current note
         fill = withinDur
-          ? `rgba(0,0,0,${0.98 - (i * 0.3) / this.NOTE_CATEGORY})`
+          ? `rgba(0,0,0,${0.9 - (i * 0.22) / this.NOTE_CATEGORY})`
           : "#131315";
       }
       return {
@@ -269,7 +221,11 @@ export default {
       // console.log(`trigger ${i},${j+(sector-1)*this.NOTE_NUM_PER_SECTOR}`)
       // make sound
       synth.triggerAttackRelease(
-        Tone.Frequency(60 + musicScale[i], "midi"),
+        Tone.Frequency(
+          scales[this.keyboardMode].initKey +
+            scales[this.keyboardMode].musicScale[i],
+          "midi"
+        ),
         0.25
       );
       // this.rectArray[i][j] = !this.rectArray[i][j] // this is how to assign a two dim array in vue 2.0...
@@ -293,7 +249,11 @@ export default {
         // take this as testing note, no store, no arrange
         // make sound
         synth.triggerAttackRelease(
-          Tone.Frequency(60 + musicScale[i], "midi"),
+          Tone.Frequency(
+            scales[this.keyboardMode].initKey +
+              scales[this.keyboardMode].musicScale[i],
+            "midi"
+          ),
           0.25
         );
         // operate current note view
@@ -390,13 +350,32 @@ export default {
         this.startloop();
       }
     },
+    updateKeyboard() {
+      this.keyboardMode =
+        this.keyboardMode == "whitekey" ? "fullkey" : "whitekey";
+      this.rectArray = Array(scales[this.keyboardMode].musicScale.length).fill(
+        []
+      );
+      this.NOTE_CATEGORY = scales[this.keyboardMode].musicScale.length;
+      this.setupCanvas();
+
+      // this.scheduleCursor();
+      // if (this.playing) {
+      //   this.stoploop();
+      //   this.startloop();
+      // }
+    },
     checkBouncibility() {
       const result = [];
       for (let i = 0; i <= this.NOTE_CATEGORY - 1; i++) {
         for (let j = 0; j <= FULL_NOTE_NUM - 1; j++) {
           if (this.rectArray[i][j]) {
             result.push({
-              note: Tone.Frequency(60 + musicScale[i], "midi").toNote(),
+              note: Tone.Frequency(
+                scales[this.keyboardMode].initKey +
+                  scales[this.keyboardMode].musicScale[i],
+                "midi"
+              ).toNote(),
               time: (j * TIME_PER_NOTE * 120) / this.tempo
             });
           }
@@ -412,7 +391,11 @@ export default {
         for (let j = 0; j <= FULL_NOTE_NUM - 1; j++) {
           if (this.rectArray[i][j]) {
             result.push({
-              note: Tone.Frequency(60 + musicScale[i], "midi").toNote(),
+              note: Tone.Frequency(
+                scales[this.keyboardMode].initKey +
+                  scales[this.keyboardMode].musicScale[i],
+                "midi"
+              ).toNote(),
               time: (j * TIME_PER_NOTE * 120) / this.tempo
             });
           }
@@ -492,6 +475,7 @@ export default {
     next();
   },
   created() {
+    this.scales = scales; //view层需要
     this.setupCanvas();
 
     // regular setup
@@ -552,7 +536,17 @@ export default {
 
 <template>
   <div class>
-    <div class="roll">
+    <div class="roll" v-bind:style="{width:controlWidth+'px'}">
+      <div
+        :style="{width:configKonva.width+'px'}"
+        style="position:absolute;height:20px;background-color:rgba(0,0,0,.5);color:white;z-index:10;display:flex;justify-content: space-around;font-size:10px"
+      >
+        <span
+          style="width:10px;"
+          v-for="i in NOTE_CATEGORY"
+          :key="i"
+        >{{scales[keyboardMode].initKey+scales[keyboardMode].musicScale[i-1] | toNote}}</span>
+      </div>
       <v-stage :config="configKonva">
         <v-layer>
           <template v-for="i in NOTE_CATEGORY">
@@ -590,6 +584,9 @@ export default {
       <div style="position:relative;display:flex;align-items:center;justify-content:center;">
         <div @touchstart="updateLoop" :id="fullloop?'fullloop':'partloop'" class="rotate"></div>
       </div>
+      <div style="position:relative;display:flex;align-items:center;justify-content:center;">
+        <div @touchstart="updateKeyboard" :id="keyboardMode" class="rotate"></div>
+      </div>
       <div class="btnContainer" @touchstart.stop.prevent="btnStart" @touchend.stop.prevent="btnEnd">
         <div :class="[playing?'pauseBtn':'playBtn', 'rotate']" @click="toggleReplay"></div>
         <div :class="[showExtendBtns?'extendBtnsShow':'extendBtnsHide','extendBtns']">
@@ -621,6 +618,7 @@ export default {
 .roll {
   position: absolute;
   right: 0;
+  overflow: scroll;
 }
 .control-panal {
   position: absolute;
@@ -634,6 +632,7 @@ export default {
   left: 0;
   background-color: black;
   color: white;
+  z-index: 100;
   #scrollup {
     width: 34px;
     height: 34px;
@@ -658,6 +657,18 @@ export default {
     width: 34px;
     height: 34px;
     background: url("../assets/viewer/fullloop.png") center center;
+    background-size: contain;
+  }
+  #fullkey {
+    width: 34px;
+    height: 34px;
+    background: url("../assets/viewer/fullkeyboard.png") center center;
+    background-size: contain;
+  }
+  #whitekey {
+    width: 34px;
+    height: 34px;
+    background: url("../assets/viewer/whitekeyboard.png") center center;
     background-size: contain;
   }
   #tempo-indicator {
