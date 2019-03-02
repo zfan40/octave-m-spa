@@ -19,7 +19,7 @@ export default {
       loading: true,
       workIntroAppear: false,
       controlPanalAppear: false,
-      titleUpdateAppear: false,
+      titleUpdateAppear: true,
       playing: false,
       userId: 0,
       favStatus: false,
@@ -315,11 +315,27 @@ export default {
     <transition name="fade">
       <div id="title-update-mask" v-show="titleUpdateAppear">
         <div class="mb-dialog">
-          <div class="title">作品名称</div>
-          <div class="input">
-            <input v-model="newWorkTitle" type="text" placeholder="作品新名称">
-            <div class="splitter"></div>
+          <div class="dialog-sector">
+            <div class="title">配图</div>
+            <div class="input">
+              <input v-model="newWorkTitle" type="text" placeholder="作品新名称">
+            </div>
           </div>
+          <div class="splitter"></div>
+          <div class="dialog-sector">
+            <div class="title">作品名称</div>
+            <div class="input">
+              <input v-model="newWorkTitle" type="text" placeholder="作品名称">
+            </div>
+          </div>
+          <div class="splitter"></div>
+          <div class="dialog-sector">
+            <div class="title">留言</div>
+            <div class="input">
+              <input v-model="newWorkTitle" type="text" placeholder="留言">
+            </div>
+          </div>
+          <div class="splitter"></div>
           <div class="btns">
             <span class="btn cancel" @click="titleUpdateAppear=false">取消</span>
             <span class="btn confirm" @click="updateWorkTitle">确认</span>
@@ -893,10 +909,13 @@ export default {
     width: getRem(570);
     padding-top: getRem(75);
     border-radius: getRem(50);
-    height: getRem(344);
     background-color: rgba(255, 255, 255, 0.96);
     display: flex;
     flex-direction: column;
+    .dialog-sector {
+      display: flex;
+      justify-content: space-between;
+    }
     .title {
       flex: 1;
       padding: 0 getRem(77);
