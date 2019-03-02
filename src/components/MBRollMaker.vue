@@ -78,6 +78,7 @@ export default {
       sector: 1, // 2*4-1,可以滚动7次，营造处4页的氛围
       rectArray: Array(18).fill([]),
       alertAppear: false,
+      alertAppear2: false,
       showExtendBtns: false,
       playing: false,
       fullloop: true,
@@ -353,12 +354,13 @@ export default {
     updateKeyboard() {
       this.keyboardMode =
         this.keyboardMode == "whitekey" ? "fullkey" : "whitekey";
+
       this.rectArray = Array(scales[this.keyboardMode].musicScale.length).fill(
         []
       );
       this.NOTE_CATEGORY = scales[this.keyboardMode].musicScale.length;
       this.setupCanvas();
-
+      this.alertAppear2 = false;
       // this.scheduleCursor();
       // if (this.playing) {
       //   this.stoploop();
@@ -585,7 +587,7 @@ export default {
         <div @touchstart="updateLoop" :id="fullloop?'fullloop':'partloop'" class="rotate"></div>
       </div>
       <div style="position:relative;display:flex;align-items:center;justify-content:center;">
-        <div @touchstart="updateKeyboard" :id="keyboardMode" class="rotate"></div>
+        <div @touchstart="alertAppear2=true" :id="keyboardMode" class="rotate"></div>
       </div>
       <div class="btnContainer" @touchstart.stop.prevent="btnStart" @touchend.stop.prevent="btnEnd">
         <div :class="[playing?'pauseBtn':'playBtn', 'rotate']" @click="toggleReplay"></div>
@@ -597,12 +599,23 @@ export default {
     </div>
 
     <transition name="fade">
-      <div id="alert-mask" v-show="alertAppear">
+      <div class="alert-mask" v-show="alertAppear">
         <div class="mb-dialog">
           <div class="title">减少些音符才能做成音乐盒，是否继续上传</div>
           <div class="btns">
             <span class="btn cancel" @click="alertAppear=false">再调整</span>
             <span class="btn confirm" @click="bounceProject">任性上传</span>
+          </div>
+        </div>
+      </div>
+    </transition>
+    <transition name="fade">
+      <div class="alert-mask" v-show="alertAppear2">
+        <div class="mb-dialog">
+          <div class="title">转换键盘将清空现有作品</div>
+          <div class="btns">
+            <span class="btn cancel" @click="alertAppear2=false">取消</span>
+            <span class="btn confirm" @click="updateKeyboard">转换键盘</span>
           </div>
         </div>
       </div>
@@ -814,7 +827,7 @@ export default {
 .rotate {
   transform: rotate(90deg);
 }
-#alert-mask {
+.alert-mask {
   position: absolute;
   top: 0;
   width: 100%;
@@ -823,6 +836,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1000;
   .mb-dialog {
     position: relative;
     transform: rotate(90deg);
