@@ -7,6 +7,9 @@ import * as Api from "../_common/js/api";
 import * as Cookies from "js-cookie";
 import * as Magic from "../_common/js/magic";
 import * as WxShare from "../_common/js/wx_share";
+
+import * as RollDemo from "../_common/js/rolldemo"; //test
+
 import { scales } from "../_common/js/seqModes";
 import pieProgress from "./common/pieProgress";
 import Vue from "vue";
@@ -221,14 +224,17 @@ export default {
     handleTouchRect(i, j, sector) {
       // console.log(`trigger ${i},${j+(sector-1)*this.NOTE_NUM_PER_SECTOR}`)
       // make sound
-      synth.triggerAttackRelease(
-        Tone.Frequency(
-          scales[this.keyboardMode].initKey +
-            scales[this.keyboardMode].musicScale[i],
-          "midi"
-        ),
-        0.25
-      );
+      setTimeout(() => {
+        synth.triggerAttackRelease(
+          Tone.Frequency(
+            scales[this.keyboardMode].initKey +
+              scales[this.keyboardMode].musicScale[i],
+            "midi"
+          ),
+          0.25
+        );
+      }, 0);
+
       // this.rectArray[i][j] = !this.rectArray[i][j] // this is how to assign a two dim array in vue 2.0...
       const newRow = this.rectArray[i].slice(0);
       newRow[j + (sector - 1) * this.NOTE_NUM_PER_SECTOR] = !newRow[
@@ -276,6 +282,11 @@ export default {
     },
     startloop() {
       // start from the current sector start(start,offset)
+      console.log(this.rectArray);
+      //issue: autoplay, https://github.com/Tonejs/Tone.js/issues/341
+      if (Tone.context.state !== "running") {
+        Tone.context.resume();
+      }
       Tone.Transport.start(
         "+0.1",
         ((this.sector - 1) * this.NOTE_NUM_PER_SECTOR * TIME_PER_NOTE * 120) /
@@ -480,6 +491,15 @@ export default {
     this.scales = scales; //view层需要
     this.setupCanvas();
 
+    // test, load a demo work
+    console.log(RollDemo.demo1);
+    // 有id 代表是某个模版的再创作
+    if (this.$store.state.route.query.id) {
+      this.keyboardMode = RollDemo.demo1.keyboardMode;
+      this.tempo = RollDemo.demo1.tempo;
+      this.rectArray = RollDemo.demo1.rectArray;
+      this.scheduleCursor();
+    }
     // regular setup
     const self = this;
     Tone.Transport.cancel();
