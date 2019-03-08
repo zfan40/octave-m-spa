@@ -1,5 +1,6 @@
 <script>
 import { swiper, swiperSlide } from "vue-awesome-swiper";
+import CardSwiper from "./common/cardSwiperControlBar";
 export default {
   // https://vuejs.org/v2/guide/components.html#Props
   props: {
@@ -17,18 +18,25 @@ export default {
   },
   components: {
     swiper,
-    swiperSlide
+    swiperSlide,
+    CardSwiper
   },
+
   computed: {
     style() {
       // return 'background-color: ' + this.hovering ? this.color: 'red';
+    },
+    swiper() {
+      return this.$refs.productList.swiper;
     },
     productList() {
       return this.$store.state.productList;
     }
   },
   data() {
-    return {};
+    return {
+      current: 0
+    };
   },
   watch: {},
   created() {
@@ -39,11 +47,15 @@ export default {
       centeredSlides: true,
       slidesPerView: 1,
       // slidesPerView: "auto",
+      watchSlidesProgress : true,
       on: {
         transitionEnd(e) {
           // console.log("3", this.activeIndex); // THIS!!! within swiper...scope.....
           console.log(this.realIndex);
           self.targetProduct = self.productList[this.realIndex];
+        },
+        progress(progress) {
+          this.current = progress
         }
       }
     };
@@ -63,6 +75,11 @@ export default {
           // id
         }
       });
+    },
+    to(page) {
+      if (typeof page !== 'number') { return false}
+      this.swiper.slideTo(page, 300, false);
+      console.log("跳转到第",page,"页面")
     }
   }
 };
@@ -71,8 +88,7 @@ export default {
 <template>
   <div class="container">
     <swiper :options="productListOption" ref="productList">
-      <!-- slides -->
-      <swiper-slide v-for="product in productList">
+      <swiper-slide  v-for="product in productList" :key="product" >
         <div class="productPage" @click="viewProductDetail">
           <div class="preview" :style="{background:`url()`}">
             <img
@@ -94,6 +110,7 @@ export default {
         </div>
       </swiper-slide>
     </swiper>
+    <CardSwiper :list="productList" :current="current" :to="to"/>
     <div
       style="position:absolute;bottom:40px;width:100%;display: flex;align-items: center;justify-content: center;"
     >
@@ -107,6 +124,20 @@ export default {
 @import "../_common/style/_variables.scss";
 @import "../_common/style/_mixins.scss";
 @import "../_common/style/_reboot.scss";
+.swiper-pagination-bullet-custom {
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  line-height: 20px;
+  font-size: 12px;
+  color: #000;
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.2);
+}
+.swiper-pagination-bullet-custom.swiper-pagination-bullet-active {
+  color: #fff;
+  background: #007aff;
+}
 .container {
   position: absolute;
   width: 100%;

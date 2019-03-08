@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import HelloWorld from '@/components/HelloWorld';
+import Square from '@/components/Square';
 // import MBMaker from '@/components/MBMaker';
 
 // import MBAuthor from '@/components/MBAuthor';
@@ -24,6 +25,11 @@ export default new Router({
       path: '/',
       name: 'HelloWorld',
       component: HelloWorld,
+    },
+    {
+      path: '/square',
+      name: 'Square',
+      component: Square,
     },
     {
       path: '/new-music-box-maker',

@@ -4,14 +4,14 @@ import * as Util from "../_common/js/util";
 import * as Api from "../_common/js/api";
 import * as Cookies from "js-cookie";
 import * as Magic from "../_common/js/magic";
-import countButton from "./common/countButton";
+import CountButton from "./common/countButton";
 import * as WxShare from "../_common/js/wx_share";
 
 // const musicPart;
 
 export default {
   components: {
-    countButton
+    CountButton
   },
   data() {
     return {
@@ -318,12 +318,12 @@ export default {
           <div class="dialog-sector">
             <div class="title">配图</div>
             <div class="input">
-              <input v-model="newWorkTitle" type="text" placeholder="作品新名称">
+              <input type="file">
             </div>
           </div>
           <div class="splitter"></div>
           <div class="dialog-sector">
-            <div class="title">作品名称</div>
+            <div class="title">曲名</div>
             <div class="input">
               <input v-model="newWorkTitle" type="text" placeholder="作品名称">
             </div>
@@ -343,7 +343,13 @@ export default {
         </div>
       </div>
     </transition>
-    <div></div>
+    <div class="buttombutton">
+      <span class="heart" @click="titleUpdateAppear=false"></span>
+      <div class="button-group">
+        <button>我来试试</button>
+        <button>八音盒</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -352,6 +358,53 @@ export default {
 @import "../_common/style/_variables.scss";
 @import "../_common/style/_mixins.scss";
 @import "../_common/style/_reboot.scss";
+.buttombutton{
+  position: fixed;
+  bottom: 0;
+  background: transparent;
+  width: 100%;
+  hegiht: 10vh;
+  z-index: 1000;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+}
+.button-group{
+  height: 10vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: getRem(300);
+}
+.button-group button{
+  flex:1;
+   font-size: 14px;
+   border: 0;
+   padding: getRem(10);
+   margin: 0;
+   color: #fff;
+   outline: 0;
+   padding: gerRem(15);
+}
+.button-group button:nth-of-type(1){
+  background:#8E7AEF;
+  border-radius: getRem(100) 0 0 getRem(100);
+}
+.button-group button:last-of-type{
+  background: #4564D7;
+  border-radius: 0 getRem(100) getRem(100) 0;
+}
+.heart{
+   width: getRem(30);
+   height: getRem(30);
+   display: inline-block;
+  background: url("../assets/heart.svg") center center;
+  background-size: cover;
+}
 .container {
   position: absolute;
   width: 100%;
