@@ -147,10 +147,11 @@ export default {
       </swiper-slide>
     </swiper>
     <swiper :options="productListOption" ref="productList">
-      <swiper-slide v-for="product in productList" :key="product.id">
+      <swiper-slide v-for="(product,index) in productList" :key="product.id">
         <img
           style="width:1rem;height:1rem;background:black;"
           :src="product.previewPic||'https://cdn4.buysellads.net/uu/1/3386/1525189887-61450.png'"
+          :class="{ invalid: index!==activeIndex }"
           alt
         >
       </swiper-slide>
@@ -238,5 +239,8 @@ export default {
   text-align: center;
   line-height: getRem(92);
   border-radius: getRem(46);
+}
+.invalid {
+  opacity: 0.6;
 }
 </style>
