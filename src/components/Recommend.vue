@@ -693,16 +693,7 @@ export default {
   transform: translateY(3rem);
   opacity: 0;
 }
-.fade-enter-active {
-  transition: all 0.3s ease-out;
-}
-.fade-leave-active {
-  transition: all 0.3s ease-out;
-}
-.fade-enter, .fade-leave-to
-/* .slide-fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
-}
+
 @keyframes music-aurora {
   0% {
     background-position: 0 0;
