@@ -74,7 +74,7 @@ export const prepareShareContent = ({ title, desc, fullPath, imgUrl }) => {
 // order pay
 export const makeWxOrder = async ({ pid, wid, amount, address }, successCallback, failCalback) => {
   // new Promise((resolve, reject) => {
-  //address is 
+  //address is
   //     {
   //   "userName": "string",
   //   "postalCode": "string",
