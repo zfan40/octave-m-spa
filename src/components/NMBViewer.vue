@@ -5,16 +5,13 @@ import * as Api from "../_common/js/api";
 import * as Cookies from "js-cookie";
 import * as Magic from "../_common/js/magic";
 import CountButton from "./common/countButton";
-import VueUploadComponent from "vue-upload-component";
-import Cropper from "cropperjs";
 import * as WxShare from "../_common/js/wx_share";
 
 // const musicPart;
 
 export default {
   components: {
-    CountButton,
-    fileUpload: VueUploadComponent
+    CountButton
   },
   data() {
     return {
@@ -27,13 +24,7 @@ export default {
       userId: 0,
       favStatus: false,
       newWorkTitle: "",
-      finalNewWorkTitle: "",
-      files: [],
-      edit: false,
-      cropper: false,
-      formFileUrl: "",
-      formName: "",
-      formComment: ""
+      finalNewWorkTitle: ""
     };
   },
   computed: {
@@ -45,88 +36,6 @@ export default {
     }
   },
   methods: {
-    uploadpic() {},
-    editSave() {
-      console.log("hahahahahahhaah");
-      this.edit = false;
-      let oldFile = this.files[0];
-      // console.log("dskfjsdkfjklsdfjdklsfjlsdjfkldsjfkldsjl", this.$refs.cropper)
-      // let binStr = atob(this.cropper.getCroppedCanvas().toDataURL(oldFile.type).split(',')[1])
-      // let arr = new Uint8Array(binStr.length)
-      // for (let i = 0; i < binStr.length; i++) {
-      //   arr[i] = binStr.charCodeAt(i)
-      // }
-      // let file = new File([arr], oldFile.name, { type: oldFile.type })
-      // console.log(this.$refs.upload)
-
-      var xhr = new XMLHttpRequest();
-      //2.设置请求行(get请求数据写在url后面)
-      xhr.open(
-        "post",
-        "https://admin.octave-love.com:8082/api/v1/picture/uploadPic"
-      );
-      xhr.onload = function() {
-        console.log(xhr.responseText);
-      };
-      // XHR2.0新增 上传进度监控
-      xhr.upload.onprogress = function(event) {
-        //  console.log(event);
-        var percent = (event.loaded / event.total) * 100 + "%";
-        console.log(percent);
-        // 设置 进度条内部step的 宽度
-        document.querySelector(".step").style.width = percent;
-      };
-      // XHR2.0新增
-
-      xhr.send(oldFile);
-
-      // this.$refs.upload.update(oldFile.id, {
-      //   oldFile,
-      //   type: oldFile.type,
-      //   size: oldFile.size,
-      //   active: true,
-      // })
-    },
-    inputFile(newFile, oldFile, prevent) {
-      if (newFile && !oldFile) {
-        this.$nextTick(function() {
-          this.edit = false;
-          this.editSave();
-        });
-      }
-      if (!newFile && oldFile) {
-        this.edit = false;
-      }
-    },
-    inputFilter(newFile, oldFile, prevent) {
-      if (newFile && !oldFile) {
-        if (!/\.(gif|jpg|jpeg|png|webp)$/i.test(newFile.name)) {
-          this.alert("Your choice is not a picture");
-          return prevent();
-        }
-      }
-      if (newFile && (!oldFile || newFile.file !== oldFile.file)) {
-        newFile.url = "";
-        let URL = window.URL || window.webkitURL;
-        if (URL && URL.createObjectURL) {
-          newFile.url = URL.createObjectURL(newFile.file);
-        }
-      }
-    },
-    inputName(event) {
-      console.log(event.currentTarget.value);
-      this.formName = event.currentTarget.value;
-    },
-    inputComment(event) {
-      console.log(event.currentTarget.value);
-      this.formCommentv = event.current.value;
-    },
-    saveEdit() {
-      console.log("发送了出去");
-      console.log(this.formFileUrl);
-      console.log(this.formName);
-      console.log(this.formComment);
-    },
     load() {},
     loadMusicById() {
       alert(2);
@@ -404,87 +313,43 @@ export default {
       </div>
     </transition>
     <transition name="fade">
-      <div class="edit-container">
-        <div class="edit-content">
-          <ul>
-            <li>
-              <div class="label-item">
-                <span>配图</span>
-                <div class="file-upload-container">
-                  <div class="example-avatar">
-                    <div class="avatar-upload" v-show="!edit">
-                      <div class="text-center p-2">
-                        <label for="avatar">
-                          <img
-                            :src="files.length ? files[0].url : 'https://www.gravatar.com/avatar/default?s=200&r=pg&d=mm'"
-                            class="rounded-circle"
-                          >
-                        </label>
-                      </div>
-                      <div class="text-center p-2">
-                        <file-upload
-                          extensions="gif,jpg,jpeg,png,webp"
-                          accept="image/png, image/gif, image/jpeg, image/webp"
-                          name="avatar"
-                          class="btn btn-primary"
-                          post-action="https://admin.octave-love.com:8082/api/v1/picture/uploadPic"
-                          :drop="!edit"
-                          v-model="files"
-                          @input-filter="inputFilter"
-                          @input-file="inputFile"
-                          ref="upload"
-                        ></file-upload>
-                      </div>
-                    </div>
-
-                    <div class="avatar-edit" v-show="files.length && edit">
-                      <div class="avatar-edit-image" v-if="files.length">
-                        <img ref="editImage" :src="files[0].url">
-                      </div>
-                      <div class="text-center p-4">
-                        <button
-                          type="button"
-                          class="btn btn-secondary"
-                          @click.prevent="$refs.upload.clear"
-                        >Cancel</button>
-                        <button type="submit" class="btn btn-primary" @click.prevent="editSave">Save</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </li>
-            <li>
-              <div class="label-item">
-                <span>曲名</span>
-                <button @click="uploadpic">上传</button>
-                <input
-                  type="text"
-                  v-modal="formName"
-                  @input="inputName"
-                  @change="inputName"
-                  placeholder="曲名"
-                >
-              </div>
-            </li>
-            <li>
-              <div class="label-item">
-                <span>留言</span>
-                <input
-                  type="text"
-                  v-modal="formComment"
-                  @input="inputComment"
-                  @change="inputComment"
-                  placeholder="留言"
-                >
-              </div>
-            </li>
-            <li></li>
-          </ul>
+      <div id="title-update-mask" v-show="titleUpdateAppear">
+        <div class="mb-dialog">
+          <div class="dialog-sector">
+            <div class="title">配图</div>
+            <div class="input">
+              <input type="file">
+            </div>
+          </div>
+          <div class="splitter"></div>
+          <div class="dialog-sector">
+            <div class="title">曲名</div>
+            <div class="input">
+              <input v-model="newWorkTitle" type="text" placeholder="作品名称">
+            </div>
+          </div>
+          <div class="splitter"></div>
+          <div class="dialog-sector">
+            <div class="title">留言</div>
+            <div class="input">
+              <input v-model="newWorkTitle" type="text" placeholder="留言">
+            </div>
+          </div>
+          <div class="splitter"></div>
+          <div class="btns">
+            <span class="btn cancel" @click="titleUpdateAppear=false">取消</span>
+            <span class="btn confirm" @click="updateWorkTitle">确认</span>
+          </div>
         </div>
-        <div class="save-button" @click="saveEdit">保存</div>
       </div>
     </transition>
+    <div class="buttombutton">
+      <span class="heart" @click="titleUpdateAppear=false"></span>
+      <div class="button-group">
+        <button>我来试试</button>
+        <button>八音盒</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -493,126 +358,6 @@ export default {
 @import "../_common/style/_variables.scss";
 @import "../_common/style/_mixins.scss";
 @import "../_common/style/_reboot.scss";
-.example-avatar .avatar-upload .rounded-circle {
-  width: getRem(100);
-  height: getRem(100);
-}
-.example-avatar .text-center .btn {
-  margin: 0 0.5rem;
-  color: #fff;
-}
-.avatar-edit {
-  margin: auto;
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: getRem(400);
-  height: getRem(400);
-}
-.example-avatar .avatar-edit-image {
-  width: getRem(400);
-  img {
-    width: getRem(400);
-  }
-}
-.example-avatar .drop-active {
-  top: 0;
-  bottom: 0;
-  right: 0;
-  left: 0;
-  position: fixed;
-  z-index: 9999;
-  opacity: 0.6;
-  text-align: center;
-  background: #000;
-}
-.example-avatar .drop-active h3 {
-  margin: -0.5em 0 0;
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  -webkit-transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
-  transform: translateY(-50%);
-  font-size: 40px;
-  color: #fff;
-  padding: 0;
-}
-.edit-content {
-  width: 100%;
-  height: getRem(654);
-  background: #000;
-  padding-top: getRem(50);
-  border-radius: getRem(20);
-  z-index: 1000;
-  ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    color: #fff;
-    li {
-      width: 100%;
-      input {
-        background: transparent;
-        outline: 0;
-        border: 0;
-        color: #fff;
-      }
-    }
-  }
-}
-.label-item {
-  border-bottom: 1px solid #333;
-  padding: getRem(40);
-  width: 100%;
-  font-size: 16px;
-  display: flex;
-  justify-content: space-between;
-  box-sizing: border-box;
-  align-items: center;
-}
-.label-item:first-of-type {
-  padding: getRem(40) getRem(40) getRem(10) getRem(40);
-}
-.save-button {
-  width: 100%;
-  font-size: 16px;
-  background: #8c95a6;
-  color: #fff;
-  z-index: 1000;
-  padding: getRem(20);
-  text-align: center;
-  height: getRem(80);
-  border-radius: getRem(50);
-}
-.edit-container {
-  display: flex;
-  justify-content: space-between;
-  flex-direction: column;
-  width: getRem(545);
-  height: getRem(785);
-  position: absolute;
-  margin: auto;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-}
-.edit-container::before {
-  content: "";
-  width: 100vw;
-  height: 100vh;
-  background: #000;
-  opacity: 0.6;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 999;
-}
 .buttombutton {
   position: fixed;
   bottom: 0;
@@ -633,13 +378,13 @@ export default {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  width: getRem(350);
+  width: getRem(300);
 }
 .button-group button {
   flex: 1;
   font-size: 14px;
   border: 0;
-  padding: getRem(15) getRem(10);
+  padding: getRem(10);
   margin: 0;
   color: #fff;
   outline: 0;
@@ -654,7 +399,6 @@ export default {
   border-radius: 0 getRem(100) getRem(100) 0;
 }
 .heart {
-  transition: 0.3s;
   width: getRem(30);
   height: getRem(30);
   display: inline-block;
