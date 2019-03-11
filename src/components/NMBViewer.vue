@@ -343,13 +343,6 @@ export default {
         </div>
       </div>
     </transition>
-    <div class="buttombutton">
-      <span class="heart" @click="titleUpdateAppear=false"></span>
-      <div class="button-group">
-        <button>我来试试</button>
-        <button>八音盒</button>
-      </div>
-    </div>
   </div>
 </template>
 

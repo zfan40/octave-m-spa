@@ -11,7 +11,7 @@ import App from './App';
 import router from './router';
 import { getDateDiff } from './_common/js/filters';
 import { longpress } from './_common/js/directives';
-alert('成功了')
+
 // Vue.use(VueTouch, { name: 'v-touch' });
 Vue.use(Toast, { defaultType: 'center', duration: 2500, wordWrap: false, width: 'auto' });
 // Vue.use(infiniteScroll)
