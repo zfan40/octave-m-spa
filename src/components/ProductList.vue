@@ -18,8 +18,7 @@ export default {
   },
   components: {
     swiper,
-    swiperSlide,
-    CardSwiper
+    swiperSlide
   },
 
   computed: {
@@ -29,33 +28,66 @@ export default {
     swiper() {
       return this.$refs.productList.swiper;
     },
+    bigSwiper() {
+      return this.$refs.bigProductList.swiper;
+    },
     productList() {
       return this.$store.state.productList;
     }
   },
   data() {
     return {
-      current: 0
+      activeIndex: 0
     };
   },
   watch: {},
   created() {
     const self = this;
-    this.productListOption = {
-      loop: true,
+    //set upper big swiper
+    this.bigProductListOption = {
+      loop: false,
       // spaceBetween: 30,
       centeredSlides: true,
       slidesPerView: 1,
       // slidesPerView: "auto",
-      watchSlidesProgress : true,
+      watchSlidesProgress: true,
+      effect: "fade",
       on: {
         transitionEnd(e) {
           // console.log("3", this.activeIndex); // THIS!!! within swiper...scope.....
           console.log(this.realIndex);
           self.targetProduct = self.productList[this.realIndex];
+          self.activeIndex = this.realIndex;
+          //let small swiper swipe to target
+          self.swiper.slideTo(self.activeIndex);
         },
         progress(progress) {
-          this.current = progress
+          // this.activeIndex = progress;
+          // console.log()
+        }
+      }
+    };
+    // set small lower swiper
+    this.productListOption = {
+      loop: false,
+      // spaceBetween: 30,
+      centeredSlides: true,
+      slidesPerView: 8,
+      // slidesPerView: "auto",
+      watchSlidesProgress: true,
+      slideToClickedSlide: true,
+      on: {
+        transitionEnd(e) {
+          // console.log("3", this.activeIndex); // THIS!!! within swiper...scope.....
+          console.log(this.realIndex);
+          self.targetProduct = self.productList[this.realIndex];
+          self.activeIndex = this.realIndex;
+          //let big swiper swipe to target
+          self.bigSwiper.slideTo(self.activeIndex);
+        },
+        progress(progress) {
+          // this.activeIndex = progress;
+          // console.log()
         }
       }
     };
@@ -77,9 +109,11 @@ export default {
       });
     },
     to(page) {
-      if (typeof page !== 'number') { return false}
+      if (typeof page !== "number") {
+        return false;
+      }
       this.swiper.slideTo(page, 300, false);
-      console.log("跳转到第",page,"页面")
+      console.log("跳转到第", page, "页面");
     }
   }
 };
@@ -87,13 +121,14 @@ export default {
 
 <template>
   <div class="container">
-    <swiper :options="productListOption" ref="productList">
-      <swiper-slide  v-for="product in productList" :key="product" >
-        <div class="productPage" @click="viewProductDetail">
+    <swiper :options="bigProductListOption" ref="bigProductList">
+      <swiper-slide v-for="product in productList" :key="product.id">
+        <!-- <transition name="fade" mode="out-in"> -->
+        <div class="productPage" @click="viewProductDetail" v-bind:key="activeIndex">
           <div class="preview" :style="{background:`url()`}">
             <img
-              style="width:100%;height:100%;position:relative;display:block;"
-              :src="product.previewImg||'https://cdn4.buysellads.net/uu/1/3386/1525189887-61450.png'"
+              style="width:100%;height:100%;position:relative;display:block;border-radius: 20px 20px 0 0;background:black;"
+              :src="product.previewPic||'https://cdn4.buysellads.net/uu/1/3386/1525189887-61450.png'"
               alt
             >
           </div>
@@ -108,9 +143,19 @@ export default {
             </div>
           </div>
         </div>
+        <!-- </transition> -->
       </swiper-slide>
     </swiper>
-    <CardSwiper :list="productList" :current="current" :to="to"/>
+    <swiper :options="productListOption" ref="productList">
+      <swiper-slide v-for="(product,index) in productList" :key="product.id">
+        <img
+          style="width:1rem;height:1rem;background:black;"
+          :src="product.previewPic||'https://cdn4.buysellads.net/uu/1/3386/1525189887-61450.png'"
+          :class="{ invalid: index!==activeIndex }"
+          alt
+        >
+      </swiper-slide>
+    </swiper>
     <div
       style="position:absolute;bottom:40px;width:100%;display: flex;align-items: center;justify-content: center;"
     >
@@ -155,7 +200,7 @@ export default {
   width: getRem(638);
   height: getRem(744);
   border-radius: 20px;
-  margin: 80px auto;
+  margin: 80px auto 40px;
   .preview {
     position: relative;
     width: 100%;
@@ -194,5 +239,8 @@ export default {
   text-align: center;
   line-height: getRem(92);
   border-radius: getRem(46);
+}
+.invalid {
+  opacity: 0.6;
 }
 </style>

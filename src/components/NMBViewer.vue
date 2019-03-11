@@ -33,7 +33,7 @@ export default {
       cropper: false,
       formFileUrl: "",
       formName: "",
-      formComment: "",
+      formComment: ""
     };
   },
   computed: {
@@ -45,13 +45,11 @@ export default {
     }
   },
   methods: {
-    uploadpic(){
-
-    },
+    uploadpic() {},
     editSave() {
-      console.log('hahahahahahhaah')
-      this.edit = false
-      let oldFile = this.files[0]
+      console.log("hahahahahahhaah");
+      this.edit = false;
+      let oldFile = this.files[0];
       // console.log("dskfjsdkfjklsdfjdklsfjlsdjfkldsjfkldsjl", this.$refs.cropper)
       // let binStr = atob(this.cropper.getCroppedCanvas().toDataURL(oldFile.type).split(',')[1])
       // let arr = new Uint8Array(binStr.length)
@@ -61,34 +59,26 @@ export default {
       // let file = new File([arr], oldFile.name, { type: oldFile.type })
       // console.log(this.$refs.upload)
 
+      var xhr = new XMLHttpRequest();
+      //2.设置请求行(get请求数据写在url后面)
+      xhr.open(
+        "post",
+        "https://admin.octave-love.com:8082/api/v1/picture/uploadPic"
+      );
+      xhr.onload = function() {
+        console.log(xhr.responseText);
+      };
+      // XHR2.0新增 上传进度监控
+      xhr.upload.onprogress = function(event) {
+        //  console.log(event);
+        var percent = (event.loaded / event.total) * 100 + "%";
+        console.log(percent);
+        // 设置 进度条内部step的 宽度
+        document.querySelector(".step").style.width = percent;
+      };
+      // XHR2.0新增
 
-        var xhr = new XMLHttpRequest();
-        //2.设置请求行(get请求数据写在url后面)
-        xhr.open('post', 'https://admin.octave-love.com:8082/api/v1/picture/uploadPic');
-        xhr.onload = function () {
-            console.log(xhr.responseText);
-        }
-        // XHR2.0新增 上传进度监控
-        xhr.upload.onprogress = function (event) {
-            //  console.log(event);
-            var percent = event.loaded / event.total * 100 + '%';
-            console.log(percent);
-            // 设置 进度条内部step的 宽度
-            document.querySelector('.step').style.width = percent;
-        }
-        // XHR2.0新增
-
-        xhr.send(oldFile);
-
-
-
-
-
-
-
-
-
-
+      xhr.send(oldFile);
 
       // this.$refs.upload.update(oldFile.id, {
       //   oldFile,
@@ -99,35 +89,43 @@ export default {
     },
     inputFile(newFile, oldFile, prevent) {
       if (newFile && !oldFile) {
-        this.$nextTick(function () {
-          this.edit = false
-          this.editSave()
-        })
+        this.$nextTick(function() {
+          this.edit = false;
+          this.editSave();
+        });
       }
       if (!newFile && oldFile) {
-        this.edit = false
+        this.edit = false;
       }
     },
     inputFilter(newFile, oldFile, prevent) {
       if (newFile && !oldFile) {
         if (!/\.(gif|jpg|jpeg|png|webp)$/i.test(newFile.name)) {
-          this.alert('Your choice is not a picture')
-          return prevent()
+          this.alert("Your choice is not a picture");
+          return prevent();
         }
       }
       if (newFile && (!oldFile || newFile.file !== oldFile.file)) {
-        newFile.url = ''
-        let URL = window.URL || window.webkitURL
+        newFile.url = "";
+        let URL = window.URL || window.webkitURL;
         if (URL && URL.createObjectURL) {
-          newFile.url = URL.createObjectURL(newFile.file)
+          newFile.url = URL.createObjectURL(newFile.file);
         }
       }
+    },
+    inputName(event) {
+      console.log(event.currentTarget.value);
+      this.formName = event.currentTarget.value;
+    },
+    inputComment(event) {
+      console.log(event.currentTarget.value);
+      this.formCommentv = event.current.value;
     },
     saveEdit() {
       console.log("发送了出去");
       console.log(this.formFileUrl);
-      console.log(this.formName)
-      console.log(this.formComment)
+      console.log(this.formName);
+      console.log(this.formComment);
     },
     load() {},
     loadMusicById() {
@@ -460,13 +458,25 @@ export default {
               <div class="label-item">
                 <span>曲名</span>
                 <button @click="uploadpic">上传</button>
-                <input type="text" v-modal="formName" placeholder="曲名">
+                <input
+                  type="text"
+                  v-modal="formName"
+                  @input="inputName"
+                  @change="inputName"
+                  placeholder="曲名"
+                >
               </div>
             </li>
             <li>
               <div class="label-item">
                 <span>留言</span>
-                <input type="text" v-modal="formComment" placeholder="留言">
+                <input
+                  type="text"
+                  v-modal="formComment"
+                  @input="inputComment"
+                  @change="inputComment"
+                  placeholder="留言"
+                >
               </div>
             </li>
             <li></li>

@@ -106,7 +106,7 @@ export default {
     <div class="item">
       <img
         class="product-img"
-        :src="targetProduct.previewImg||'https://cdn4.buysellads.net/uu/1/3386/1525189887-61450.png'"
+        :src="targetProduct.previewPic||'https://cdn4.buysellads.net/uu/1/3386/1525189887-61450.png'"
         alt
       >
       <div class="goods">
