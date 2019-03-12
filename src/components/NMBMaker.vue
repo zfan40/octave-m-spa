@@ -320,7 +320,7 @@ export default {
             info: {
               title: "尚未起名",
               content: "default",
-              cover: "default"
+              cover: ""
             }
           })
           .then(id => {
@@ -1104,11 +1104,11 @@ h2 {
   color: #2c3e50;
 }
 
-* {
-  user-select: none;
-  margin: 0;
-  padding: 0;
-}
+// * {
+//   user-select: none;
+//   margin: 0;
+//   padding: 0;
+// }
 
 .container {
   width: 100%;

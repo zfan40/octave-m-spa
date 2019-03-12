@@ -171,7 +171,7 @@ export function toggleFavSong({ workId, status }) {
   // .then((res) => { console.log(res); })
   // .catch((err) => { console.log(err); });
 }
-export function updateWorkTitle({ id, title }) {
+export function updateWork({ id, title }) {
   return axios.put(
     `//api.octave-love.com/api/v1/work/updateWork/${id}`,
     JSON.stringify({ title }),

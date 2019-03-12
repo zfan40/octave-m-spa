@@ -420,7 +420,7 @@ export default {
           info: {
             title: "尚未起名",
             content: "default",
-            cover: "default"
+            cover: ""
           }
         })
         .then(id => {

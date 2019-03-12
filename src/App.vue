@@ -76,6 +76,11 @@ export default {
 <style>
 * {
   user-select: none;
+  margin: 0;
+  padding: 0;
+}
+input,textarea {
+  -webkit-user-select: auto;
 }
 textarea:focus,
 input:focus {

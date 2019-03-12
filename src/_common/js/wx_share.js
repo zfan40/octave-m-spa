@@ -35,6 +35,8 @@ export const prepareShareConfig = () =>
               'onMenuShareAppMessage',
               'chooseWXPay',
               'openAddress',
+              'chooseImage',
+              'uploadImage'
             ],
           });
           wx.ready(() => {
@@ -140,57 +142,57 @@ export const createAddress = (cb1, cb2) => {
   });
 }
 // address
-export const newMakeWxOrder = ({ pid, wid, amount }, cb1, cb2) => {
-  console.log(res);
-  createOrder({ pid, wid, amount, address: res }).then((res) => {
-    const orderId = res.data.data;
-    payOrder({ orderId }).then((res) => {
-      // alert(JSON.stringify(res));
-      const params = res.data.data;
-      alert(JSON.stringify(params));
-      console.log(params.nonceStr);
-      console.log(params.signType);
-      console.log(params.package);
-      console.log(params.timeStamp);
-      console.log(params.appId);
-      console.log(params.paySign);
-      console.log('1234');
-      wx.chooseWXPay({
-        // ...params,
-        appId: params.appId,
-        timestamp: params.timeStamp,
-        nonceStr: params.nonceStr,
-        package: params.package,
-        signType: params.signType,
-        paySign: params.paySign,
-        success(res) {
-          console.log(res);
-          cb1(res);
-        },
-        fail() {
-          cb2();
-        },
-        cancel() {
-          cb2();
-        }
-      });
-    });
-  });
-}
+// export const newMakeWxOrder = ({ pid, wid, amount }, cb1, cb2) => {
+//   console.log(res);
+//   createOrder({ pid, wid, amount, address: res }).then((res) => {
+//     const orderId = res.data.data;
+//     payOrder({ orderId }).then((res) => {
+//       // alert(JSON.stringify(res));
+//       const params = res.data.data;
+//       alert(JSON.stringify(params));
+//       console.log(params.nonceStr);
+//       console.log(params.signType);
+//       console.log(params.package);
+//       console.log(params.timeStamp);
+//       console.log(params.appId);
+//       console.log(params.paySign);
+//       console.log('1234');
+//       wx.chooseWXPay({
+//         // ...params,
+//         appId: params.appId,
+//         timestamp: params.timeStamp,
+//         nonceStr: params.nonceStr,
+//         package: params.package,
+//         signType: params.signType,
+//         paySign: params.paySign,
+//         success(res) {
+//           console.log(res);
+//           cb1(res);
+//         },
+//         fail() {
+//           cb2();
+//         },
+//         cancel() {
+//           cb2();
+//         }
+//       });
+//     });
+//   });
+// }
 
-export const getAddress = () => {
-  new Promise((resolve, reject) => {
-    wx.openAddress({
-      success(res) {
-        console.log(res);
-        resolve(res);
-      },
-      cancel() {
-        reject();
-      },
-    });
-  });
-};
+// export const getAddress = () => {
+//   new Promise((resolve, reject) => {
+//     wx.openAddress({
+//       success(res) {
+//         console.log(res);
+//         resolve(res);
+//       },
+//       cancel() {
+//         reject();
+//       },
+//     });
+//   });
+// };
 // 调用分享
 // $_wechat().config().then((res) => {
 //   $_wechat().share({ // 配置分享
@@ -202,3 +204,43 @@ export const getAddress = () => {
 // }, (err) => {
 //   console.warn(err);
 // });
+
+
+export const selectAndUploadImage = (cb1, cb2) => {
+  wx.chooseImage({
+    count: 1,
+    sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+    sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+    success: function (res) {
+      const localId = res.localIds[0]; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+      wx.uploadImage({
+        localId, // 需要上传的图片的本地ID，由chooseImage接口获得
+        isShowProgressTips: 1, // 默认为1，显示进度提示
+        success: function (res) {
+          const serverId = res.serverId
+          const imgUrl = localId // for now...
+          cb1(imgUrl)
+          // $.ajax({
+          //   url: "/uploadImg",
+          //   dataType: "json",
+          //   async: false,
+          //   contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+          //   data: { "mediaId": serverId },
+          //   type: "POST",
+          //   timeout: 30000,
+          //   success: function (data, textStatus) {
+          //     $('#imgUrl').val(data);
+          //     $.toast('上传成功', 'text');
+          //   },
+          //   error: function (XMLHttpRequest, textStatus, errorThrown) {
+          //     $.toast('上传错误,请稍候重试!', 'text');
+          //   }
+          // });
+        },
+        fail: function (error) {
+          cb2()
+        }
+      });
+    }
+  });
+}

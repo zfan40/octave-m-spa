@@ -29,6 +29,7 @@ export function createStore() {
       myInfo: {},
       recordParts: [],
       recordProject: [],
+      recordProjectInfo: {},
       musixiserInfo: {},
       musixiserWorksObj: { content: [] },
       favWorksObj: { content: [] },

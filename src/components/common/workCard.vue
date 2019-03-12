@@ -31,7 +31,7 @@ export default {
     const mock = {
       id: 148,
       title: "castle",
-      cover: "default",
+      cover: "",
       content: "default",
       url: "//img.musixise.com/LIjPhuhF_castle.mid",
       favStatus: 0,
