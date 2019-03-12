@@ -224,16 +224,16 @@ export default {
     handleTouchRect(i, j, sector) {
       // console.log(`trigger ${i},${j+(sector-1)*this.NOTE_NUM_PER_SECTOR}`)
       // make sound
-      setTimeout(() => {
-        synth.triggerAttackRelease(
-          Tone.Frequency(
-            scales[this.keyboardMode].initKey +
-              scales[this.keyboardMode].musicScale[i],
-            "midi"
-          ),
-          0.25
-        );
-      }, 0);
+      // setTimeout(() => {
+      synth.triggerAttackRelease(
+        Tone.Frequency(
+          scales[this.keyboardMode].initKey +
+            scales[this.keyboardMode].musicScale[i],
+          "midi"
+        ),
+        0.25
+      );
+      // }, 0);
 
       // this.rectArray[i][j] = !this.rectArray[i][j] // this is how to assign a two dim array in vue 2.0...
       const newRow = this.rectArray[i].slice(0);

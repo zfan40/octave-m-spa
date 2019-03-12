@@ -214,6 +214,7 @@ export function preview(items, start) {
     // TODO: this is weird...but you need to play something to make sure it works
     // trigger to avoid no sound
     if (!oncePlayed) {
+      console.log('pp')
       mbox.triggerAttack('E6', 0, 0);
       oncePlayed = true;
     }
@@ -243,6 +244,12 @@ export function preview(items, start) {
 }
 
 export function previewMidi(url, start) {
+  // TODO why so fucking tricky
+  if (!oncePlayed) {
+    console.log('ppp')
+    mbox.triggerAttack('E6', 0, 0);
+    oncePlayed = true;
+  }
   MidiConvert.load(url, (midi) => {
     const mergeNotes = midi.tracks.reduce((a, b) => a.concat(b.notes), []);
     preview(mergeNotes, start)
