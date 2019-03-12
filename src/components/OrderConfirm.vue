@@ -56,7 +56,10 @@ export default {
         WxShare.makeWxOrder(
           { ...this.orderToCreate, amount: this.amount },
           () => {
-            console.log("pay succeed");
+            this.$toast("下单成功");
+            this.$router.push({
+              path: "/my-orders"
+            });
           },
           () => {
             console.log("pay fail");

@@ -226,12 +226,12 @@ export function preview(items, start) {
     }
     musicPreview = new Tone.Part((time, value) => {
       // mbox.triggerAttackRelease(value.note, '4n', time);
-      mbox.triggerAttackRelease(Tone.Frequency(value.midi, 'midi'), '4n', time);
+      mbox.triggerAttackRelease(Tone.Frequency(value.midi, 'midi'), '2n', time);
     }, items).start(0, 0);
     musicPreview.loop = true;
-    
-    const lastNote = items[items.length-1]
-    if (lastNote.time>=20) {
+
+    const lastNote = items[items.length - 1]
+    if (lastNote.time >= 20) {
       musicPreview.loopEnd = lastNote.time + lastNote.duration + 2
     } else {
       musicPreview.loopEnd = 21; // 20s的作品，多一秒喘息
@@ -250,10 +250,10 @@ export function previewMidi(url, start) {
 }
 
 export function canMakePaper30(items) {
-  const paper30Notes = [48,50,55,57,59,60,62,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,86,88]
-  return items.every(item=>paper30Notes.indexOf(item)>=0)
+  const paper30Notes = [48, 50, 55, 57, 59, 60, 62, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 86, 88]
+  return items.every(item => paper30Notes.indexOf(item) >= 0)
 }
 export function canMakePaper15(items) {
-  const paper15Notes = [48,50,52,53,55,57,59,60,62,64,65,67,69,71,72]
-  return items.every(item=>paper15Notes.indexOf(item)>=0)
+  const paper15Notes = [48, 50, 52, 53, 55, 57, 59, 60, 62, 64, 65, 67, 69, 71, 72]
+  return items.every(item => paper15Notes.indexOf(item) >= 0)
 }

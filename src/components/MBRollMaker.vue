@@ -427,6 +427,9 @@ export default {
           console.log("successfully bounced");
           this.bouncing = false;
           this.$toast("作品已为您存储");
+          // clear tone
+          cursorSchedules.forEach(schedule => Tone.Transport.clear(schedule));
+          // cursorSchedules = [];
           this.$router.push({
             path: "/new-music-box-viewer",
             query: {

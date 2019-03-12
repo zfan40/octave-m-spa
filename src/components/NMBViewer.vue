@@ -154,7 +154,13 @@ export default {
     purchaseItem() {
       // TODO: router push with workId
       console.log(`you are about to purchase ${this.projectInfo.id}`);
-      this.$store.commit("SAVE_ORDER_INFO", { work: this.projectInfo }); // store current workId
+      this.$store.commit("SAVE_ORDER_INFO", {
+        work: {
+          ...this.projectInfo,
+          title: this.newWorkTitle,
+          content: this.newMessage
+        }
+      }); // store current workId
 
       this.$router.push({
         path: "/product-list",
