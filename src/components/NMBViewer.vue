@@ -98,7 +98,7 @@ export default {
     uploadPic() {
       WxShare.selectAndUploadImage(
         imgUrl => {
-          console.log("local url:", imgUrl);
+          console.log("url:", imgUrl);
           this.newCover = imgUrl;
         },
         () => {

@@ -45,17 +45,13 @@ export default {
     }
   },
   methods: {
-    loadMusixiserById() {
-      console.log("my id: ", this.userId);
-      const id = this.userId;
-      this.$store.dispatch("FETCH_MUSIXISER", {
-        id
-      });
+    loadFavById() {
+      // console.log("my id: ", this.userId);
+      // const id = this.userId;
+      // this.$store.dispatch("FETCH_MUSIXISER", {
+      //   id
+      // });
       this.busy = false;
-      // this.$store.dispatch('FETCH_WORKS_FROM_MUSIXISER', {
-      //   id,
-      //   page:1
-      // })
     },
     loadMore() {
       //will call automatically when enter!
@@ -70,7 +66,7 @@ export default {
         })
         .then(() => {
           console.log("2222222", this.favWorksObj);
-          if (this.favWorksObj.content.length < this.favWorksObj.total) {
+          if (+this.favWorksObj.content.length < +this.favWorksObj.total) {
             this.busy = false;
           }
         });
@@ -157,7 +153,7 @@ export default {
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase());
     if (!inWechat) {
       this.userId = this.$store.state.route.query.id || 149;
-      self.loadMusixiserById();
+      self.loadFavById();
       return;
     }
     const fullPath = `${location.origin}${
@@ -190,7 +186,7 @@ export default {
           self.userId =
             this.$store.state.route.query.id || res.data.data.userId;
           self.isMe = self.userId == res.data.data.userId;
-          self.loadMusixiserById();
+          self.loadFavById();
 
           console.log("get user info success", res.data.data);
         })
@@ -256,7 +252,6 @@ export default {
     </div>-->
   </div>
 </template>
-
 <style lang="scss" scoped>
 @import "../_common/style/_functions.scss";
 @import "../_common/style/_variables.scss";
@@ -342,4 +337,3 @@ export default {
   }
 }
 </style>
-

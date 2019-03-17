@@ -73,7 +73,8 @@ export default {
         .then(() => {
           console.log("2222222", this.musixiserWorksObj);
           if (
-            this.musixiserWorksObj.content.length < this.musixiserWorksObj.total
+            +this.musixiserWorksObj.content.length <
+            +this.musixiserWorksObj.total
           ) {
             //otherwise no more content
             this.busy = false;

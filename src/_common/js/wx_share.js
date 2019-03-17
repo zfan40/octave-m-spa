@@ -1,6 +1,6 @@
 import axios from 'axios';
 import wx from 'weixin-js-sdk';
-import { createOrder, payOrder, sendAddress } from './api';
+import { createOrder, payOrder, sendAddress, getWXMedia } from './api';
 import { fail } from 'assert';
 
 const reqConfig = {
@@ -205,7 +205,6 @@ export const createAddress = (cb1, cb2) => {
 //   console.warn(err);
 // });
 
-
 export const selectAndUploadImage = (cb1, cb2) => {
   wx.chooseImage({
     count: 1,
@@ -216,26 +215,12 @@ export const selectAndUploadImage = (cb1, cb2) => {
       wx.uploadImage({
         localId, // 需要上传的图片的本地ID，由chooseImage接口获得
         isShowProgressTips: 1, // 默认为1，显示进度提示
-        success: function (res) {
+        success: async function (res) {
           const serverId = res.serverId
-          const imgUrl = localId // for now...
-          cb1(imgUrl)
-          // $.ajax({
-          //   url: "/uploadImg",
-          //   dataType: "json",
-          //   async: false,
-          //   contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-          //   data: { "mediaId": serverId },
-          //   type: "POST",
-          //   timeout: 30000,
-          //   success: function (data, textStatus) {
-          //     $('#imgUrl').val(data);
-          //     $.toast('上传成功', 'text');
-          //   },
-          //   error: function (XMLHttpRequest, textStatus, errorThrown) {
-          //     $.toast('上传错误,请稍候重试!', 'text');
-          //   }
-          // });
+          const imgRes = await getWXMedia({ media_id: serverId })
+          // const imgUrl = localId // for now...
+          console.log('file derived', imgRes)
+          cb1(imgRes.data.data)
         },
         fail: function (error) {
           cb2()

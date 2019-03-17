@@ -62,7 +62,7 @@ export default new Router({
       component: MusixiserDetail,
     },
     {
-      path: '/myfav',
+      path: '/my-fav',
       name: 'MyFav',
       component: MyFav,
     },

@@ -8,7 +8,7 @@ export default {
   //   confirmTime: 1547734350000,
   //   userId: 0,
   //   amount: 1,
-  //   product: {
+  //   content: {
   //     wid: 148,
   //     product: {
   //       id: 1,
@@ -60,7 +60,7 @@ export default {
     <div class="preview-bg">
       <img
         class="cover"
-        :src="info.product.product.previewImg||'https://cdn4.buysellads.net/uu/1/3386/1525189887-61450.png'"
+        :src="info.content.product.previewImg||'https://cdn4.buysellads.net/uu/1/3386/1525189887-61450.png'"
         alt
       >
       <div class="shipment">
@@ -75,8 +75,8 @@ export default {
     <div class="detail">
       <div class="detail-basic">
         <div class="title">
-          <p class="product-name">{{info.product.product.name}}</p>
-          <p class="song-title">{{info.product.title}}</p>
+          <p class="product-name">{{info.content.product.name}}</p>
+          <p class="song-title">{{info.content.title}}</p>
         </div>
         <div class="playBtn"></div>
       </div>

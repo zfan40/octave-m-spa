@@ -7,7 +7,8 @@ import {
   fetchMusixiser,
   fetchWorksFromMusixiser,
   fetchFavWorks,
-  fetchProductList
+  fetchProductList,
+  fetchOrders
 } from '../_common/js/api';
 /*
   getUserInfo
@@ -113,12 +114,13 @@ export default {
         resolve();
       });
     }),
-  FETCH_ORDERS: ({ commit, state }, { id, page }) =>
+  FETCH_ORDERS: ({ commit, state }, { page }) =>
     new Promise((resolve, reject) => {
       // 获取某id的音乐盒音乐内容
-      fetchProductList().then((products) => {
-        console.log('product list: ', products.data.data.list);
-        commit('PUSH_PRODUCTLIST', { productList: products.data.data.list });
+      alert(321)
+      fetchOrders(page).then((orders) => {
+        // console.log('product list: ', orders.data.data.list);
+        commit('PUSH_ORDERS', { orders: orders.data.data });
         resolve();
       });
     }),

@@ -354,6 +354,10 @@ export default {
         }
       }, 50);
     },
+    scrollToBegin() {
+      clearInterval(aInterval);
+      this.sector = 1;
+    },
     updateLoop() {
       this.fullloop = !this.fullloop;
       this.scheduleCursor();
@@ -362,10 +366,14 @@ export default {
         this.startloop();
       }
     },
+    clearNotes() {
+      this.rectArray = Array(scales[this.keyboardMode].musicScale.length).fill(
+        []
+      );
+    },
     updateKeyboard() {
       this.keyboardMode =
         this.keyboardMode == "whitekey" ? "fullkey" : "whitekey";
-
       this.rectArray = Array(scales[this.keyboardMode].musicScale.length).fill(
         []
       );
@@ -589,8 +597,10 @@ export default {
 
     <div class="control-panal">
       <div>
+        <div @touchstart="scrollToBegin" id="scrollup" class="rotate"></div>
         <div @touchstart="scrollup" id="scrollup" class="rotate"></div>
         <div @touchstart="scrolldown" id="scrolldown"></div>
+        <div @touchstart="clearNotes" id="scrolldown"></div>
       </div>
       <div
         style="position:relative;display:flex;align-items:center;justify-content:center;transform:rotate(90deg);"

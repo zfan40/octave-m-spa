@@ -13,6 +13,7 @@ const reqConfig = {
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',
+    'Authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjIzOSwic3ViIjoiMjM5IiwiZXhwIjoxNTU1MjIyNzcxLCJpYXQiOjE1NTI2MzA3NzEsImp0aSI6IjE1NTI2MzA3NzE2MzgifQ.J1WNccABxwadbcjF-GsCLUhBhyROpcxP52g6JXW0vKI'
   },
 };
 // const tokenObj = { access_token: '' };
@@ -199,6 +200,11 @@ export function payOrder({ orderId }) {
     reqConfig,
   );
 }
+export function fetchOrders(page) {
+  alert('calling api')
+  return axios.get(`//api.octave-love.com/api/v1/shop/orders/myOrderList?page=${page}&size=15`, reqConfig,
+  );
+}
 
 export function sendAddress(addressVO) {
   return axios.post(
@@ -206,6 +212,12 @@ export function sendAddress(addressVO) {
     JSON.stringify(addressVO),
     reqConfig
   )
+}
+export function getWXMedia({ media_id }) {
+  return axios.post(`//api.octave-love.com/api/v1/wechat/saveMedia?media_id=${media_id}`,
+    '',
+    reqConfig,
+  );
 }
 export function fetchProductList() {
   return axios.get(

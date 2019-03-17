@@ -75,6 +75,18 @@ export default {
     state.productList = productList
     state.targetProduct = productList[0]
   },
+  PUSH_ORDERS: (state, { orders }) => {
+    // 储存录制信息
+    console.log('xxxxxxx', orders);
+    if (+orders.current === 1) {
+      state.orders.content = orders.list;
+    } else {
+      state.orders.content = state.orders.content.concat(orders.list);
+    }
+    state.orders.total = orders.total;
+    state.orders.size = orders.size;
+    state.orders.current = orders.current;
+  },
   OPERATE_WORK: (state, { work }) => {
     state.operatingWorkId = work.id
   },

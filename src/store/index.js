@@ -9,23 +9,6 @@ Vue.use(Vuex);
 export function createStore() {
   return new Vuex.Store({
     state: {
-      activeType: null,
-      itemsPerPage: 20,
-      items: {
-        /* [id: number]: Item */
-      },
-      users: {
-        /* [id: string]: User */
-      },
-      lists: {
-        top: [
-          /* number */
-        ],
-        new: [],
-        show: [],
-        ask: [],
-        job: [],
-      },
       myInfo: {},
       recordParts: [],
       recordProject: [],
@@ -35,6 +18,7 @@ export function createStore() {
       favWorksObj: { content: [] },
       targetProduct: {},
       targetWork: {},
+      orders: { content: [] },
       productList: [
         // {
         //   "id": 5,
