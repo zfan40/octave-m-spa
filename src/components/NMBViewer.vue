@@ -102,7 +102,7 @@ export default {
           this.newCover = imgUrl;
         },
         () => {
-          alert("mayemeigan");
+          // alert("mayemeigan");
         }
       );
     },

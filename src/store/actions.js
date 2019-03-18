@@ -117,7 +117,6 @@ export default {
   FETCH_ORDERS: ({ commit, state }, { page }) =>
     new Promise((resolve, reject) => {
       // 获取某id的音乐盒音乐内容
-      alert(321)
       fetchOrders(page).then((orders) => {
         // console.log('product list: ', orders.data.data.list);
         commit('PUSH_ORDERS', { orders: orders.data.data });

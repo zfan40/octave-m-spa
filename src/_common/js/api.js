@@ -153,13 +153,13 @@ export function fetchMusixiser(id) {
 }
 export function fetchWorksFromMusixiser(id, page) {
   return axios.get(
-    `//api.octave-love.com/api/v1/work/getListByUid/${id}?page=${page}&size=15`,
+    `//api.octave-love.com/api/v1/work/getListByUid/${id}?page=${page}&size=14`,
     reqConfig,
   );
 }
 export function fetchFavWorks(id, page) {
   return axios.get(
-    `//api.octave-love.com/api/v1/favorite/getWorkList/${id}?page=${page}&size=15`,
+    `//api.octave-love.com/api/v1/favorite/getWorkList/${id}?page=${page}&size=14`,
     reqConfig,
   );
 }
@@ -201,8 +201,7 @@ export function payOrder({ orderId }) {
   );
 }
 export function fetchOrders(page) {
-  alert('calling api')
-  return axios.get(`//api.octave-love.com/api/v1/shop/orders/myOrderList?page=${page}&size=15`, reqConfig,
+  return axios.get(`//api.octave-love.com/api/v1/shop/orders/myOrderList?page=${page}&size=14`, reqConfig,
   );
 }
 

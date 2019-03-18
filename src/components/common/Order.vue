@@ -37,7 +37,12 @@ export default {
   //   }
   // }
   props: {
-    info: Object
+    info: Object,
+    playingStatus: {
+      type: Boolean,
+      default: false
+    },
+    onPlayWork: Function
   },
   computed: {},
   data() {
@@ -78,10 +83,10 @@ export default {
           <p class="product-name">{{info.content.product.name}}</p>
           <p class="song-title">{{info.content.title}}</p>
         </div>
-        <div class="playBtn"></div>
+        <div :class="playingStatus?'stopBtn':'playBtn'" @touchend="onPlayWork"></div>
       </div>
       <div class="detail-other">
-        <p>{{info.shipTime}}</p>
+        <p>{{info.shipTime|getDateDiff}}</p>
         <p>¥{{info.price}}</p>
       </div>
     </div>
@@ -99,13 +104,13 @@ export default {
   width: getRem(342);
   height: getRem(348);
   margin-bottom: getRem(16);
-  margin-right: getRem(16);
   .preview-bg {
     position: relative;
     width: 100%;
     height: getRem(208);
     .cover {
       position: absolute;
+      left: 0;
       width: 100%;
       height: 100%;
     }
@@ -140,6 +145,7 @@ export default {
       align-items: center;
       .title {
         flex: 1;
+        text-align: left;
         .product-name {
           font-size: 14px;
         }
@@ -149,6 +155,13 @@ export default {
       }
       .playBtn {
         background: url("../../assets/play.svg") no-repeat center center;
+        background-size: cover;
+        color: yellow;
+        width: getRem(30);
+        height: getRem(30);
+      }
+      .stopBtn {
+        background: url("../../assets/stop.svg") no-repeat center center;
         background-size: cover;
         color: yellow;
         width: getRem(30);

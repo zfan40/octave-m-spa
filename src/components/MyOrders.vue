@@ -4,6 +4,7 @@ import * as Api from "../_common/js/api";
 import * as Cookies from "js-cookie";
 import order from "./common/Order";
 import infiniteScroll from "vue-infinite-scroll";
+import * as Magic from "../_common/js/magic";
 
 export default {
   name: "myorders",
@@ -135,6 +136,9 @@ export default {
   computed: {
     orders() {
       return this.$store.state.orders;
+    },
+    playingWorkId() {
+      return this.$store.state.playingWorkId;
     }
   },
 
@@ -162,15 +166,41 @@ export default {
             this.busy = false;
           }
         });
+    },
+    playWork(work) {
+      console.log("work going to play: ", work);
+      work.id = work.wid; //简单转换一下
+      if (work.id != this.playingWorkId) {
+        this.playing = true;
+        Magic.previewMidi(work.url, this.playing);
+
+        this.$store.commit("PLAY_WORK", { work });
+      } else {
+        //操作的同一个
+        if (this.playing) {
+          //正播着这个呢
+          this.playing = false;
+          Magic.previewMidi(work.url, this.playing);
+          this.$store.commit("PLAY_WORK", { work: { id: -1 } });
+        } else {
+          //这个已经被停了
+          this.playing = true;
+          Magic.previewMidi(work.url, 1);
+          this.$store.commit("PLAY_WORK", { work });
+        }
+      }
     }
   },
   created() {
     var docElem = document.documentElement;
     window.rem = docElem.getBoundingClientRect().width / 10;
     docElem.style.fontSize = window.rem + "px";
-    // this.busy = true; //important： disable auto loadmore at create, call loadmore manually after user auth
+    this.busy = true; //important： disable auto loadmore at create, call loadmore manually after user auth
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase());
-    if (!inWechat) return;
+    if (!inWechat) {
+      this.busy = false;
+      return;
+    }
     if (Util.getUrlParam("code") || Cookies.get("serviceToken")) {
       //TODO:ajax call to get info
       Api.getUserInfo(Util.getUrlParam("code"))
@@ -183,7 +213,7 @@ export default {
             );
           }
           // alert(`welcome${res.data.data.realname}`);
-          // this.loadMore();
+          this.loadMore();
           console.log("get user info success", res.data.data);
         })
         .catch(err => {
@@ -210,7 +240,13 @@ export default {
       infinite-scroll-distance="10"
       class="orderlist"
     >
-      <order v-for="(order,index) in orders.content" v-bind:info="order" v-bind:key="order.id"></order>
+      <order
+        v-for="(order,index) in orders.content"
+        v-bind:info="order"
+        v-bind:key="order.id"
+        :playingStatus="order.content.wid==playingWorkId"
+        :onPlayWork="()=>playWork(order.content)"
+      ></order>
     </div>
   </div>
 </template>
@@ -244,7 +280,7 @@ export default {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
-  padding: getRem(20);
+  padding: getRem(24);
   background-color: #404249;
   overflow: scroll;
 }
