@@ -2,21 +2,27 @@
 export function getDateDiff(dateTimeStamp) {
   let result = ''
   // some are"2019-03-12 22:54:36", some are 1552399367000
-  const newdateTimeStamp = typeof dateTimeStamp === 'string' ? + new Date(`${dateTimeStamp}`) : dateTimeStamp
+  // alert(+ new Date(dateTimeStamp))
+  const newdateTimeStamp = typeof dateTimeStamp === 'string' ? + new Date(dateTimeStamp.replace(' ', 'T')) : dateTimeStamp
   var minute = 1000 * 60;
   var hour = minute * 60;
   var day = hour * 24;
   var halfamonth = day * 15;
   var month = day * 30;
+  var year = month * 12;
   var now = new Date().getTime();
   var diffValue = now - newdateTimeStamp;
   if (diffValue < 0) { return; }
+  var yearC = diffValue / year;
   var monthC = diffValue / month;
   var weekC = diffValue / (7 * day);
   var dayC = diffValue / day;
   var hourC = diffValue / hour;
   var minC = diffValue / minute;
-  if (monthC >= 1) {
+  if (yearC >= 1) {
+    result = "" + parseInt(yearC) + "年前";
+  }
+  else if (monthC >= 1) {
     result = "" + parseInt(monthC) + "月前";
   }
   else if (weekC >= 1) {

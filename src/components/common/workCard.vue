@@ -6,6 +6,10 @@ export default {
     // editing: bool. //instead of as state, can be passed in prop, to keep only one current editing card in a work card list
     // onPlayClick: function. //
     // onPauseClick: function. //
+    isMine: {
+      type: Boolean,
+      default: false
+    },
     workInfo: { type: Object },
     playingStatus: {
       type: Boolean,
@@ -18,6 +22,7 @@ export default {
     onShareWork: Function,
     onHideWork: Function,
     onDeleteWork: Function,
+    onToggleLike: Function,
     onLongPress: {
       type: Function,
       default: function() {
@@ -55,7 +60,7 @@ export default {
         nation: "",
         isMaster: 0,
         brief: null,
-        followStatus: 0,
+        favStatus: 0,
         followNum: 0,
         fansNum: 0,
         songNum: 43,
@@ -84,6 +89,22 @@ export default {
     //   // can be in state data
     //   this.editing = false;
     // }
+    gotoWork(id) {
+      this.$router.push({
+        path: "/new-music-box-viewer",
+        query: {
+          id
+        }
+      });
+    },
+    gotoMusixiser(id) {
+      this.$router.push({
+        path: "/musixiser",
+        query: {
+          id
+        }
+      });
+    },
   }
 };
 </script>
@@ -93,15 +114,15 @@ export default {
     <transition name="fade">
       <div v-show="maskOn" class="mask" @touchstart.self="onTapMask">
         <div class="circle-btn pink" @click="onPurchaseWork">购买</div>
-        <div class="circle-btn purple" @click="onShareWork">分享</div>
-        <div class="circle-btn blue" @click="onHideWork">私密</div>
-        <div class="circle-btn gray" @click="onDeleteWork">删除</div>
+        <!-- <div class="circle-btn purple" @click="onShareWork">分享</div> -->
+        <!-- <div v-if="isMine" class="circle-btn blue" @click="onHideWork">私密</div> -->
+        <!-- <div v-if="isMine" class="circle-btn gray" @click="onDeleteWork">删除</div> -->
       </div>
     </transition>
     <div class="preview-bg">
       <img
         class="cover"
-        :src="workInfo.cover=='default'?workInfo.userVO.smallAvatar:'https://cdn4.buysellads.net/uu/1/3386/1525189887-61450.png'"
+        :src="workInfo.cover||'https://cdn4.buysellads.net/uu/1/3386/1525189887-61450.png'"
         alt
       >
       <img
@@ -120,15 +141,16 @@ export default {
       >
     </div>
     <div class="detail">
-      <p class="title">{{workInfo.title}}</p>
-      <div class="user">
+      <p class="title" @click="gotoWork(workInfo.id)">{{workInfo.title}}</p>
+      <div class="user" @click="gotoMusixiser(workInfo.userId)">
         <img class="avatar" :src="workInfo.userVO.smallAvatar" alt>
         <p class="song-title">{{workInfo.userVO.realname}}</p>
       </div>
       <div class="detail-other">
-        <div>{{workInfo.lastModifiedDate|getDateDiff}}</div>
-        <div class="likes">
-          <img src="../../assets/viewer/icon-like-gray1.png" alt>
+        <div>{{(workInfo.lastModifiedDate||workInfo.createdDate)|getDateDiff}}</div>
+        <div class="likes" @click="onToggleLike(workInfo)">
+          <img v-if="!workInfo.favStatus" src="../../assets/viewer/strokeheart.svg" alt>
+          <img v-if="workInfo.favStatus" src="../../assets/viewer/fillheart.svg" alt>
           {{workInfo.collectNum}}
         </div>
       </div>
@@ -145,6 +167,7 @@ export default {
   display: inline-block;
   position: relative;
   width: getRem(342);
+  height:getRem(372);
   margin-bottom: getRem(16);
   // margin-right: getRem(16);
   .mask {

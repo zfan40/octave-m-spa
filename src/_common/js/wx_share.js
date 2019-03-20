@@ -96,6 +96,42 @@ export const makeWxOrder = async ({ pid, wid, amount, address }, successCallback
   // 得到返回的支付参数
   // alert(JSON.stringify(res));
   const orderId = res.data.data;
+
+  payWxOrder({orderId},successCallback, failCalback)
+
+  // const payResult = await payOrder({ orderId })
+  // // alert(JSON.stringify(res));
+  // const params = payResult.data.data;
+  // // alert(JSON.stringify(params));
+  // console.log(params.nonceStr);
+  // console.log(params.signType);
+  // console.log(params.package);
+  // console.log(params.timeStamp);
+  // console.log(params.appId);
+  // console.log(params.paySign);
+  // console.log('sdsd');
+  // wx.chooseWXPay({
+  //   // ...params,
+  //   appId: params.appId,
+  //   timestamp: params.timeStamp,
+  //   nonceStr: params.nonceStr,
+  //   package: params.package,
+  //   signType: params.signType,
+  //   paySign: params.paySign,
+  //   success(res) {
+  //     console.log(res);
+  //     // resolve(res);
+  //     successCallback(res)
+  //   },
+  //   fail() {
+  //     failCalback();
+  //   },
+  //   cancel() {
+  //     failCalback();
+  //   }
+  // });
+}
+export const payWxOrder = async ({orderId}, successCallback, failCalback)=> {
   const payResult = await payOrder({ orderId })
   // alert(JSON.stringify(res));
   const params = payResult.data.data;
@@ -128,7 +164,6 @@ export const makeWxOrder = async ({ pid, wid, amount, address }, successCallback
     }
   });
 }
-
 // });
 
 export const createAddress = (cb1, cb2) => {

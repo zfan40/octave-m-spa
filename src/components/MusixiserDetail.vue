@@ -120,6 +120,21 @@ export default {
         }
       });
     },
+    toggleLike(workInfo) {
+      // console.log('current work info',workInfo.favStatus)
+      Api.toggleFavSong({
+        workId: workInfo.id,
+        status: +!workInfo.favStatus
+      }).then(()=>{
+        this.$store.commit("LOCAL_UPDATE_LIST",{
+          type: 'musixiserWorksObj',
+          item: {
+            id: workInfo.id,
+            favStatus: +!workInfo.favStatus
+          }
+        })
+      })
+    },
     shareWork() {
       console.log("share in");
     },
@@ -162,7 +177,7 @@ export default {
 
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase());
     if (!inWechat) {
-      this.userId = this.$store.state.route.query.id || 149;
+      this.userId = this.$store.state.route.query.id || 239;
       self.loadMusixiserById();
       return;
     }
@@ -252,6 +267,7 @@ export default {
         :onHideWork="hideWork"
         :onDeleteWork="deleteWork"
         :onTapMask="cancelOperate"
+        :onToggleLike="toggleLike"
       />
     </div>
     <!-- <div class="emptysection" v-show="!loading && musixiserWorksObj.content.length==0">

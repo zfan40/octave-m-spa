@@ -5,6 +5,7 @@ import * as Cookies from "js-cookie";
 import order from "./common/Order";
 import infiniteScroll from "vue-infinite-scroll";
 import * as Magic from "../_common/js/magic";
+import * as WxShare from "../_common/js/wx_share";
 
 export default {
   name: "myorders",
@@ -167,6 +168,19 @@ export default {
           }
         });
     },
+    payOrder(orderId) {
+        WxShare.payWxOrder({ orderId },
+          () => {
+            this.$toast("下单成功");
+            this.$router.push({
+              path: "/my-orders"
+            });
+          },
+          () => {
+            alert('pay fail')
+          }
+        );
+    },
     playWork(work) {
       console.log("work going to play: ", work);
       work.id = work.wid; //简单转换一下
@@ -246,6 +260,7 @@ export default {
         v-bind:key="order.id"
         :playingStatus="order.content.wid==playingWorkId"
         :onPlayWork="()=>playWork(order.content)"
+        :onPayOrder="()=>payOrder(order.id)"
       ></order>
     </div>
   </div>

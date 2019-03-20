@@ -42,7 +42,8 @@ export default {
       type: Boolean,
       default: false
     },
-    onPlayWork: Function
+    onPlayWork: Function,
+    onPayOrder: Function,
   },
   computed: {},
   data() {
@@ -69,12 +70,14 @@ export default {
         alt
       >
       <div class="shipment">
-        <img v-if="info.status===1" class="statusProcess" src="../../assets/123-1.png" alt>
-        <p v-if="info.status===1" class="statusText">制作中...</p>
-        <img v-if="info.status===2" class="statusProcess" src="../../assets/123-2.png" alt>
-        <p v-if="info.status===2" class="statusText">运输中...</p>
-        <img v-if="info.status===3" class="statusProcess" src="../../assets/123-3.png" alt>
+      <img v-if="info.status===1" class="statusProcess" src="../../assets/123-0.png" alt>
+        <p v-if="info.status===1" class="statusText" @click="onPayOrder">去支付</p>
+        <img v-if="info.status===2" class="statusProcess" src="../../assets/123-1.png" alt>
+        <p v-if="info.status===2" class="statusText">制作中...</p>
+        <img v-if="info.status===3" class="statusProcess" src="../../assets/123-2.png" alt>
         <p v-if="info.status===3" class="statusText">派送中...</p>
+        <img v-if="info.status===4" class="statusProcess" src="../../assets/123-3.png" alt>
+        <p v-if="info.status===4" class="statusText">已派送...</p>
       </div>
     </div>
     <div class="detail">
@@ -86,7 +89,7 @@ export default {
         <div :class="playingStatus?'stopBtn':'playBtn'" @touchend="onPlayWork"></div>
       </div>
       <div class="detail-other">
-        <p>{{info.shipTime|getDateDiff}}</p>
+        <p>{{info.confirmTime|getDateDiff}}</p>
         <p>¥{{info.price}}</p>
       </div>
     </div>

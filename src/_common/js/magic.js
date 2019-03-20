@@ -250,10 +250,19 @@ export function previewMidi(url, start) {
     mbox.triggerAttack('E6', 0, 0);
     oncePlayed = true;
   }
+  // try {
   MidiConvert.load(url, (midi) => {
+    console.log('dasdsad', midi)
     const mergeNotes = midi.tracks.reduce((a, b) => a.concat(b.notes), []);
+    // alert(mergeNotes)
     preview(mergeNotes, start)
   });
+  // } catch (error) {
+  //   console.log(3333)
+  //   alert(error)
+  // }
+
+
 }
 
 export function canMakePaper30(items) {

@@ -19,7 +19,7 @@ export default {
       loading: true,
       workIntroAppear: false,
       controlPanalAppear: false,
-      workUpdateAppear: true,
+      workUpdateAppear: false,
       playing: false,
       userId: 0,
       favStatus: false,

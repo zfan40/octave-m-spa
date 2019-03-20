@@ -113,6 +113,21 @@ export default {
     shareWork() {
       console.log("share in");
     },
+    toggleLike(workInfo) {
+      // console.log('current work info',workInfo.favStatus)
+      Api.toggleFavSong({
+        workId: workInfo.id,
+        status: +!workInfo.favStatus
+      }).then(()=>{
+        this.$store.commit("LOCAL_UPDATE_LIST",{
+          type: 'favWorksObj',
+          item: {
+            id: workInfo.id,
+            favStatus: +!workInfo.favStatus
+          }
+        })
+      })
+    },
     hideWork() {
       console.log("hide in");
     },
@@ -152,7 +167,7 @@ export default {
 
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase());
     if (!inWechat) {
-      this.userId = this.$store.state.route.query.id || 149;
+      this.userId = this.$store.state.route.query.id || 239;
       self.loadFavById();
       return;
     }
@@ -242,6 +257,7 @@ export default {
         :onHideWork="hideWork"
         :onDeleteWork="deleteWork"
         :onTapMask="cancelOperate"
+        :onToggleLike="toggleLike"
       />
     </div>
     <!-- <div class="emptysection" v-show="!loading && musixiserWorksObj.content.length==0">

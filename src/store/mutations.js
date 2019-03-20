@@ -92,5 +92,14 @@ export default {
   },
   PLAY_WORK: (state, { work }) => {
     state.playingWorkId = work.id
+  },
+  LOCAL_UPDATE_LIST: (state,{type,item}) => {
+    console.log(item)
+    state[type].content.forEach((work)=>{
+      if (work.id==item.id) {
+        work.favStatus = item.favStatus
+        work.collectNum = work.favStatus?work.collectNum+1:work.collectNum-1
+      }
+    })
   }
 };
