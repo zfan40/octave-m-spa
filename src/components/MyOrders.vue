@@ -169,17 +169,17 @@ export default {
         });
     },
     payOrder(orderId) {
-        WxShare.payWxOrder({ orderId },
-          () => {
-            this.$toast("下单成功");
-            this.$router.push({
-              path: "/my-orders"
-            });
-          },
-          () => {
-            alert('pay fail')
-          }
-        );
+      WxShare.payWxOrder(
+        { orderId },
+        () => {
+          this.$toast("下单成功");
+          this.$store.commit("LOCAL_UPDATE_ORDER_STATUS", {
+            orderId,
+            status: 2
+          });
+        },
+        () => {}
+      );
     },
     playWork(work) {
       console.log("work going to play: ", work);
@@ -260,7 +260,7 @@ export default {
         v-bind:key="order.id"
         :playingStatus="order.content.wid==playingWorkId"
         :onPlayWork="()=>playWork(order.content)"
-        :onPayOrder="()=>payOrder(order.id)"
+        :onPayOrder="()=>payOrder(order.orderId)"
       ></order>
     </div>
   </div>
@@ -295,6 +295,7 @@ export default {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
+  align-content: flex-start;
   padding: getRem(24);
   background-color: #404249;
   overflow: scroll;

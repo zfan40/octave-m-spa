@@ -54,7 +54,7 @@ export default {
       } else {
         console.log(this.orderToCreate);
         WxShare.makeWxOrder(
-          { ...this.orderToCreate, amount: this.amount },
+          { ...this.orderToCreate, amount: this.amount, message: this.giftMsg },
           () => {
             this.$toast("下单成功");
             this.$router.push({
@@ -62,10 +62,16 @@ export default {
             });
           },
           () => {
-            console.log("pay fail");
+            this.$toast("未下单");
+            this.$router.push({
+              path: "/my-orders"
+            });
           }
         );
       }
+    },
+    positionWindow() {
+      window.scroll(0, 0);
     },
     editAddress() {
       //都是同步操作
@@ -118,7 +124,7 @@ export default {
       </div>
       <div class="amount">
         <span @click="reduceAmount">-</span>
-        <input v-model.number="amount" type="number">
+        <input v-model.number="amount" @blur="positionWindow" type="number">
         <span @click="addAmount">+</span>
       </div>
     </div>
@@ -135,7 +141,12 @@ export default {
       </div>
     </div>
     <div class="msg">
-      <input v-model="giftMsg" type="text" placeholder="默认祝福语：「在乐音相伴的梦里，世界一片白银」">
+      <input
+        v-model="giftMsg"
+        @blur="positionWindow"
+        type="text"
+        placeholder="默认祝福语：「在乐音相伴的梦里，世界一片白银」"
+      >
     </div>
     <div class="readme">购买说明
       <ul>

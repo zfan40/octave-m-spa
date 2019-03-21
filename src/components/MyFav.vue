@@ -118,15 +118,15 @@ export default {
       Api.toggleFavSong({
         workId: workInfo.id,
         status: +!workInfo.favStatus
-      }).then(()=>{
-        this.$store.commit("LOCAL_UPDATE_LIST",{
-          type: 'favWorksObj',
+      }).then(() => {
+        this.$store.commit("LOCAL_UPDATE_LIST_FAV", {
+          type: "favWorksObj",
           item: {
             id: workInfo.id,
             favStatus: +!workInfo.favStatus
           }
-        })
-      })
+        });
+      });
     },
     hideWork() {
       console.log("hide in");
@@ -285,6 +285,7 @@ export default {
   height: 100%;
   display: flex;
   justify-content: space-between;
+  align-content: flex-start;
   flex-wrap: wrap;
   padding: getRem(20);
   background-color: #404249;

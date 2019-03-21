@@ -93,12 +93,19 @@ export default {
   PLAY_WORK: (state, { work }) => {
     state.playingWorkId = work.id
   },
-  LOCAL_UPDATE_LIST: (state,{type,item}) => {
+  LOCAL_UPDATE_LIST_FAV: (state, { type, item }) => {
     console.log(item)
-    state[type].content.forEach((work)=>{
-      if (work.id==item.id) {
+    state[type].content.forEach((work) => {
+      if (work.id == item.id) {
         work.favStatus = item.favStatus
-        work.collectNum = work.favStatus?work.collectNum+1:work.collectNum-1
+        work.collectNum = work.favStatus ? work.collectNum + 1 : work.collectNum - 1
+      }
+    })
+  },
+  LOCAL_UPDATE_ORDER_STATUS: (state, { orderId, status }) => {
+    state.orders.content.forEach((order) => {
+      if (order.orderId == orderId) {
+        order.status = status
       }
     })
   }
