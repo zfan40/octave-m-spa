@@ -81,8 +81,9 @@ export default {
       timelineConfig: {
         value: 0,
         width: 8,
-        // height: `${window.screen.height*0.9-20}px`,
-        height: "90%",
+        // height: `${window.screen.height * 0.9 - 20}px`,
+        height: `${window.innerHeight * 0.9 - 20}px`,
+        // height: "90%",
         padding: "0",
         dotSize: 20,
         eventType: "auto",
@@ -361,6 +362,9 @@ export default {
     },
     onMiniKeyboardStart(e) {
       console.log(e);
+    },
+    removeNoteInRecordPart(index) {
+      this.recordPart.splice(index, 1);
     },
     keng(e) {
       // console.log(e)
@@ -778,6 +782,7 @@ export default {
                 ry="2"
                 :fill="mapNoteTimeToColor(item.time)"
                 filter="url(#glowing)"
+                @click="removeNoteInRecordPart(index)"
               ></rect>
               <rect
                 v-for="(item,index) in recordParts[PARTNUM-n]"
