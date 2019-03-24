@@ -173,7 +173,6 @@ export default {
       width: 100%;
       position: absolute;
       bottom: 0;
-      z-index: 1000;
       font-size: 14px;
       background: rgb(44, 45, 48);
       color: rgb(82, 92, 86);
