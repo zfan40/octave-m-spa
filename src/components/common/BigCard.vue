@@ -75,7 +75,8 @@ export default {
         :src="workInfo.cover||'https://cdn4.buysellads.net/uu/1/3386/1525189887-61450.png'"
         alt
       >
-      <p>{{workInfo.content}}</p>
+      <div class="dark-mask"></div>
+      <p class="work-content">{{workInfo.content}}</p>
       <img
         class="playBtn"
         @touchend="onPlayWork"
@@ -92,17 +93,21 @@ export default {
       >
     </div>
     <div class="detail">
-      <p class="title" @click="gotoWork(workInfo.id)">{{workInfo.title}}</p>
-      <div class="user" @click="gotoMusixiser(workInfo.userId)">
-        <img class="avatar" :src="workInfo.userVO.smallAvatar" alt>
-        <p class="song-title">{{workInfo.userVO.realname}}</p>
+      <div class="basic-info" @click="gotoMusixiser(workInfo.userId)">
+        <p class="title" @click="gotoWork(workInfo.id)">{{workInfo.title}}</p>
+        <div style="display:flex;align-items:center;">
+          <img class="avatar" :src="workInfo.userVO.smallAvatar" alt>
+          <p class="song-title">{{workInfo.userVO.realname}}</p>
+          <p
+            class="update-info"
+          >&nbsp;· 更新于{{(workInfo.lastModifiedDate||workInfo.createdDate)|getDateDiff}}</p>
+        </div>
       </div>
-      <div class="detail-other">
-        <div>更新于{{(workInfo.lastModifiedDate||workInfo.createdDate)|getDateDiff}}</div>
+      <div class="like-info">
         <div class="likes" @click="onToggleLike(workInfo)">
           <img v-if="!workInfo.favStatus" src="../../assets/viewer/strokeheart.svg" alt>
           <img v-if="workInfo.favStatus" src="../../assets/viewer/fillheart.svg" alt>
-          {{workInfo.collectNum}}
+          <p>{{workInfo.collectNum}}</p>
         </div>
       </div>
     </div>
@@ -115,12 +120,12 @@ export default {
 @import "../../_common/style/_mixins.scss";
 @import "../../_common/style/_reboot.scss";
 .card {
-  width: getRem(325 * 2);
-  height: getRem(530 * 2);
+  display: inline-block;
   position: relative;
-  box-shadow: 0 2px 2px rgb(20, 45, 44);
-  background: rgb(44, 45, 48);
-  border-radius: getRem(50);
+  width: getRem(670);
+  height: getRem(920);
+  margin-bottom: getRem(16);
+  // margin-right: getRem(16);
   .mask {
     z-index: 2;
     top: 0;
@@ -159,7 +164,19 @@ export default {
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: getRem(208);
+    height: getRem(758);
+    .work-content {
+      position: absolute;
+      left: getRem(40);
+      top: getRem(40);
+      color: white;
+    }
+    .dark-mask {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.1);
+    }
     .playBtn {
       position: relative;
       width: getRem(30);
@@ -174,6 +191,7 @@ export default {
       right: -10px;
     }
     .cover {
+      background-color: white;
       position: absolute;
       left: 0;
       top: 0;
@@ -183,6 +201,8 @@ export default {
   }
   .detail {
     position: relative;
+    display: flex;
+    align-items: center;
     width: 100%;
     background-color: $dark-gray;
     color: $gray-text;
@@ -192,9 +212,10 @@ export default {
       font-size: getRem(28);
       color: #8c8c92;
     }
-    .user {
-      display: flex;
-      align-items: center;
+    .basic-info {
+      flex: 1;
+      // display: flex;
+      // align-items: center;
       margin-bottom: getRem(16);
       .avatar {
         width: getRem(46);
@@ -205,18 +226,24 @@ export default {
         font-size: 12px;
         color: #6d6e75;
       }
+      .update-info {
+        font-size: 12px;
+        color: #6d6e75;
+        opacity: 0.5;
+      }
     }
-    .detail-other {
+    .like-info {
       display: flex;
       justify-content: space-between;
       // padding: getRem(10) getRem(16);
       font-size: 10px;
       .likes {
-        display: flex;
+        // display: flex;
+        text-align: center;
         img {
           width: getRem(26);
           height: getRem(22);
-          margin-right: getRem(8);
+          // margin-right: getRem(8);
         }
       }
     }

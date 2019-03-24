@@ -10,6 +10,7 @@ export default {
   name: "Square",
   data() {
     return {
+      cards: [], //to be commented
       userId: 0,
       config: {
         allowedDirections: [
@@ -59,6 +60,18 @@ export default {
             this.busy = false;
           }
         });
+    },
+    onThrowout({ target, throwDirection }) {
+      console.log(`Threw out ${target.textContent}!`);
+    },
+    add() {
+      this.cards.push(`${this.cards.length + 1}`);
+    },
+    remove() {
+      this.swing();
+      setTimeout(() => {
+        this.cards.pop();
+      }, 100);
     }
   },
   beforeRouteLeave(to, from, next) {
