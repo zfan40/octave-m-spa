@@ -358,6 +358,10 @@ export default {
       clearInterval(aInterval);
       this.sector = 1;
     },
+    // scrollToEnd() {
+    //         clearInterval(aInterval);
+    //   this.sector = 1;
+    // }
     updateLoop() {
       this.fullloop = !this.fullloop;
       this.scheduleCursor();
@@ -597,18 +601,19 @@ export default {
 
     <div class="control-panal">
       <div>
-        <div @touchstart="scrollToBegin" id="scrollup" class="rotate"></div>
+        <div @touchstart="scrollToBegin" id="scrolltop" class="rotate"></div>
         <div @touchstart="scrollup" id="scrollup" class="rotate"></div>
-        <div @touchstart="scrolldown" id="scrolldown"></div>
-        <div @touchstart="clearNotes" id="scrolldown"></div>
+        <div @touchstart="scrolldown" id="scrolldown" class="rotate"></div>
+        <!-- <div @touchstart="scrollToEnd" id="scrollbottom" class="rotate"></div> -->
+        <div @touchstart="clearNotes" id="clear" class="rotate"></div>
       </div>
-      <div
+      <!-- <div
         style="position:relative;display:flex;align-items:center;justify-content:center;transform:rotate(90deg);"
       >
         <pie-progress :progress="100*currentTime/MB_DUR"/>
         <p style="position:absolute;font-size:12px;">{{currentTime|intTime}}</p>
-      </div>
-      <div>
+      </div>-->
+      <div v-show="playing">
         <div @touchstart="minusTempo" id="minustempo" class="rotate"></div>
         <div id="tempo-indicator">
           <div id="tempo-progress" :style="tempoLength"></div>
@@ -616,10 +621,16 @@ export default {
         </div>
         <div @touchstart="addTempo" id="addtempo" class="rotate"></div>
       </div>
-      <div style="position:relative;display:flex;align-items:center;justify-content:center;">
+      <div
+        v-show="!playing"
+        style="position:relative;display:flex;align-items:center;justify-content:center;"
+      >
         <div @touchstart="updateLoop" :id="fullloop?'fullloop':'partloop'" class="rotate"></div>
       </div>
-      <div style="position:relative;display:flex;align-items:center;justify-content:center;">
+      <div
+        v-show="!playing"
+        style="position:relative;display:flex;align-items:center;justify-content:center;"
+      >
         <div @touchstart="alertAppear2=true" :id="keyboardMode" class="rotate"></div>
       </div>
       <div class="btnContainer" @touchstart.stop.prevent="btnStart" @touchend.stop.prevent="btnEnd">
@@ -674,48 +685,72 @@ export default {
   justify-content: space-around;
   width: 50px;
   height: 100%;
+  padding: 30px 0;
   top: 0;
   left: 0;
   background-color: black;
   color: white;
   z-index: 100;
+  #clear {
+    width: 34px;
+    height: 34px;
+    background: url("../assets/clear.png") center center no-repeat;
+    background-size: cover;
+    margin-bottom: 20px;
+  }
+  #scrolltop {
+    width: 34px;
+    height: 34px;
+    background: url("../assets/rewind1.png") center center no-repeat;
+    background-size: cover;
+    margin-bottom: 20px;
+  }
+  #scrollbottom {
+    width: 34px;
+    height: 34px;
+    background: url("../assets/rewind2.png") center center no-repeat;
+    background-size: cover;
+    margin-bottom: 20px;
+  }
   #scrollup {
     width: 34px;
     height: 34px;
-    background: url("../assets/left.png") center center;
-    background-size: contain;
+    background: url("../assets/left.png") center center no-repeat;
+    background-size: cover;
     margin-bottom: 20px;
   }
   #scrolldown {
     width: 34px;
     height: 34px;
-    background: url("../assets/left.png") center center;
-    background-size: contain;
+    background: url("../assets/left.png") center center no-repeat;
+    background-size: cover;
     transform: rotate(270deg);
+    margin-bottom: 20px;
   }
   #partloop {
     width: 34px;
     height: 34px;
-    background: url("../assets/viewer/partloop.png") center center;
-    background-size: contain;
+    background: url("../assets/viewer/partloop.png") center center no-repeat;
+    background-size: cover;
   }
   #fullloop {
     width: 34px;
     height: 34px;
-    background: url("../assets/viewer/fullloop.png") center center;
-    background-size: contain;
+    background: url("../assets/viewer/fullloop.png") center center no-repeat;
+    background-size: cover;
   }
   #fullkey {
     width: 34px;
     height: 34px;
-    background: url("../assets/viewer/fullkeyboard.png") center center;
-    background-size: contain;
+    background: url("../assets/viewer/fullkeyboard.png") center center no-repeat;
+    background-size: cover;
   }
   #whitekey {
     width: 34px;
     height: 34px;
-    background: url("../assets/viewer/whitekeyboard.png") center center;
-    background-size: contain;
+    background: url("../assets/viewer/whitekeyboard.png") center center
+      no-repeat;
+    background-size: cover;
   }
   #tempo-indicator {
     position: relative;
@@ -724,6 +759,7 @@ export default {
     align-items: center;
     width: 18px;
     height: 154px;
+    // height: 60px;
     border-radius: 9px;
     border: 1px solid #25252b;
     background-color: #25252b;
