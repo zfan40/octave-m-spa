@@ -43,7 +43,7 @@ export default {
       default: false
     },
     onPlayWork: Function,
-    onPayOrder: Function,
+    onPayOrder: Function
   },
   computed: {},
   data() {
@@ -64,20 +64,16 @@ export default {
 <template>
   <div class="order-container">
     <div class="preview-bg">
-      <img
-        class="cover"
-        :src="info.content.product.previewImg||'https://cdn4.buysellads.net/uu/1/3386/1525189887-61450.png'"
-        alt
-      >
+      <img class="cover" :src="info.content.product.previewPic" alt>
       <div class="shipment">
-      <img v-if="info.status===1" class="statusProcess" src="../../assets/123-0.png" alt>
+        <img v-if="info.status===1" class="statusProcess" src="../../assets/123-0.png" alt>
         <p v-if="info.status===1" class="statusText" @click="onPayOrder">去支付</p>
         <img v-if="info.status===2" class="statusProcess" src="../../assets/123-1.png" alt>
-        <p v-if="info.status===2" class="statusText">制作中...</p>
+        <p v-if="info.status===2" class="statusText">制作中👷</p>
         <img v-if="info.status===3" class="statusProcess" src="../../assets/123-2.png" alt>
-        <p v-if="info.status===3" class="statusText">派送中...</p>
+        <p v-if="info.status===3" class="statusText">派送中🏍️</p>
         <img v-if="info.status===4" class="statusProcess" src="../../assets/123-3.png" alt>
-        <p v-if="info.status===4" class="statusText">已派送...</p>
+        <p v-if="info.status===4" class="statusText">已收件🎁</p>
       </div>
     </div>
     <div class="detail">
@@ -89,7 +85,7 @@ export default {
         <div :class="playingStatus?'stopBtn':'playBtn'" @touchend="onPlayWork"></div>
       </div>
       <div class="detail-other">
-        <p>{{info.confirmTime|getDateDiff}}</p>
+        <p>{{info.orderTime|getDateDiff}}下单</p>
         <p>¥{{info.price}}</p>
       </div>
     </div>

@@ -1,6 +1,5 @@
 <script>
 import { swiper, swiperSlide } from "vue-awesome-swiper";
-import CardSwiper from "./common/cardSwiperControlBar";
 export default {
   // https://vuejs.org/v2/guide/components.html#Props
   props: {

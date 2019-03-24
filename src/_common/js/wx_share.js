@@ -74,7 +74,7 @@ export const prepareShareContent = ({ title, desc, fullPath, imgUrl }) => {
 };
 
 // order pay
-export const makeWxOrder = async ({ pid, wid, amount, address }, successCallback, failCalback) => {
+export const makeWxOrder = async ({ pid, wid, amount, address, message }, successCallback, failCalback) => {
   // new Promise((resolve, reject) => {
   //address is
   //     {
@@ -92,12 +92,12 @@ export const makeWxOrder = async ({ pid, wid, amount, address }, successCallback
   console.log('===========')
   console.log(addressObj)
   // return
-  const res = await createOrder({ pid, wid, amount, addressId: addressObj.data.data })
+  const res = await createOrder({ pid, wid, amount, addressId: addressObj.data.data, message })
   // 得到返回的支付参数
   // alert(JSON.stringify(res));
   const orderId = res.data.data;
 
-  payWxOrder({orderId},successCallback, failCalback)
+  payWxOrder({ orderId }, successCallback, failCalback)
 
   // const payResult = await payOrder({ orderId })
   // // alert(JSON.stringify(res));
@@ -131,7 +131,7 @@ export const makeWxOrder = async ({ pid, wid, amount, address }, successCallback
   //   }
   // });
 }
-export const payWxOrder = async ({orderId}, successCallback, failCalback)=> {
+export const payWxOrder = async ({ orderId }, successCallback, failCalback) => {
   const payResult = await payOrder({ orderId })
   // alert(JSON.stringify(res));
   const params = payResult.data.data;

@@ -185,10 +185,10 @@ export function getRecommendations() {
   return axios.post('//api.octave-love.com/api/v1/home', '', reqConfig);
 }
 
-export function createOrder({ pid, wid, amount, addressId }) {
+export function createOrder({ pid, wid, amount, addressId, message }) {
   return axios.post(
     '//api.octave-love.com/api/v1/shop/orders/create',
-    JSON.stringify({ pid, wid, amount, addressId }),
+    JSON.stringify({ pid, wid, amount, addressId, message }),
     reqConfig,
   );
 }
