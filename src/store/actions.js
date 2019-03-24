@@ -8,7 +8,8 @@ import {
   fetchWorksFromMusixiser,
   fetchFavWorks,
   fetchProductList,
-  fetchOrders
+  fetchOrders,
+  fetchStacks
 } from '../_common/js/api';
 /*
   getUserInfo
@@ -123,6 +124,13 @@ export default {
         resolve();
       });
     }),
+  FETCH_STACKS: ({ commit, state }, { page, size }) =>
+    new Promise((resolve, reject) => {
+      fetchStacks({ page, size }).then((stacks) => {
+        commit('PUSH_STACKS', { stacks: stacks.data.list });
+        resolve();
+      })
+    })
   //   // ensure data for rendering given list type
   //   FETCH_LIST_DATA: ({ commit, dispatch, state }, { type }) => {
   //     commit('SET_ACTIVE_TYPE', { type });

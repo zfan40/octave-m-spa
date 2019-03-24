@@ -1,16 +1,69 @@
 <script>
+import * as Swing from "swing";
+const { Direction } = Swing;
+/**
+ *页面信息配置
+ * UPDATE: 更新阀值
+ * INITPAGE: 分页首页
+ * SIZE: 分页一页的数量
+ */
+const pageConfig = {
+  UPDATE: 5,
+  INITPAGE: 1,
+  SIZE: 10
+};
+/**
+ * mock数据
+ */
+const testData = (() => {
+  const item = {
+    id: 166,
+    title: "尚未起名",
+    cover: "default",
+    content: "default",
+    url: "//audio.musixise.com/Vwcz7dNc_output.mid",
+    favStatus: null,
+    createdDate: "2019-03-16 11:33:54",
+    userId: 249,
+    collectNum: 0,
+    lastModifiedDate: "2019-03-16 11:33:54",
+    fileHash: "9f2ef529a3e4a1e922f97bf9caac6ca8",
+    userVO: null
+  };
+  const result = [];
+  for (let i = 0; i < pageConfig.SIZE; ++i) {
+    result.push(item);
+  }
+  return result;
+})();
+/**
+ * swing 库初始化配置
+ */
+const config = {
+  // 减少左右滑动的距离，体验更好
+  throwOutConfidence: (xOffset, yOffset, element) => {
+    const xConfidence = Math.min(
+      (Math.abs(xOffset) / element.offsetWidth) * 2,
+      1
+    );
+    const yConfidence = Math.min(Math.abs(yOffset) / element.offsetHeight, 1);
+
+    return Math.max(xConfidence, yConfidence);
+  },
+  allowedDirections: [Direction.LEFT, Direction.RIGHT]
+};
 /**
  * 首页 component
  * 业务逻辑， 左滑动下一个， 右滑动点赞下一个， 双击点赞，点击中间播放， 点击下面按钮 （编曲页面 | 购买页面）
  *
  */
-import * as Swing from "swing";
 export default {
   name: "Square",
   data() {
+    const { INITPAGE, SIZE } = pageConfig;
     return {
-      page: 1, // 请求页面为第一页
-      size: 10, // 请求一次10条数据
+      page: INITPAGE, // 请求页面为第一页
+      size: SIZE, // 请求一次20条数据
       // 请求的数据
       stack: []
     };
@@ -20,179 +73,27 @@ export default {
   },
   computed: {
     isShouldUpdate: function() {
-      return stack.length <= 2;
+      const { UPDATE } = pageConfig;
+      // 剩余UPDATE条就要请求下一个
+      return this.stack.length <= UPDATE;
     }
   },
   methods: {
-    requestData() {
-      const testData = [
-        {
-          id: 166,
-          title: "尚未起名",
-          cover: "default",
-          content: "default",
-          url: "//audio.musixise.com/Vwcz7dNc_output.mid",
-          favStatus: null,
-          createdDate: "2019-03-16 11:33:54",
-          userId: 249,
-          collectNum: 0,
-          lastModifiedDate: "2019-03-16 11:33:54",
-          fileHash: "9f2ef529a3e4a1e922f97bf9caac6ca8",
-          userVO: null
-        },
-        {
-          id: 165,
-          title: "乱名",
-          cover: "",
-          content: "default",
-          url: "//audio.musixise.com/XBrm8UpX_output.mid",
-          favStatus: null,
-          createdDate: "2019-03-12 22:54:36",
-          userId: 239,
-          collectNum: 1,
-          lastModifiedDate: "2019-03-12 23:08:09",
-          fileHash: "3948d78c8c1c6e196c055b0aae320242",
-          userVO: null
-        },
-        {
-          id: 164,
-          title: "尚未起名",
-          cover: "",
-          content: "default",
-          url: "//audio.musixise.com/GcPxfIwh_output.mid",
-          favStatus: null,
-          createdDate: "2019-03-12 22:53:48",
-          userId: 239,
-          collectNum: 0,
-          lastModifiedDate: "2019-03-12 22:53:48",
-          fileHash: "444625eabf61700c91caedf9f7c9b2ed",
-          userVO: null
-        },
-        {
-          id: 163,
-          title: "尚未起名",
-          cover: "",
-          content: "default",
-          url: "//audio.musixise.com/bGUub2c1_output.mid",
-          favStatus: null,
-          createdDate: "2019-03-12 22:51:58",
-          userId: 239,
-          collectNum: 0,
-          lastModifiedDate: "2019-03-12 22:51:58",
-          fileHash: "3f342bc3d0f2660be2594c17626fd71b",
-          userVO: null
-        },
-        {
-          id: 162,
-          title: "roll欢乐颂",
-          cover: "",
-          content: "速度有点别扭",
-          url: "//audio.musixise.com/daVKJiQL_output.mid",
-          favStatus: null,
-          createdDate: "2019-03-12 22:29:27",
-          userId: 239,
-          collectNum: 0,
-          lastModifiedDate: "2019-03-12 22:30:45",
-          fileHash: "bdc68a9dc63a44dbf1ce74169305f146",
-          userVO: null
-        },
-        {
-          id: 161,
-          title: "阿拉蕾",
-          cover: "",
-          content: "hahahhaa",
-          url: "//audio.musixise.com/RhqrR3T0_output.mid",
-          favStatus: null,
-          createdDate: "2019-03-12 22:15:44",
-          userId: 239,
-          collectNum: 0,
-          lastModifiedDate: "2019-03-12 22:23:15",
-          fileHash: "d863f6469fcdd0331c672d9383ae949e",
-          userVO: null
-        },
-        {
-          id: 160,
-          title: "bupt-pre",
-          cover: "default",
-          content: "default",
-          url: "//img.musixise.com/be58Jtk6_bupt-prelude.mid",
-          favStatus: null,
-          createdDate: "2019-03-19 21:42:24",
-          userId: 242,
-          collectNum: 0,
-          lastModifiedDate: "2019-03-19 21:42:24",
-          fileHash: "2780626fcc15fc5fa9258ba76976d043",
-          userVO: null
-        },
-        {
-          id: 159,
-          title: "尚未起名",
-          cover: "default",
-          content: "default",
-          url: "//audio.musixise.com/lXYNXDtK_output.mid",
-          favStatus: null,
-          createdDate: "2019-03-08 21:56:37",
-          userId: 242,
-          collectNum: 0,
-          lastModifiedDate: "2019-03-08 21:56:37",
-          fileHash: "ad9ad5aa6425d6023ea8283e1afd66e9",
-          userVO: null
-        },
-        {
-          id: 158,
-          title: "尚未起名",
-          cover: "default",
-          content: "default",
-          url: "//img.musixise.com/32VVWR4u_xuemaojiao.mid",
-          favStatus: null,
-          createdDate: "2019-03-13 14:20:20",
-          userId: 242,
-          collectNum: 0,
-          lastModifiedDate: "2019-03-13 14:20:20",
-          fileHash: "ec9f72b9270e55ca8843830a3cd7ed90",
-          userVO: null
-        },
-        {
-          id: 157,
-          title: "尚未起名",
-          cover: "default",
-          content: "default",
-          url: "//audio.musixise.com/ZadefSIX_output.mid",
-          favStatus: null,
-          createdDate: "2019-03-08 21:56:33",
-          userId: 242,
-          collectNum: 0,
-          lastModifiedDate: "2019-03-08 21:56:34",
-          fileHash: "c7432cd81fba2d229d334246fd622411",
-          userVO: null
-        }
-      ];
-      console.log("开始请求呀");
+    requestData(page, size) {
+      console.log("开始请求呀", page, size);
       // 请求首页数据
       // this.$store.dispatch();
+      this.$store
+        .dispatch("FETCH_STACKS", {
+          page,
+          size
+        })
+        .then(() => {});
       setTimeout(() => {
-        this.stack = testData;
+        this.stack = [...testData, ...this.stack];
       }, 1000);
     },
     createSwingStack() {
-      const { Direction } = Swing;
-      const config = {
-        // 减少左右滑动的距离，体验更好
-        throwOutConfidence: (xOffset, yOffset, element) => {
-          const xConfidence = Math.min(
-            (Math.abs(xOffset) / element.offsetWidth) * 2,
-            1
-          );
-          const yConfidence = Math.min(
-            Math.abs(yOffset) / element.offsetHeight,
-            1
-          );
-
-          return Math.max(xConfidence, yConfidence);
-        },
-        allowedDirections: [Direction.LEFT, Direction.RIGHT]
-      };
-      this.$nextTick()
       const cards = this.$refs.card.children;
       const stack = Swing.Stack(config);
 
@@ -207,8 +108,15 @@ export default {
           "Throw direction: " +
             (event.throwDirection == Direction.LEFT ? "left" : "right")
         );
+        console.log("毁灭", event);
         // 只要是拽出去了， 就是不在显示了
+        // 在throwoutend 的 事件会多次触发， 在这里动画会获取不到dom
+        // 待解决
         this.stack.pop();
+        if (this.isShouldUpdate) {
+          // 如果数量小于，进行新一轮的请求
+          this.requestData(++this.page, this.size);
+        }
       });
       stack.on("throwin", event => {
         console.log("throwin");
@@ -218,13 +126,10 @@ export default {
   watch: {
     stack: async function(value) {
       // '监测到数据变动，重新构建swing的stack'
-      await this.$nextTick()
+      await this.$nextTick();
       // DOM已经更新完毕， 可以调用swing的 stack
       this.createSwingStack();
     }
-  },
-  mounted() {
-    this.createSwingStack();
   }
 };
 </script>
@@ -241,19 +146,68 @@ export default {
   position: absolute;
   background: rgb(20, 45, 44);
   li {
-    width: getRem(335 * 2);
-    height: getRem(460 * 2);
+    width: getRem(325 * 2);
+    height: getRem(530 * 2);
     position: absolute;
     margin: auto;
     left: 0;
     right: 0;
     top: 0;
     bottom: 0;
-    background: #0f0;
+    box-shadow: 0 2px 2px rgb(20, 45, 44);
+    background: rgb(44, 45, 48);
     border-radius: getRem(50);
+    margin-top: getRem(50);
+    // display: flex;
+    // flex-direction: column;
+    // justify-content: space-between;
     img {
       width: 100%;
-      border-radius: getRem(50) getRem(50) 0 0;
+      height: 100%;
+      border-radius: getRem(50);
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+    .text-content {
+      width: 100%;
+      position: absolute;
+      bottom: 0;
+      z-index: 1000;
+      font-size: 14px;
+      background: rgb(44, 45, 48);
+      color: rgb(82, 92, 86);
+      height: getRem(300);
+      border-radius: 0 0 getRem(50) getRem(50);
+    }
+  }
+}
+
+.button_group {
+  width: 100%;
+  height: getRem(100);
+  position: fixed;
+  bottom: getRem(30);
+  margin: auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  button {
+    outline: 0;
+    border: 0;
+    display: block;
+    width: getRem(325);
+    color: #fff;
+    padding: getRem(20);
+    font-size: 16px;
+    &:first-of-type {
+      border-radius: getRem(50) 0 0 getRem(50);
+      background: rgb(113, 113, 230);
+    }
+    &:last-of-type {
+      border-radius: 0 getRem(50) getRem(50) 0;
+      background: rgb(69, 100, 215);
     }
   }
 }
@@ -261,12 +215,16 @@ export default {
 <template>
   <div>
     <ul class="stack-container" ref="card">
-      <li v-for="i in stack" :key="i.fileHash">
-        <img
-          :src="i.cover === 'default'  || i.cover ? i.cover : '//img.musixise.com/md1x4ZNE_2.jpeg'"
-          alt
-        >
+      <li v-for="(i, index) in stack" :key="i.fileHash + index">
+        <img :src="'http://pic1.win4000.com/mobile/2019-03-18/5c8f0b339c094.jpg'" alt>
+        <div class="text-content">
+          <span>{{i.title}}</span>
+        </div>
       </li>
     </ul>
+    <div class="button_group">
+      <button>我来试试</button>
+      <button>制作八音盒</button>
+    </div>
   </div>
 </template>

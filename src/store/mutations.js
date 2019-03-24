@@ -108,5 +108,8 @@ export default {
         order.status = status
       }
     })
+  },
+  PUSH_STACKS: (state, { stacks }) => {
+    console.log('来自mutation', stacks)
   }
 };

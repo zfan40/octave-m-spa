@@ -224,3 +224,10 @@ export function fetchProductList() {
     reqConfig
   )
 }
+
+export function fetchStacks({ page, size }) {
+  return axios.get(
+    `//api.octave-love.com//api/v1/admin/works?page=${page}&size=${size}`,
+    reqConfig
+  )
+}
