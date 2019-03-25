@@ -82,6 +82,7 @@ export default {
       rectArray: Array(18).fill([]),
       alertAppear: false,
       alertAppear2: false,
+      menuAppear: true,
       showExtendBtns: false,
       playing: false,
       fullloop: true,
@@ -375,7 +376,12 @@ export default {
         []
       );
     },
+    chooseKeyboard(keyboardMode) {
+      if (this.keyboardMode == keyboardMode) return;
+      this.alertAppear2 = true;
+    },
     updateKeyboard() {
+      //肯定是切换了嘛
       this.keyboardMode =
         this.keyboardMode == "whitekey" ? "fullkey" : "whitekey";
       this.rectArray = Array(scales[this.keyboardMode].musicScale.length).fill(
@@ -384,11 +390,7 @@ export default {
       this.NOTE_CATEGORY = scales[this.keyboardMode].musicScale.length;
       this.setupCanvas();
       this.alertAppear2 = false;
-      // this.scheduleCursor();
-      // if (this.playing) {
-      //   this.stoploop();
-      //   this.startloop();
-      // }
+      this.menuAppear = false;
     },
     checkBouncibility() {
       const result = [];
@@ -463,39 +465,8 @@ export default {
         this.alertAppear = true;
       }
     },
-    clearProject() {},
-    btnStart(e) {
-      console.log(e);
-      extendBtnsTimeout = setTimeout(() => {
-        //show extend buttons
-        this.showExtendBtns = true;
-      }, 200);
-    },
     btnEnd(e) {
-      // console.log(e)
-      clearTimeout(extendBtnsTimeout);
-      const a = document.elementFromPoint(
-        e.changedTouches[0].clientX,
-        e.changedTouches[0].clientY
-      );
-      console.log(a);
-      if (a && a.classList.contains("bounceBtn")) {
-        this.submitProject();
-      } else if (
-        a &&
-        (a.classList.contains("playBtn") || a.classList.contains("pauseBtn"))
-      ) {
-        //播放
-        // console.log(Tone.Transport.state)
-        this.toggleReplay();
-        this.showExtendBtns = false;
-      } else if (
-        a &&
-        (a.classList.contains("playBtn") || a.classList.contains("cancelBtn"))
-      ) {
-        //hide extend buttons
-        this.showExtendBtns = false;
-      }
+      this.toggleReplay();
     }
   },
   beforeRouteLeave(to, from, next) {
@@ -601,11 +572,11 @@ export default {
 
     <div class="control-panal">
       <div>
+        <div @touchstart="menuAppear=true" id="menuicon" class="rotate"></div>
         <div @touchstart="scrollToBegin" id="scrolltop" class="rotate"></div>
         <div @touchstart="scrollup" id="scrollup" class="rotate"></div>
         <div @touchstart="scrolldown" id="scrolldown" class="rotate"></div>
         <!-- <div @touchstart="scrollToEnd" id="scrollbottom" class="rotate"></div> -->
-        <div @touchstart="clearNotes" id="clear" class="rotate"></div>
       </div>
       <!-- <div
         style="position:relative;display:flex;align-items:center;justify-content:center;transform:rotate(90deg);"
@@ -613,7 +584,10 @@ export default {
         <pie-progress :progress="100*currentTime/MB_DUR"/>
         <p style="position:absolute;font-size:12px;">{{currentTime|intTime}}</p>
       </div>-->
-      <div v-show="playing">
+      <div style="position:relative;display:flex;align-items:center;justify-content:center;">
+        <div @touchstart="updateLoop" :id="fullloop?'fullloop':'partloop'" class="rotate"></div>
+      </div>
+      <div>
         <div @touchstart="minusTempo" id="minustempo" class="rotate"></div>
         <div id="tempo-indicator">
           <div id="tempo-progress" :style="tempoLength"></div>
@@ -621,18 +595,7 @@ export default {
         </div>
         <div @touchstart="addTempo" id="addtempo" class="rotate"></div>
       </div>
-      <div
-        v-show="!playing"
-        style="position:relative;display:flex;align-items:center;justify-content:center;"
-      >
-        <div @touchstart="updateLoop" :id="fullloop?'fullloop':'partloop'" class="rotate"></div>
-      </div>
-      <div
-        v-show="!playing"
-        style="position:relative;display:flex;align-items:center;justify-content:center;"
-      >
-        <div @touchstart="alertAppear2=true" :id="keyboardMode" class="rotate"></div>
-      </div>
+
       <div class="btnContainer" @touchstart.stop.prevent="btnStart" @touchend.stop.prevent="btnEnd">
         <div :class="[playing?'pauseBtn':'playBtn', 'rotate']" @click="toggleReplay"></div>
         <div :class="[showExtendBtns?'extendBtnsShow':'extendBtnsHide','extendBtns']">
@@ -650,6 +613,27 @@ export default {
             <span class="btn cancel" @click="alertAppear=false">再调整</span>
             <span class="btn confirm" @click="bounceProject">任性上传</span>
           </div>
+        </div>
+      </div>
+    </transition>
+    <transition name="fade">
+      <div class="alert-mask" v-show="menuAppear">
+        <div class="menu">
+          <div
+            @touchstart="chooseKeyboard('whitekey')"
+            :class="[keyboardMode=='whitekey'?'':'inactive']"
+          >
+            <div id="whitekey" class="rotate"></div>简单音符
+          </div>
+          <div
+            @touchstart="chooseKeyboard('fullkey')"
+            :class="[keyboardMode=='fullkey'?'':'inactive']"
+          >
+            <div id="fullkey" class="rotate"></div>复杂音符
+          </div>
+          <div @touchstart="clearNotes" class>清空作品</div>
+          <div @touchstart="submitProject" class>完成作品</div>
+          <div @touchstart="menuAppear=false" class>退出</div>
         </div>
       </div>
     </transition>
@@ -695,6 +679,13 @@ export default {
     width: 34px;
     height: 34px;
     background: url("../assets/clear.png") center center no-repeat;
+    background-size: cover;
+    margin-bottom: 20px;
+  }
+  #menuicon {
+    width: 34px;
+    height: 34px;
+    background: url("../assets/menu.png") center center no-repeat;
     background-size: cover;
     margin-bottom: 20px;
   }
@@ -982,6 +973,48 @@ export default {
         justify-content: flex-end;
         padding-right: getRem(77);
       }
+    }
+  }
+  .menu {
+    display: flex;
+    right: 0;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    position: absolute;
+    padding: getRem(40);
+    font-size: 0.5rem;
+    top: 0;
+    width: getRem(240 * 2);
+    height: getRem(375 * 2);
+    background-color: #3c3f4b;
+    color: white;
+    // important rotate
+    left: 100%;
+    transform-origin: 0% 0%;
+    transform: rotate(90deg);
+    #fullkey {
+      width: 34px;
+      height: 34px;
+      padding-right: 4px;
+      background: url("../assets/viewer/fullkeyboard.png") center center
+        no-repeat;
+      background-size: cover;
+    }
+    #whitekey {
+      width: 34px;
+      height: 34px;
+      padding-right: 4px;
+      background: url("../assets/viewer/whitekeyboard.png") center center
+        no-repeat;
+      background-size: cover;
+    }
+    .inactive {
+      opacity: 0.4;
+    }
+    > div {
+      display: flex;
+      align-items: center;
     }
   }
 }
