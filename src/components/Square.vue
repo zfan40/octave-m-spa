@@ -1,6 +1,6 @@
 <script>
-import VueSwing from "vue-swing";
 import Card from "./common/BigCard";
+import { swiper, swiperSlide } from "vue-awesome-swiper";
 /**
  * 首页 component
  * 业务逻辑， 左滑动下一个， 右滑动点赞下一个， 双击点赞，点击中间播放， 点击下面按钮 （编曲页面 | 购买页面）
@@ -8,38 +8,35 @@ import Card from "./common/BigCard";
  */
 export default {
   name: "Square",
+  components: {
+    Card,
+    swiper,
+    swiperSlide
+  },
   data() {
     return {
       cards: [], //to be commented
       userId: 0,
-      config: {
-        allowedDirections: [
-          VueSwing.Direction.UP,
-          VueSwing.Direction.DOWN,
-          VueSwing.Direction.LEFT,
-          VueSwing.Direction.RIGHT
-        ],
-        minThrowOutDistance: 250,
-        maxThrowOutDistance: 300
-      }
+      bigCardListOption: [],
+      activeIndex: 0
     };
-  },
-  components: {
-    Card,
-    VueSwing
   },
   computed: {
     musixiserWorksObj() {
       return this.$store.state.musixiserWorksObj;
     },
-    operatingWorkId() {
-      return this.$store.state.operatingWorkId;
-    },
-    playingWorkId() {
-      return this.$store.state.playingWorkId;
+    // operatingWorkId() {
+    //   return this.$store.state.operatingWorkId;
+    // },
+    // playingWorkId() {
+    //   return this.$store.state.playingWorkId;
+    // },
+    bigSwiper() {
+      return this.$refs.bigCardList.swiper;
     }
   },
   methods: {
+    playWork() {},
     loadWorks() {
       console.log("my id: ", this.userId);
       const id = this.userId; // this.userId手传参id或当前用户id
@@ -60,18 +57,6 @@ export default {
             this.busy = false;
           }
         });
-    },
-    onThrowout({ target, throwDirection }) {
-      console.log(`Threw out ${target.textContent}!`);
-    },
-    add() {
-      this.cards.push(`${this.cards.length + 1}`);
-    },
-    remove() {
-      this.swing();
-      setTimeout(() => {
-        this.cards.pop();
-      }, 100);
     }
   },
   beforeRouteLeave(to, from, next) {
@@ -79,9 +64,29 @@ export default {
     next();
   },
   created() {
+    const self = this;
+
+    this.bigCardListOption = {
+      loop: false,
+      // spaceBetween: 30,
+      centeredSlides: true,
+      slidesPerView: 1,
+      // slidesPerView: "auto",
+      watchSlidesProgress: true,
+      on: {
+        transitionEnd(e) {
+          // console.log(this.realIndex);
+          self.targetProduct = self.musixiserWorksObj.content[this.realIndex];
+          self.activeIndex = this.realIndex;
+        },
+        progress(progress) {
+          // this.activeIndex = progress;
+          // console.log()
+        }
+      }
+    };
     //check cookie to get serviceToken first
     // if stoken not exist, go auth
-    const self = this;
     var docElem = document.documentElement;
     window.rem = docElem.getBoundingClientRect().width / 10;
     docElem.style.fontSize = window.rem + "px";
@@ -145,17 +150,19 @@ export default {
   }
 };
 </script>
+<template>
+  <div style="display:flex;">
+    <swiper :options="bigCardListOption" ref="bigCardList">
+      <swiper-slide v-for="work in musixiserWorksObj.content" :key="work.id">
+        <card :workInfo="work" :onPlayWork="playWork"></card>
+      </swiper-slide>
+    </swiper>
+  </div>
+</template>
 <style lang="scss">
 @import "../_common/style/_functions.scss";
 @import "../_common/style/_variables.scss";
 @import "../_common/style/_mixins.scss";
 @import "../_common/style/_reboot.scss";
 </style>
-<template>
-  <div>
-    <vue-swing @throwout="onThrowout" :config="config" ref="vueswing">
-      <card v-for="work in musixiserWorksObj.content" :key="work.id" :workInfo="work"></card>
-    </vue-swing>
-    <card></card>
-  </div>
-</template>
+
