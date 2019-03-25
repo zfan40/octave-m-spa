@@ -1,6 +1,9 @@
 <script>
 import Card from "./common/BigCard";
 import { swiper, swiperSlide } from "vue-awesome-swiper";
+import * as Magic from "../_common/js/magic";
+import * as Api from "../_common/js/api";
+import * as Cookies from "js-cookie";
 /**
  * 首页 component
  * 业务逻辑， 左滑动下一个， 右滑动点赞下一个， 双击点赞，点击中间播放， 点击下面按钮 （编曲页面 | 购买页面）
@@ -66,6 +69,21 @@ export default {
         query: {
           // id
         }
+      });
+    },
+    toggleLike(workInfo) {
+      // console.log('current work info',workInfo.favStatus)
+      Api.toggleFavSong({
+        workId: workInfo.id,
+        status: +!workInfo.favStatus
+      }).then(() => {
+        this.$store.commit("LOCAL_UPDATE_LIST_FAV", {
+          type: "musixiserWorksObj",
+          item: {
+            id: workInfo.id,
+            favStatus: +!workInfo.favStatus
+          }
+        });
       });
     },
     loadWorks() {
@@ -182,14 +200,15 @@ export default {
 };
 </script>
 <template>
-  <div style="display:flex;">
+  <div style="display:flex;padding-top:2rem;">
     <swiper :options="bigCardListOption" ref="bigCardList">
-      <swiper-slide v-for="work in musixiserWorksObj.content" :key="work.id">
+      <swiper-slide v-for="item in musixiserWorksObj.content" :key="item.id">
         <card
-          :workInfo="work"
+          :workInfo="item"
           :onPlayWork="()=>playWork(item)"
-          :playingStatus="work.id==playingWorkId"
-          :onPurchaseWork="()=>purchaseWork(work)"
+          :playingStatus="item.id==playingWorkId"
+          :onPurchaseWork="()=>purchaseWork(item)"
+          :onToggleLike="toggleLike"
         ></card>
       </swiper-slide>
     </swiper>

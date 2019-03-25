@@ -104,7 +104,7 @@ export default {
           id
         }
       });
-    },
+    }
   }
 };
 </script>
@@ -167,7 +167,7 @@ export default {
   display: inline-block;
   position: relative;
   width: getRem(342);
-  height:getRem(372);
+  height: getRem(372);
   margin-bottom: getRem(16);
   // margin-right: getRem(16);
   .mask {
@@ -224,6 +224,7 @@ export default {
     }
     .cover {
       position: absolute;
+      object-fit: cover;
       left: 0;
       top: 0;
       width: 100%;

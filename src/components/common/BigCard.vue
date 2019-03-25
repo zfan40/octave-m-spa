@@ -125,6 +125,7 @@ export default {
   width: getRem(670);
   height: getRem(920);
   margin-bottom: getRem(16);
+  background-color: $dark-gray;
   // margin-right: getRem(16);
   .mask {
     z-index: 2;
@@ -170,6 +171,7 @@ export default {
       left: getRem(40);
       top: getRem(40);
       color: white;
+      font-size: getRem(24);
     }
     .dark-mask {
       position: absolute;
@@ -197,6 +199,7 @@ export default {
       top: 0;
       width: 100%;
       height: 100%;
+      object-fit: cover;
     }
   }
   .detail {
@@ -204,19 +207,19 @@ export default {
     display: flex;
     align-items: center;
     width: 100%;
-    background-color: $dark-gray;
+    height: getRem(162);
     color: $gray-text;
     text-align: left;
-    padding: getRem(16);
+    padding: getRem(32) getRem(16);
     .title {
       font-size: getRem(28);
       color: #8c8c92;
+      margin-bottom: getRem(16);
     }
     .basic-info {
       flex: 1;
       // display: flex;
       // align-items: center;
-      margin-bottom: getRem(16);
       .avatar {
         width: getRem(46);
         height: getRem(46);
@@ -241,8 +244,8 @@ export default {
         // display: flex;
         text-align: center;
         img {
-          width: getRem(26);
-          height: getRem(22);
+          width: getRem(52);
+          height: getRem(42);
           // margin-right: getRem(8);
         }
       }
