@@ -28,15 +28,46 @@ export default {
     // operatingWorkId() {
     //   return this.$store.state.operatingWorkId;
     // },
-    // playingWorkId() {
-    //   return this.$store.state.playingWorkId;
-    // },
+    playingWorkId() {
+      return this.$store.state.playingWorkId;
+    },
     bigSwiper() {
       return this.$refs.bigCardList.swiper;
     }
   },
   methods: {
-    playWork() {},
+    playWork(work) {
+      console.log("work going to play: ", work);
+      if (work.id != this.playingWorkId) {
+        this.playing = true;
+        Magic.previewMidi(work.url, this.playing);
+
+        this.$store.commit("PLAY_WORK", { work });
+      } else {
+        //操作的同一个
+        if (this.playing) {
+          //正播着这个呢
+          this.playing = false;
+          Magic.previewMidi(work.url, this.playing);
+          this.$store.commit("PLAY_WORK", { work: { id: -1 } });
+        } else {
+          //这个已经被停了
+          this.playing = true;
+          Magic.previewMidi(work.url, 1);
+          this.$store.commit("PLAY_WORK", { work });
+        }
+      }
+    },
+    purchaseWork(work) {
+      console.log("purchase in");
+      this.$store.commit("SAVE_ORDER_INFO", { work }); // store current workId
+      this.$router.push({
+        path: "/product-list",
+        query: {
+          // id
+        }
+      });
+    },
     loadWorks() {
       console.log("my id: ", this.userId);
       const id = this.userId; // this.userId手传参id或当前用户id
@@ -154,7 +185,12 @@ export default {
   <div style="display:flex;">
     <swiper :options="bigCardListOption" ref="bigCardList">
       <swiper-slide v-for="work in musixiserWorksObj.content" :key="work.id">
-        <card :workInfo="work" :onPlayWork="playWork"></card>
+        <card
+          :workInfo="work"
+          :onPlayWork="()=>playWork(item)"
+          :playingStatus="work.id==playingWorkId"
+          :onPurchaseWork="()=>purchaseWork(work)"
+        ></card>
       </swiper-slide>
     </swiper>
   </div>
