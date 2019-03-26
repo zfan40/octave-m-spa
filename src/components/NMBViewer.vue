@@ -346,7 +346,7 @@ export default {
             <div class="title">配图</div>
             <img
               class="work-cover"
-              :src="newCover||'http://via.placeholder.com/150'"
+              :src="newCover||'https://cdn.cnbj1.fds.api.mi-img.com/mbox/img/default-s-bg.jpg'"
               @click="uploadPic"
               alt
             >

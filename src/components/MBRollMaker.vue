@@ -657,6 +657,7 @@ export default {
 @import "../_common/style/_mixins.scss";
 @import "../_common/style/_reboot.scss";
 .roll {
+  background-color: white;
   position: absolute;
   right: 0;
   overflow: scroll;

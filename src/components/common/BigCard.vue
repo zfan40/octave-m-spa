@@ -72,7 +72,7 @@ export default {
     <div class="preview-bg">
       <img
         class="cover"
-        :src="workInfo.cover||'https://cdn4.buysellads.net/uu/1/3386/1525189887-61450.png'"
+        :src="workInfo.cover||'https://cdn.cnbj1.fds.api.mi-img.com/mbox/img/default-l-bg.jpg'"
         alt
       >
       <div class="dark-mask"></div>
