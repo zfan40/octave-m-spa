@@ -32,6 +32,20 @@ export default {
     // 储存录制信息
     state.musixiserInfo = musixiserInfo;
   },
+  PUSH_SQUARE_WORKS: (state, { squareWorksObj }) => {
+    // 储存录制信息
+    console.log('ccccc', squareWorksObj.current);
+    if (+squareWorksObj.current === 1) {
+      state.squareWorksObj.content = squareWorksObj.list;
+    } else {
+      state.squareWorksObj.content = state.squareWorksObj.content.concat(
+        squareWorksObj.list,
+      );
+    }
+    state.squareWorksObj.total = squareWorksObj.total;
+    state.squareWorksObj.size = squareWorksObj.size;
+    state.squareWorksObj.current = squareWorksObj.current;
+  },
   PUSH_MUSIXISER_WORKS: (state, { musixiserWorksObj }) => {
     // 储存录制信息
     console.log('ccccc', musixiserWorksObj.current);
