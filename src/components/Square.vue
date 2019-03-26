@@ -25,8 +25,8 @@ export default {
     };
   },
   computed: {
-    musixiserWorksObj() {
-      return this.$store.state.musixiserWorksObj;
+    squareWorksobj() {
+      return this.$store.state.squareWorksobj;
     },
     // operatingWorkId() {
     //   return this.$store.state.operatingWorkId;
@@ -39,6 +39,18 @@ export default {
     }
   },
   methods: {
+    loadMusixiserById() {
+      console.log("my id: ", this.userId);
+      const id = this.userId; // this.userId手传参id或当前用户id
+      this.$store.dispatch("FETCH_MUSIXISER", {
+        id
+      });
+      this.busy = false;
+      // this.$store.dispatch('FETCH_WORKS_FROM_MUSIXISER', {
+      //   id,
+      //   page:1
+      // })
+    },
     playWork(work) {
       console.log("work going to play: ", work);
       if (work.id != this.playingWorkId) {
@@ -78,7 +90,7 @@ export default {
         status: +!workInfo.favStatus
       }).then(() => {
         this.$store.commit("LOCAL_UPDATE_LIST_FAV", {
-          type: "musixiserWorksObj",
+          type: "squareWorksobj",
           item: {
             id: workInfo.id,
             favStatus: +!workInfo.favStatus
@@ -86,21 +98,30 @@ export default {
         });
       });
     },
+    // initload(){
+    //    this.$store.dispatch('FETCH_SQUARE_WORKS', {
+    //      FETCH_SQUARE_WORKS
+    //    })
+    // },
     loadWorks() {
       console.log("my id: ", this.userId);
       const id = this.userId; // this.userId手传参id或当前用户id
+      console.log(
+        "----------------",
+        JSON.stringify(this.$store.state.squareWorksObj),
+        this.squareWorksobj
+      );
       this.$store
-        .dispatch("FETCH_WORKS_FROM_MUSIXISER", {
+        .dispatch("FETCH_SQUARE_WORKS", {
           id,
-          page: this.musixiserWorksObj.current
-            ? this.musixiserWorksObj.current + 1
+          page: this.squareWorksobj.current
+            ? this.squareWorksobj.current + 1
             : 1
         })
         .then(() => {
-          console.log("2222222", this.musixiserWorksObj);
+          console.log("2222222", this.squareWorksobj);
           if (
-            +this.musixiserWorksObj.content.length <
-            +this.musixiserWorksObj.total
+            +this.squareWorksobj.content.length < +this.squareWorksobj.total
           ) {
             //otherwise no more content
             this.busy = false;
@@ -125,7 +146,7 @@ export default {
       on: {
         transitionEnd(e) {
           // console.log(this.realIndex);
-          self.targetProduct = self.musixiserWorksObj.content[this.realIndex];
+          self.targetProduct = self.squareWorksobj.content[this.realIndex];
           self.activeIndex = this.realIndex;
         },
         progress(progress) {
@@ -202,7 +223,7 @@ export default {
 <template>
   <div style="display:flex;padding-top:2rem;">
     <swiper :options="bigCardListOption" ref="bigCardList">
-      <swiper-slide v-for="item in musixiserWorksObj.content" :key="item.id">
+      <swiper-slide v-for="item in squareWorksobj.content" :key="item.id">
         <card
           :workInfo="item"
           :onPlayWork="()=>playWork(item)"

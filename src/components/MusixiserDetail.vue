@@ -35,6 +35,7 @@ export default {
       return this.$store.state.musixiserInfo;
     },
     musixiserWorksObj() {
+      console.log(JSON.stringify(this.$store.state.musixiserWorksObj))
       return this.$store.state.musixiserWorksObj;
     },
     operatingWorkId() {
