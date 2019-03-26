@@ -28,10 +28,6 @@ export default {
     squareWorksObj() {
       return this.$store.state.squareWorksObj;
     },
-    shouldUpdate() {
-      const { size, current } = this.squareWorksObj;
-      return this.activeIndex >= (size * current - 1) / 2;
-    },
     // operatingWorkId() {
     //   return this.$store.state.operatingWorkId;
     // },
@@ -144,11 +140,12 @@ export default {
       watchSlidesProgress: true,
       on: {
         transitionEnd(e) {
+          const { size, current } = self.squareWorksObj;
           // console.log(this.realIndex);
           self.targetProduct = self.squareWorksObj.content[this.realIndex];
           self.activeIndex = this.realIndex;
-          if (self.shouldUpdate) {
-            self.loadWorks()
+          if (self.activeIndex >= (size * current - 1) / 2) {
+            self.loadWorks();
           }
         },
         progress(progress) {
