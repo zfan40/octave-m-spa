@@ -82,7 +82,7 @@ export default {
       rectArray: Array(18).fill([]),
       alertAppear: false,
       alertAppear2: false,
-      menuAppear: true,
+      menuAppear: false,
       showExtendBtns: false,
       playing: false,
       fullloop: true,
@@ -128,7 +128,7 @@ export default {
       this.scheduleCursor();
     },
     scheduleCursor() {
-      const fullNoteNumWithinDur = Math.ceil(
+      const fullNoteNumWithinDur = Math.floor(
         MB_DUR / ((TIME_PER_NOTE * 120) / this.tempo)
       );
       // const fullNoteNumWithinDur = 10;
@@ -457,6 +457,10 @@ export default {
         });
     },
     submitProject() {
+      if (this.rectArray.flat().length === 0) {
+        this.$toast("作品不能为空");
+        return;
+      }
       if (this.checkBouncibility()) {
         // alert(1);
         this.bounceProject();
@@ -578,12 +582,12 @@ export default {
         <div @touchstart="scrolldown" id="scrolldown" class="rotate"></div>
         <!-- <div @touchstart="scrollToEnd" id="scrollbottom" class="rotate"></div> -->
       </div>
-      <!-- <div
+      <div
         style="position:relative;display:flex;align-items:center;justify-content:center;transform:rotate(90deg);"
       >
         <pie-progress :progress="100*currentTime/MB_DUR"/>
         <p style="position:absolute;font-size:12px;">{{currentTime|intTime}}</p>
-      </div>-->
+      </div>
       <div style="position:relative;display:flex;align-items:center;justify-content:center;">
         <div @touchstart="updateLoop" :id="fullloop?'fullloop':'partloop'" class="rotate"></div>
       </div>
@@ -596,12 +600,8 @@ export default {
         <div @touchstart="addTempo" id="addtempo" class="rotate"></div>
       </div>
 
-      <div class="btnContainer" @touchstart.stop.prevent="btnStart" @touchend.stop.prevent="btnEnd">
+      <div class="btnContainer" @touchend.stop.prevent="btnEnd">
         <div :class="[playing?'pauseBtn':'playBtn', 'rotate']" @click="toggleReplay"></div>
-        <div :class="[showExtendBtns?'extendBtnsShow':'extendBtnsHide','extendBtns']">
-          <div class="bounceBtn rotate"></div>
-          <div class="cancelBtn"></div>
-        </div>
       </div>
     </div>
 
@@ -616,7 +616,7 @@ export default {
         </div>
       </div>
     </transition>
-    <transition name="fade">
+    <transition name="slide">
       <div class="alert-mask" v-show="menuAppear">
         <div class="menu">
           <div
@@ -669,7 +669,7 @@ export default {
   justify-content: space-around;
   width: 50px;
   height: 100%;
-  padding: 30px 0;
+  padding: 16px 0;
   top: 0;
   left: 0;
   background-color: black;
@@ -749,7 +749,7 @@ export default {
     justify-content: center;
     align-items: center;
     width: 18px;
-    height: 154px;
+    height: 104px;
     // height: 60px;
     border-radius: 9px;
     border: 1px solid #25252b;
@@ -775,7 +775,7 @@ export default {
     }
   }
   #minustempo {
-    margin-top: 50px;
+    margin-top: 0px; //todo more space here
     margin-bottom: 10px;
     width: 20px;
     height: 20px;
@@ -819,29 +819,33 @@ export default {
   }
 }
 .btnContainer {
+  // position: relative;
+  // width: getRem(84);
+  // height: getRem(84);
+  // margin-top: 0.3rem;
   position: relative;
-  width: getRem(84);
-  height: getRem(84);
-  margin-top: 0.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   .playBtn {
     z-index: 2;
     position: absolute;
-    width: 100%;
-    height: 100%;
-    border-radius: getRem(42);
+    width: 34px;
+    height: 34px;
+    border-radius: 0.56rem;
     background: url("../assets/play.svg") center center no-repeat;
-    background-size: getRem(32);
-    background-color: rgb(69, 106, 255);
+    background-size: 0.42667rem;
+    background-color: #456aff;
   }
   .pauseBtn {
     z-index: 2;
     position: absolute;
-    width: 100%;
-    height: 100%;
-    border-radius: getRem(42);
+    width: 34px;
+    height: 34px;
+    border-radius: 0.56rem;
     background: url("../assets/pause.svg") center center no-repeat;
-    background-size: getRem(32);
-    background-color: rgb(69, 106, 255);
+    background-size: 0.42667rem;
+    background-color: #456aff;
   }
   .bounceBtn {
     position: absolute;
@@ -1017,5 +1021,18 @@ export default {
       align-items: center;
     }
   }
+}
+.slide-enter-active {
+  transition: all 0.3s ease-out;
+  top: 0px;
+}
+.slide-leave-active {
+  transition: all 0.3s ease-out;
+  top: 0px;
+}
+.slide-enter, .slide-leave-to
+/* .slide-fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+  top: -200px;
 }
 </style>
