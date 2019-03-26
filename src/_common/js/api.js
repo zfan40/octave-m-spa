@@ -231,3 +231,10 @@ export function fetchStacks({ page, size }) {
     reqConfig
   )
 }
+
+export function fetchSquareWorks({page, size, id}) {
+  return axios.get(
+    `//api.octave-love.com/api/v1/work/getListByUid/${id}?page=${page}&size=${size}`,
+    reqConfig,
+  );
+}

@@ -25,8 +25,12 @@ export default {
     };
   },
   computed: {
-    squareWorksobj() {
-      return this.$store.state.squareWorksobj;
+    squareWorksObj() {
+      return this.$store.state.squareWorksObj;
+    },
+    shouldUpdate() {
+      const { size, current } = this.squareWorksObj;
+      return this.activeIndex >= (size * current - 1) / 2;
     },
     // operatingWorkId() {
     //   return this.$store.state.operatingWorkId;
@@ -90,7 +94,7 @@ export default {
         status: +!workInfo.favStatus
       }).then(() => {
         this.$store.commit("LOCAL_UPDATE_LIST_FAV", {
-          type: "squareWorksobj",
+          type: "squareWorksObj",
           item: {
             id: workInfo.id,
             favStatus: +!workInfo.favStatus
@@ -106,22 +110,17 @@ export default {
     loadWorks() {
       console.log("my id: ", this.userId);
       const id = this.userId; // this.userId手传参id或当前用户id
-      console.log(
-        "----------------",
-        JSON.stringify(this.$store.state.squareWorksObj),
-        this.squareWorksobj
-      );
       this.$store
         .dispatch("FETCH_SQUARE_WORKS", {
           id,
-          page: this.squareWorksobj.current
-            ? this.squareWorksobj.current + 1
-            : 1
+          page: this.squareWorksObj.current
+            ? this.squareWorksObj.current + 1
+            : 1,
+          size: 4
         })
         .then(() => {
-          console.log("2222222", this.squareWorksobj);
           if (
-            +this.squareWorksobj.content.length < +this.squareWorksobj.total
+            +this.squareWorksObj.content.length < +this.squareWorksObj.total
           ) {
             //otherwise no more content
             this.busy = false;
@@ -146,8 +145,11 @@ export default {
       on: {
         transitionEnd(e) {
           // console.log(this.realIndex);
-          self.targetProduct = self.squareWorksobj.content[this.realIndex];
+          self.targetProduct = self.squareWorksObj.content[this.realIndex];
           self.activeIndex = this.realIndex;
+          if (self.shouldUpdate) {
+            self.loadWorks()
+          }
         },
         progress(progress) {
           // this.activeIndex = progress;
@@ -223,7 +225,7 @@ export default {
 <template>
   <div style="display:flex;padding-top:2rem;">
     <swiper :options="bigCardListOption" ref="bigCardList">
-      <swiper-slide v-for="item in squareWorksobj.content" :key="item.id">
+      <swiper-slide v-for="item in squareWorksObj.content" :key="item.id">
         <card
           :workInfo="item"
           :onPlayWork="()=>playWork(item)"

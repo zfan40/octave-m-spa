@@ -14,7 +14,7 @@ export function createStore() {
       recordProject: [],
       recordProjectInfo: {},
       musixiserInfo: {},
-      squareWorksObj: { content: [], current: 1 },
+      squareWorksObj: { content: [] },
       musixiserWorksObj: { content: [] },
       favWorksObj: { content: [] },
       targetProduct: {},
