@@ -151,10 +151,11 @@ export default {
           self.targetProduct = self.squareWorksObj.content[this.realIndex];
           self.activeIndex = this.realIndex;
           //TODO: first one need click, rest should be auto played.
-          // self.playWork(self.squareWorksObj.content[this.realIndex]);
+          self.playWork(self.squareWorksObj.content[this.realIndex]);
           if (self.activeIndex >= (size * current - 1) / 2) {
             self.loadWorks();
           }
+
         },
         progress(progress) {
           // this.activeIndex = progress;
@@ -227,7 +228,7 @@ export default {
 };
 </script>
 <template>
-  <div style="display:flex;padding-top:2rem;">
+  <div style="display:flex;padding-top:2rem;height: 100%;background:rgb(26, 28, 30)">
     <swiper :options="bigCardListOption" ref="bigCardList">
       <swiper-slide v-for="item in squareWorksObj.content" :key="item.id">
         <card

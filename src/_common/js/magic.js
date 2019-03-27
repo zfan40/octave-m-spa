@@ -251,6 +251,7 @@ export function previewMidi(url, start) {
     oncePlayed = true;
   }
   // try {
+    console.log('midi---url', url)
   MidiConvert.load(url, (midi) => {
     console.log('dasdsad', midi)
     const mergeNotes = midi.tracks.reduce((a, b) => a.concat(b.notes), []);

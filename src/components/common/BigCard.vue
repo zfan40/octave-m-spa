@@ -126,9 +126,12 @@ export default {
   height: getRem(920);
   margin-bottom: getRem(16);
   background-color: $dark-gray;
+  border-radius: getRem(40);
   // margin-right: getRem(16);
   .mask {
     z-index: 2;
+    padding: getRem(40 / 2);
+
     top: 0;
     position: absolute;
     background-color: $img-mask;
@@ -166,6 +169,9 @@ export default {
     align-items: center;
     width: 100%;
     height: getRem(758);
+    img {
+      border-radius: getRem(40) getRem(40) 0 0;
+    }
     .work-content {
       position: absolute;
       left: getRem(40);
@@ -178,6 +184,8 @@ export default {
       position: absolute;
       width: 100%;
       height: 100%;
+      border-radius: getRem(40) getRem(40) 0 0;
+      overflow: hidden;
       background-color: rgba(0, 0, 0, 0.1);
     }
     .playBtn {
