@@ -55,13 +55,13 @@ export default {
     </transition>
     <transition name="slideDown">
       <div class="btn active" v-show="currentActive">
-        <div class></div>
+        <img src="../../assets/heartfill.svg" class="heart">
         <p>{{currentActiveCount}}</p>
       </div>
     </transition>
     <transition name="slideUp">
       <div class="btn inactive" v-show="!currentActive">
-        <div class></div>
+        <img src="../../assets/heartstroke.svg" class="heart">
         <p>{{currentActiveCount-1}}</p>
       </div>
     </transition>
@@ -76,17 +76,17 @@ export default {
 .btnContainer {
   position: relative;
   width: getRem(92);
-  height: getRem(92);
-  border: 1px solid #7d839e;
-  border-radius: 50%;
+  height: getRem(68);
+  // border: 1px solid #7d839e;
+  // border-radius: 50%;
   overflow: hidden;
   // -webkit-mask-image: -webkit-radial-gradient(circle, white, black);
   .active-btn-background {
     position: absolute;
     width: 100%;
     height: 100%;
-    background-color: #7d839e;
-    border-radius: 50%;
+    // background-color: #7d839e;
+    // border-radius: 50%;
     border: none;
     overflow: hidden;
   }
@@ -97,24 +97,20 @@ export default {
     height: 100%;
     top: 0;
     left: 0;
-    border-radius: 50%;
+    // border-radius: 50%;
     display: flex;
     flex-direction: column;
     color: white;
     align-items: center;
     justify-content: space-around;
-    div {
-      width: getRem(34);
-      height: getRem(24);
-      margin-top: 0.2rem;
-      background: url("../../assets/heartstroke.svg") center center no-repeat;
-      background-size: cover;
+    .heart {
+      width: getRem(39);
+      height: getRem(28);
     }
     p {
-      font-size: 0.37rem;
-      margin: 0 0 0.1rem 0;
-      line-height: 0.37rem;
-      color: white;
+      font-size: getRem(24);
+      // margin: 0 0 0.1rem 0;
+      color: #707baa;
     }
   }
   .inactive {
@@ -124,23 +120,19 @@ export default {
     height: 100%;
     top: 0;
     left: 0;
-    border-radius: 50%;
+    // border-radius: 50%;
     display: flex;
     flex-direction: column;
     color: white;
     align-items: center;
     justify-content: space-around;
-    div {
-      width: getRem(34);
-      height: getRem(24);
-      margin-top: 0.2rem;
-      background: url("../../assets/heartfill.svg") center center no-repeat;
-      background-size: cover;
+    .heart {
+      width: getRem(39);
+      height: getRem(28);
     }
     p {
-      font-size: 0.37rem;
-      margin: 0 0 0.1rem 0;
-      line-height: 0.37rem;
+      font-size: getRem(24);
+      // margin: 0 0 0.1rem 0;
       color: #7d839e;
     }
   }
