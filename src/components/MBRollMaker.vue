@@ -12,6 +12,7 @@ import * as RollDemo from "../_common/js/rolldemo"; //test
 
 import { scales } from "../_common/js/seqModes";
 import pieProgress from "./common/pieProgress";
+import anotherPieProgress from "./common/anotherPieProgress";
 import Vue from "vue";
 import VueKonva from "vue-konva";
 
@@ -24,7 +25,7 @@ window.cursorSchedules = [];
 let aInterval = undefined;
 let extendBtnsTimeout = undefined;
 const TIME_PER_NOTE = 0.25; // quarter note seemingly
-const FULL_NOTE_NUM = 120; // tempo 180, 20seconds => 120 notes, :test 30.
+const FULL_NOTE_NUM = 120; // max tempo 180, 20seconds => 120 notes, :test 30.
 const NOTE_NUM_PER_SECTOR = 10; // :test 10
 const MB_DUR = 20; // 20 seconds length // :test 5
 const MIN_TEMPO = 60;
@@ -61,7 +62,8 @@ const synth = new Tone.Sampler(
 // const piano = new Tone.PolySynth(18, Tone.Synth, pulseOptions).toMaster();
 export default {
   components: {
-    pieProgress
+    pieProgress,
+    anotherPieProgress
   },
   data() {
     return {
@@ -582,12 +584,13 @@ export default {
         <div @touchstart="scrolldown" id="scrolldown" class="rotate"></div>
         <!-- <div @touchstart="scrollToEnd" id="scrollbottom" class="rotate"></div> -->
       </div>
-      <div
+      <!-- <div
         style="position:relative;display:flex;align-items:center;justify-content:center;transform:rotate(90deg);"
-      >
-        <pie-progress :progress="100*currentTime/MB_DUR"/>
+      >-->
+      <!-- <pie-progress :progress="100*currentTime/MB_DUR"/> -->
+      <!-- <another-pie-progress radius="30" :progress="currentTime*100/MB_DUR" stroke="4"/>
         <p style="position:absolute;font-size:12px;">{{currentTime|intTime}}</p>
-      </div>
+      </div>-->
       <div style="position:relative;display:flex;align-items:center;justify-content:center;">
         <div @touchstart="updateLoop" :id="fullloop?'fullloop':'partloop'" class="rotate"></div>
       </div>
@@ -601,6 +604,7 @@ export default {
       </div>
 
       <div class="btnContainer" @touchend.stop.prevent="btnEnd">
+        <another-pie-progress radius="30" :progress="currentTime*100/MB_DUR" stroke="4"/>
         <div :class="[playing?'pauseBtn':'playBtn', 'rotate']" @click="toggleReplay"></div>
       </div>
     </div>

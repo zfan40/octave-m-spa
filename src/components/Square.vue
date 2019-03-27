@@ -52,6 +52,7 @@ export default {
       // })
     },
     playWork(work) {
+      if (!work) return;
       console.log("work going to play: ", work);
       if (work.id != this.playingWorkId) {
         this.playing = true;
@@ -73,14 +74,19 @@ export default {
         }
       }
     },
+    redirectToMaker() {
+      this.$router.push({
+        path: "/new-music-box-maker",
+        query: {}
+      });
+    },
     purchaseWork(work) {
+      // TODO: need check if order matches current work
       console.log("purchase in");
       this.$store.commit("SAVE_ORDER_INFO", { work }); // store current workId
       this.$router.push({
         path: "/product-list",
-        query: {
-          // id
-        }
+        query: {}
       });
     },
     toggleLike(workInfo) {
@@ -112,7 +118,7 @@ export default {
           page: this.squareWorksObj.current
             ? this.squareWorksObj.current + 1
             : 1,
-          size: 4
+          size: 10
         })
         .then(() => {
           if (
@@ -144,6 +150,8 @@ export default {
           // console.log(this.realIndex);
           self.targetProduct = self.squareWorksObj.content[this.realIndex];
           self.activeIndex = this.realIndex;
+          //TODO: first one need click, rest should be auto played.
+          // self.playWork(self.squareWorksObj.content[this.realIndex]);
           if (self.activeIndex >= (size * current - 1) / 2) {
             self.loadWorks();
           }
@@ -180,7 +188,6 @@ export default {
     });
     // alert(Cookies.get('serviceToken'))
     if (Util.getUrlParam("code") || Cookies.get("serviceToken")) {
-      //TODO:ajax call to get info
       Api.getUserInfo(Util.getUrlParam("code"))
         .then(res => {
           if (res.data.errcode >= 20000) {
@@ -232,6 +239,11 @@ export default {
         ></card>
       </swiper-slide>
     </swiper>
+    <div class="button_group">
+      <button @click="redirectToMaker">我来试试</button>
+      <!-- FUTURE WORK: not all work can be built, disabled here on condition -->
+      <button @click="purchaseWork(squareWorksObj.content[activeIndex])">制作八音盒</button>
+    </div>
   </div>
 </template>
 <style lang="scss">
@@ -239,5 +251,33 @@ export default {
 @import "../_common/style/_variables.scss";
 @import "../_common/style/_mixins.scss";
 @import "../_common/style/_reboot.scss";
+.button_group {
+  width: 100%;
+  height: getRem(100);
+  position: fixed;
+  bottom: getRem(30);
+  margin: auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  button {
+    outline: 0;
+    border: 0;
+    display: block;
+    width: getRem(325);
+    color: #fff;
+    padding: getRem(20);
+    font-size: 16px;
+    &:first-of-type {
+      border-radius: getRem(50) 0 0 getRem(50);
+      background: rgb(113, 113, 230);
+    }
+    &:last-of-type {
+      border-radius: 0 getRem(50) getRem(50) 0;
+      background: rgb(69, 100, 215);
+    }
+  }
+}
 </style>
 

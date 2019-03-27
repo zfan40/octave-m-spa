@@ -105,8 +105,8 @@ export default {
       </div>
       <div class="like-info">
         <div class="likes" @click="onToggleLike(workInfo)">
-          <img v-if="!workInfo.favStatus" src="../../assets/viewer/strokeheart.svg" alt>
-          <img v-if="workInfo.favStatus" src="../../assets/viewer/fillheart.svg" alt>
+          <img v-if="!workInfo.favStatus" src="../../assets/heartstroke.svg" alt>
+          <img v-if="workInfo.favStatus" src="../../assets/heartfill.svg" alt>
           <p>{{workInfo.collectNum}}</p>
         </div>
       </div>
@@ -171,6 +171,7 @@ export default {
       left: getRem(40);
       top: getRem(40);
       color: white;
+      opacity: 0.7;
       font-size: getRem(24);
     }
     .dark-mask {
