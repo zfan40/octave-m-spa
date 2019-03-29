@@ -19,7 +19,7 @@ const testData = (() => {
   const item = {
     id: 166,
     title: "尚未起名",
-    cover: "default",
+    cover: "",
     content: "default",
     url: "//audio.musixise.com/Vwcz7dNc_output.mid",
     favStatus: null,

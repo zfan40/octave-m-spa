@@ -59,7 +59,7 @@ export default {
             location.pathname
           }#/new-music-box-viewer?id=${this.$store.state.route.query.id}`;
           WxShare.prepareShareContent({
-            title: `来听${this.projectInfo.userVO.realname}的作品-${
+            title: `${this.projectInfo.userVO.realname}做了个八音盒-${
               this.projectInfo.title
             }`,
             desc: "一般人儿我不告诉TA",
@@ -120,13 +120,15 @@ export default {
         location.pathname
       }#/new-music-box-viewer?id=${this.$store.state.route.query.id}`;
       WxShare.prepareShareContent({
-        title: "MUSIXISE",
-        desc: `来听${this.projectInfo.userVO.realname}的作品-${
+        title: `${this.projectInfo.userVO.realname}做了个八音盒-${
           this.newWorkTitle
         }`,
+        desc: "一般人儿我不告诉TA",
         // fullPath:location.href.split('#')[0],
         fullPath,
-        imgUrl: "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
+        imgUrl:
+          this.projectInfo.cover ||
+          "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
       });
       setTimeout(() => {
         this.workUpdateAppear = false;
@@ -154,6 +156,10 @@ export default {
       window.scroll(0, 0);
     },
     purchaseItem() {
+      if (this.projectInfo.machineNum > 18) {
+        this.$toast("该作品目前无法制作");
+        return;
+      }
       // TODO: router push with workId
       console.log(`you are about to purchase ${this.projectInfo.id}`);
       this.$store.commit("SAVE_ORDER_INFO", {
@@ -337,7 +343,10 @@ export default {
           iconImg
           :onClickCall="toggleFav"
         />
-        <div class="purchaseBtn" @click="purchaseItem">购买</div>
+        <div
+          :class="['purchaseBtn',projectInfo.machineNum>18?'disabled':'']"
+          @click="purchaseItem"
+        >购买</div>
         <div class="makeBtn" @click="redirectToMaker">编曲</div>
       </div>
     </transition>

@@ -406,6 +406,10 @@
       text-align: center;
       line-height: getRem(92);
     }
+    .disabled {
+      background-color: gray;
+      color:white;
+    }
     .makeBtn {
       position: relative;
       width: getRem(250);

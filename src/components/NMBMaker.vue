@@ -320,7 +320,7 @@ export default {
             record: bouncepart,
             info: {
               title: "尚未起名",
-              content: "default",
+              content: "",
               cover: ""
             }
           })

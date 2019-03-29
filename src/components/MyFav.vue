@@ -45,13 +45,35 @@ export default {
     }
   },
   methods: {
-    loadFavById() {
-      // console.log("my id: ", this.userId);
-      // const id = this.userId;
-      // this.$store.dispatch("FETCH_MUSIXISER", {
-      //   id
-      // });
+    loadMusixiserById() {
+      console.log("my id: ", this.userId);
+      const id = this.userId; // this.userId手传参id或当前用户id
+      this.$store
+        .dispatch("FETCH_MUSIXISER", {
+          id
+        })
+        .then(() => {
+          document.title = `${this.$store.state.musixiserInfo.realname}的收藏`;
+          const fullPath = `${location.origin}${location.pathname}#/my-fav?id=${
+            this.userId
+          }`;
+          WxShare.prepareShareConfig().then(() => {
+            WxShare.prepareShareContent({
+              title: `${this.$store.state.musixiserInfo.realname}的收藏`,
+              desc: "口味不太一样哦～",
+              // fullPath:location.href.split('#')[0],
+              fullPath,
+              imgUrl:
+                `http:${this.$store.state.musixiserInfo.smallAvatar}` ||
+                "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
+            });
+          });
+        });
       this.busy = false;
+      // this.$store.dispatch('FETCH_WORKS_FROM_MUSIXISER', {
+      //   id,
+      //   page:1
+      // })
     },
     loadMore() {
       //will call automatically when enter!
@@ -101,6 +123,10 @@ export default {
       this.$store.commit("OPERATE_WORK", { work: { id: -1 } });
     },
     purchaseWork(work) {
+      if (work.machineNum > 18) {
+        this.$toast("该作品目前无法制作");
+        return;
+      }
       console.log("purchase in");
       this.$store.commit("SAVE_ORDER_INFO", { work }); // store current workId
       this.$router.push({
@@ -168,21 +194,21 @@ export default {
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase());
     if (!inWechat) {
       this.userId = this.$store.state.route.query.id || 239;
-      self.loadFavById();
+      self.loadMusixiserById();
       return;
     }
-    const fullPath = `${location.origin}${
-      location.pathname
-    }#/new-music-box-viewer?id=${self.$store.state.route.query.id}`;
-    WxShare.prepareShareConfig().then(() => {
-      WxShare.prepareShareContent({
-        title: "MUSIXISE",
-        desc: "我的地盘你就dê听我的",
-        // fullPath:location.href.split('#')[0],
-        fullPath,
-        imgUrl: "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
-      });
-    });
+    const fullPath = `${location.origin}${location.pathname}#/my-fav?id=${
+      self.$store.state.route.query.id
+    }`;
+    // WxShare.prepareShareConfig().then(() => {
+    //   WxShare.prepareShareContent({
+    //     title: "MUSIXISE",
+    //     desc: "我的地盘你就dê听我的",
+    //     // fullPath:location.href.split('#')[0],
+    //     fullPath,
+    //     imgUrl: "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
+    //   });
+    // });
     // alert(Cookies.get('serviceToken'))
     if (Util.getUrlParam("code") || Cookies.get("serviceToken")) {
       //TODO:ajax call to get info
@@ -198,21 +224,10 @@ export default {
               )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
             );
           }
-          WxShare.prepareShareConfig().then(() => {
-            WxShare.prepareShareContent({
-              title: `${res.data.data.realname}的收藏`,
-              desc: "我的品味有点儿不同..",
-              // fullPath:location.href.split('#')[0],
-              fullPath,
-              imgUrl:
-                res.data.data.smallAvatar ||
-                "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
-            });
-          });
           self.userId =
             this.$store.state.route.query.id || res.data.data.userId;
           self.isMe = self.userId == res.data.data.userId;
-          self.loadFavById();
+          self.loadMusixiserById();
 
           console.log("get user info success", res.data.data);
         })

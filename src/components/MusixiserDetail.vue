@@ -32,19 +32,6 @@ export default {
   },
   computed: {
     musixiserInfo() {
-      document.title = `${this.$store.state.musixiserInfo.realname}的作品`;
-      const fullPath = `${location.origin}${
-        location.pathname
-      }#/new-music-box-viewer?id=${self.$store.state.route.query.id}`;
-      WxShare.prepareShareConfig().then(() => {
-        WxShare.prepareShareContent({
-          title: "${this.$store.state.musixiserInfo.realname}的作品",
-          desc: "很好听哦～",
-          // fullPath:location.href.split('#')[0],
-          fullPath,
-          imgUrl: this.$store.state.musixiserInfo.smallAvatar
-        });
-      });
       return this.$store.state.musixiserInfo;
     },
     musixiserWorksObj() {
@@ -62,9 +49,27 @@ export default {
     loadMusixiserById() {
       console.log("my id: ", this.userId);
       const id = this.userId; // this.userId手传参id或当前用户id
-      this.$store.dispatch("FETCH_MUSIXISER", {
-        id
-      });
+      this.$store
+        .dispatch("FETCH_MUSIXISER", {
+          id
+        })
+        .then(() => {
+          document.title = `${this.$store.state.musixiserInfo.realname}的作品`;
+          const fullPath = `${location.origin}${
+            location.pathname
+          }#/musixiser?id=${this.userId}`;
+          WxShare.prepareShareConfig().then(() => {
+            WxShare.prepareShareContent({
+              title: `${this.$store.state.musixiserInfo.realname}的作品`,
+              desc: "很好听哦～",
+              // fullPath:location.href.split('#')[0],
+              fullPath,
+              imgUrl:
+                `http:${this.$store.state.musixiserInfo.smallAvatar}` ||
+                "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
+            });
+          });
+        });
       this.busy = false;
       // this.$store.dispatch('FETCH_WORKS_FROM_MUSIXISER', {
       //   id,
@@ -125,6 +130,10 @@ export default {
       this.$store.commit("OPERATE_WORK", { work: { id: -1 } });
     },
     purchaseWork(work) {
+      if (work.machineNum > 18) {
+        this.$toast("该作品目前无法制作");
+        return;
+      }
       console.log("purchase in");
       this.$store.commit("SAVE_ORDER_INFO", { work }); // store current workId
       this.$router.push({
@@ -198,15 +207,15 @@ export default {
     const fullPath = `${location.origin}${
       location.pathname
     }#/new-music-box-viewer?id=${self.$store.state.route.query.id}`;
-    WxShare.prepareShareConfig().then(() => {
-      WxShare.prepareShareContent({
-        title: "MUSIXISE",
-        desc: "我的地盘你就dê听我的",
-        // fullPath:location.href.split('#')[0],
-        fullPath,
-        imgUrl: "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
-      });
-    });
+    // WxShare.prepareShareConfig().then(() => {
+    //   WxShare.prepareShareContent({
+    //     title: "MUSIXISE",
+    //     desc: "我的地盘你就dê听我的",
+    //     // fullPath:location.href.split('#')[0],
+    //     fullPath,
+    //     imgUrl: "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
+    //   });
+    // });
     // alert(Cookies.get('serviceToken'))
     if (Util.getUrlParam("code") || Cookies.get("serviceToken")) {
       //TODO:ajax call to get info

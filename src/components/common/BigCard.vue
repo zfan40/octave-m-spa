@@ -89,9 +89,9 @@ export default {
       >
     </div>
     <div class="detail">
-      <div class="basic-info" @click="gotoMusixiser(workInfo.userId)">
+      <div class="basic-info">
         <p class="title" @click="gotoWork(workInfo.id)">{{workInfo.title}}</p>
-        <div style="display:flex;align-items:center;">
+        <div style="display:flex;align-items:center;" @click="gotoMusixiser(workInfo.userId)">
           <img class="avatar" :src="workInfo.userVO.smallAvatar" alt>
           <p class="song-title">{{workInfo.userVO.realname}}</p>
           <p
@@ -165,8 +165,8 @@ export default {
     width: 100%;
     border-radius: getRem(40) getRem(40) 0 0;
     height: getRem(758);
-    background: linear-gradient(top, #444 0%, #222 100%);
-    background-size: 2rem;
+    background: linear-gradient(#585c63 0%, #36373b 100%);
+    // background-size: 2rem;
     // opacity: 0.5;
     .work-content {
       position: absolute;

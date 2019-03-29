@@ -443,7 +443,7 @@ export default {
           record: result,
           info: {
             title: "尚未起名",
-            content: "default",
+            content: "",
             cover: ""
           }
         })
@@ -707,7 +707,7 @@ export default {
     width: 34px;
     height: 34px;
     background: url("../assets/clear.png") center center no-repeat;
-    background-size: cover;
+    background-size: contain;
     margin-bottom: 20px;
   }
 
@@ -715,28 +715,28 @@ export default {
     width: 34px;
     height: 34px;
     background: url("../assets/rewind1.png") center center no-repeat;
-    background-size: cover;
+    background-size: contain;
     margin-bottom: 20px;
   }
   #scrollbottom {
     width: 34px;
     height: 34px;
     background: url("../assets/rewind2.png") center center no-repeat;
-    background-size: cover;
+    background-size: contain;
     margin-bottom: 20px;
   }
   #scrollup {
     width: 34px;
     height: 34px;
     background: url("../assets/left.png") center center no-repeat;
-    background-size: cover;
+    background-size: contain;
     margin-bottom: 20px;
   }
   #scrolldown {
     width: 34px;
     height: 34px;
     background: url("../assets/left.png") center center no-repeat;
-    background-size: cover;
+    background-size: contain;
     transform: rotate(270deg);
     margin-bottom: 20px;
   }
@@ -744,26 +744,26 @@ export default {
     width: 34px;
     height: 34px;
     background: url("../assets/viewer/partloop.png") center center no-repeat;
-    background-size: cover;
+    background-size: contain;
   }
   #fullloop {
     width: 34px;
     height: 34px;
     background: url("../assets/viewer/fullloop.png") center center no-repeat;
-    background-size: cover;
+    background-size: contain;
   }
   #fullkey {
     width: 34px;
     height: 34px;
     background: url("../assets/viewer/fullkeyboard.png") center center no-repeat;
-    background-size: cover;
+    background-size: contain;
   }
   #whitekey {
     width: 34px;
     height: 34px;
     background: url("../assets/viewer/whitekeyboard.png") center center
       no-repeat;
-    background-size: cover;
+    background-size: contain;
   }
   #tempo-indicator {
     position: relative;

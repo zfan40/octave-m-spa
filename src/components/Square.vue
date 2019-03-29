@@ -42,18 +42,6 @@ export default {
     }
   },
   methods: {
-    loadMusixiserById() {
-      console.log("my id: ", this.userId);
-      const id = this.userId; // this.userId手传参id或当前用户id
-      this.$store.dispatch("FETCH_MUSIXISER", {
-        id
-      });
-      this.busy = false;
-      // this.$store.dispatch('FETCH_WORKS_FROM_MUSIXISER', {
-      //   id,
-      //   page:1
-      // })
-    },
     playWork(work) {
       if (!work) return;
       this.everPlayFlag = true;
@@ -86,6 +74,10 @@ export default {
     },
     purchaseWork(work) {
       // TODO: need check if order matches current work
+      if (work.machineNum > 18) {
+        this.$toast("该作品目前无法制作");
+        return;
+      }
       console.log("purchase in");
       this.$store.commit("SAVE_ORDER_INFO", { work }); // store current workId
       this.$router.push({
@@ -208,7 +200,6 @@ export default {
           // self.userId =
           //   this.$store.state.route.query.id || res.data.data.userId;
           // self.isMe = self.userId == res.data.data.userId;
-          // self.loadMusixiserById();
           self.loadWorks();
           console.log("get user info success", res.data.data);
         })
@@ -232,7 +223,7 @@ export default {
 };
 </script>
 <template>
-  <div style="display:flex;padding-top:2rem;background:rgb(26, 28, 30)">
+  <div style="display:flex;padding-top:2rem;background:rgb(26, 28, 30);height:100%;">
     <swiper :options="bigCardListOption" ref="bigCardList">
       <swiper-slide v-for="item in squareWorksObj.content" :key="item.id">
         <card
@@ -266,6 +257,7 @@ export default {
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  z-index: 100;
   button {
     outline: 0;
     border: 0;
