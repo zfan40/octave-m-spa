@@ -133,7 +133,7 @@ export default {
       if (val) {
         //start progress bar
         replayInterval = setInterval(() => {
-          this.vuetimeline += 1;
+          this.vuetimeline += 10;
           if (this.vuetimeline >= 2000) {
             this.toggleReplay();
             this.vuetimeline = 0;
