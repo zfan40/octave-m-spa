@@ -198,6 +198,17 @@ export default {
               )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
             );
           }
+          WxShare.prepareShareConfig().then(() => {
+            WxShare.prepareShareContent({
+              title: `${res.data.data.realname}的收藏`,
+              desc: "我的品味有点儿不同..",
+              // fullPath:location.href.split('#')[0],
+              fullPath,
+              imgUrl:
+                res.data.data.smallAvatar ||
+                "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
+            });
+          });
           self.userId =
             this.$store.state.route.query.id || res.data.data.userId;
           self.isMe = self.userId == res.data.data.userId;

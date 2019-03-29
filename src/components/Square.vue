@@ -1,9 +1,11 @@
 <script>
 import Card from "./common/BigCard";
 import { swiper, swiperSlide } from "vue-awesome-swiper";
+import * as Util from "../_common/js/util";
 import * as Magic from "../_common/js/magic";
 import * as Api from "../_common/js/api";
 import * as Cookies from "js-cookie";
+import * as WxShare from "../_common/js/wx_share";
 /**
  * 首页 component
  * 业务逻辑， 左滑动下一个， 右滑动点赞下一个， 双击点赞，点击中间播放， 点击下面按钮 （编曲页面 | 购买页面）
@@ -21,12 +23,13 @@ export default {
       cards: [], //to be commented
       userId: 0,
       bigCardListOption: [],
-      activeIndex: 0
+      activeIndex: 0,
+      everPlayFlag: false
     };
   },
   computed: {
-    musixiserWorksObj() {
-      return this.$store.state.musixiserWorksObj;
+    squareWorksObj() {
+      return this.$store.state.squareWorksObj;
     },
     // operatingWorkId() {
     //   return this.$store.state.operatingWorkId;
@@ -39,7 +42,21 @@ export default {
     }
   },
   methods: {
+    loadMusixiserById() {
+      console.log("my id: ", this.userId);
+      const id = this.userId; // this.userId手传参id或当前用户id
+      this.$store.dispatch("FETCH_MUSIXISER", {
+        id
+      });
+      this.busy = false;
+      // this.$store.dispatch('FETCH_WORKS_FROM_MUSIXISER', {
+      //   id,
+      //   page:1
+      // })
+    },
     playWork(work) {
+      if (!work) return;
+      this.everPlayFlag = true;
       console.log("work going to play: ", work);
       if (work.id != this.playingWorkId) {
         this.playing = true;
@@ -61,14 +78,19 @@ export default {
         }
       }
     },
+    redirectToMaker() {
+      this.$router.push({
+        path: "/new-music-box-maker",
+        query: {}
+      });
+    },
     purchaseWork(work) {
+      // TODO: need check if order matches current work
       console.log("purchase in");
       this.$store.commit("SAVE_ORDER_INFO", { work }); // store current workId
       this.$router.push({
         path: "/product-list",
-        query: {
-          // id
-        }
+        query: {}
       });
     },
     toggleLike(workInfo) {
@@ -78,7 +100,7 @@ export default {
         status: +!workInfo.favStatus
       }).then(() => {
         this.$store.commit("LOCAL_UPDATE_LIST_FAV", {
-          type: "musixiserWorksObj",
+          type: "squareWorksObj",
           item: {
             id: workInfo.id,
             favStatus: +!workInfo.favStatus
@@ -86,21 +108,25 @@ export default {
         });
       });
     },
+    // initload(){
+    //    this.$store.dispatch('FETCH_SQUARE_WORKS', {
+    //      FETCH_SQUARE_WORKS
+    //    })
+    // },
     loadWorks() {
       console.log("my id: ", this.userId);
       const id = this.userId; // this.userId手传参id或当前用户id
       this.$store
-        .dispatch("FETCH_WORKS_FROM_MUSIXISER", {
+        .dispatch("FETCH_SQUARE_WORKS", {
           id,
-          page: this.musixiserWorksObj.current
-            ? this.musixiserWorksObj.current + 1
-            : 1
+          page: this.squareWorksObj.current
+            ? this.squareWorksObj.current + 1
+            : 1,
+          size: 10
         })
         .then(() => {
-          console.log("2222222", this.musixiserWorksObj);
           if (
-            +this.musixiserWorksObj.content.length <
-            +this.musixiserWorksObj.total
+            +this.squareWorksObj.content.length < +this.squareWorksObj.total
           ) {
             //otherwise no more content
             this.busy = false;
@@ -114,7 +140,6 @@ export default {
   },
   created() {
     const self = this;
-
     this.bigCardListOption = {
       loop: false,
       // spaceBetween: 30,
@@ -124,9 +149,16 @@ export default {
       watchSlidesProgress: true,
       on: {
         transitionEnd(e) {
+          const { size, current } = self.squareWorksObj;
           // console.log(this.realIndex);
-          self.targetProduct = self.musixiserWorksObj.content[this.realIndex];
+          self.targetProduct = self.squareWorksObj.content[this.realIndex];
           self.activeIndex = this.realIndex;
+          //TODO: first one need click, rest should be auto played.
+          if (self.everPlayFlag)
+            self.playWork(self.squareWorksObj.content[this.realIndex]);
+          if (self.activeIndex >= (size * current - 1) / 2) {
+            self.loadWorks();
+          }
         },
         progress(progress) {
           // this.activeIndex = progress;
@@ -141,8 +173,9 @@ export default {
     docElem.style.fontSize = window.rem + "px";
 
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase());
+    this.userId = 239;
+
     if (!inWechat) {
-      this.userId = this.$store.state.route.query.id || 239;
       self.loadWorks();
       return;
     }
@@ -151,7 +184,7 @@ export default {
     }#/new-music-box-viewer?id=${self.$store.state.route.query.id}`;
     WxShare.prepareShareConfig().then(() => {
       WxShare.prepareShareContent({
-        title: "MUSIXISE",
+        title: "ai",
         desc: "我的地盘你就dê听我的",
         // fullPath:location.href.split('#')[0],
         fullPath,
@@ -160,7 +193,6 @@ export default {
     });
     // alert(Cookies.get('serviceToken'))
     if (Util.getUrlParam("code") || Cookies.get("serviceToken")) {
-      //TODO:ajax call to get info
       Api.getUserInfo(Util.getUrlParam("code"))
         .then(res => {
           if (res.data.errcode >= 20000) {
@@ -173,11 +205,11 @@ export default {
               )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
             );
           }
-          self.userId =
-            this.$store.state.route.query.id || res.data.data.userId;
-          self.isMe = self.userId == res.data.data.userId;
-          self.loadMusixiserById();
-
+          // self.userId =
+          //   this.$store.state.route.query.id || res.data.data.userId;
+          // self.isMe = self.userId == res.data.data.userId;
+          // self.loadMusixiserById();
+          self.loadWorks();
           console.log("get user info success", res.data.data);
         })
         .catch(err => {
@@ -200,9 +232,9 @@ export default {
 };
 </script>
 <template>
-  <div style="display:flex;padding-top:2rem;">
+  <div style="display:flex;padding-top:2rem;background:rgb(26, 28, 30)">
     <swiper :options="bigCardListOption" ref="bigCardList">
-      <swiper-slide v-for="item in musixiserWorksObj.content" :key="item.id">
+      <swiper-slide v-for="item in squareWorksObj.content" :key="item.id">
         <card
           :workInfo="item"
           :onPlayWork="()=>playWork(item)"
@@ -212,6 +244,11 @@ export default {
         ></card>
       </swiper-slide>
     </swiper>
+    <div class="button_group">
+      <button @click="redirectToMaker">我来试试</button>
+      <!-- FUTURE WORK: not all work can be built, disabled here on condition -->
+      <button @click="purchaseWork(squareWorksObj.content[activeIndex])">制作八音盒</button>
+    </div>
   </div>
 </template>
 <style lang="scss">
@@ -219,5 +256,33 @@ export default {
 @import "../_common/style/_variables.scss";
 @import "../_common/style/_mixins.scss";
 @import "../_common/style/_reboot.scss";
+.button_group {
+  width: 100%;
+  height: getRem(100);
+  position: absolute;
+  bottom: getRem(60);
+  margin: auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  button {
+    outline: 0;
+    border: 0;
+    display: block;
+    width: getRem(325);
+    color: #fff;
+    padding: getRem(20);
+    font-size: 16px;
+    &:first-of-type {
+      border-radius: getRem(50) 0 0 getRem(50);
+      background: rgb(113, 113, 230);
+    }
+    &:last-of-type {
+      border-radius: 0 getRem(50) getRem(50) 0;
+      background: rgb(69, 100, 215);
+    }
+  }
+}
 </style>
 

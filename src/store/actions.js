@@ -9,7 +9,8 @@ import {
   fetchFavWorks,
   fetchProductList,
   fetchOrders,
-  fetchStacks
+  fetchStacks,
+  fetchSquareWorks
 } from '../_common/js/api';
 /*
   getUserInfo
@@ -88,10 +89,10 @@ export default {
         resolve();
       });
     }),
-  FETCH_SQUARE_WORKS: ({ commit, state }, { id, page }) =>
+  FETCH_SQUARE_WORKS: ({ commit, state }, { id, page, size }) =>
     new Promise((resolve, reject) => {
       // 获取某id的音乐盒音乐内容
-      fetchWorksFromMusixiser(id, page).then((works) => {
+      fetchSquareWorks({id, page, size}).then((works) => {
         console.log('works list: ', works.data.data);
         commit('PUSH_SQUARE_WORKS', { squareWorksObj: works.data.data });
         resolve();

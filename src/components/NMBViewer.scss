@@ -1,10 +1,10 @@
-.heart {
-  width: getRem(30);
-  height: getRem(30);
-  display: inline-block;
-  background: url("../assets/heart.svg") center center;
-  background-size: cover;
-}
+// .heart {
+//   width: getRem(30);
+//   height: getRem(30);
+//   display: inline-block;
+//   background: url("../assets/heart.svg") center center;
+//   background-size: cover;
+// }
 .container {
   position: absolute;
   width: 100%;
@@ -12,6 +12,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background-color:white;
   #spirit {
     will-change: transform;
     transition: transform 4.5s ease-out;

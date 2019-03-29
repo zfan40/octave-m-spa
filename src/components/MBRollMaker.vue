@@ -12,6 +12,7 @@ import * as RollDemo from "../_common/js/rolldemo"; //test
 
 import { scales } from "../_common/js/seqModes";
 import pieProgress from "./common/pieProgress";
+import anotherPieProgress from "./common/anotherPieProgress";
 import Vue from "vue";
 import VueKonva from "vue-konva";
 
@@ -24,12 +25,12 @@ window.cursorSchedules = [];
 let aInterval = undefined;
 let extendBtnsTimeout = undefined;
 const TIME_PER_NOTE = 0.25; // quarter note seemingly
-const FULL_NOTE_NUM = 120; // tempo 180, 20seconds => 120 notes, :test 30.
+const FULL_NOTE_NUM = 120 + 10; // max tempo 180, 20seconds => 120 notes, :test 30. with 10 as extra space
 const NOTE_NUM_PER_SECTOR = 10; // :test 10
 const MB_DUR = 20; // 20 seconds length // :test 5
 const MIN_TEMPO = 60;
 const MAX_TEMPO = 180;
-const NOTE_CATEGORY_PAGE_LIMIT = 18; // above this, will have scroll
+const NOTE_CATEGORY_PAGE_LIMIT = 12; // above this, will have scroll
 const DEFAULT_KEYBOARD_MODE = "whitekey";
 const synth = new Tone.Sampler(
   {
@@ -61,7 +62,8 @@ const synth = new Tone.Sampler(
 // const piano = new Tone.PolySynth(18, Tone.Synth, pulseOptions).toMaster();
 export default {
   components: {
-    pieProgress
+    pieProgress,
+    anotherPieProgress
   },
   data() {
     return {
@@ -128,7 +130,7 @@ export default {
       this.scheduleCursor();
     },
     scheduleCursor() {
-      const fullNoteNumWithinDur = Math.floor(
+      const fullNoteNumWithinDur = Math.ceil(
         MB_DUR / ((TIME_PER_NOTE * 120) / this.tempo)
       );
       // const fullNoteNumWithinDur = 10;
@@ -154,6 +156,10 @@ export default {
           cursorSchedules[i] = Tone.Transport.scheduleRepeat(
             time => {
               this.activeJ = i;
+
+              // feat: cursor follow
+              // this.sector = Math.ceil(this.activeJ / NOTE_NUM_PER_SECTOR);
+              this.sector = 2 * Math.floor(this.activeJ / MB_DUR) + 1;
               this.currentTime = (i * TIME_PER_NOTE * 120) / this.tempo;
               // const now = performance.now();
               // console.log(now - lastTiming);
@@ -293,6 +299,10 @@ export default {
         ((this.sector - 1) * this.NOTE_NUM_PER_SECTOR * TIME_PER_NOTE * 120) /
           this.tempo
       );
+      // Tone.Transport.start(
+      //   "+0.1",
+      //   (this.activeJ * TIME_PER_NOTE * 120) / this.tempo
+      // );
       this.playing = true;
     },
     stoploop() {
@@ -548,13 +558,15 @@ export default {
 
 <template>
   <div class>
+    <div @touchstart="menuAppear=true" id="menuicon" class="rotate"></div>
     <div class="roll" v-bind:style="{width:controlWidth+'px'}">
       <div
         :style="{width:configKonva.width+'px'}"
         style="position:absolute;height:20px;background-color:rgba(0,0,0,.5);color:white;z-index:10;display:flex;justify-content: space-around;font-size:10px"
       >
         <span
-          style="width:10px;"
+          style="position:relative;width:10px;transform-origin: 0% 0%;left: 10px;"
+          class="rotate"
           v-for="i in NOTE_CATEGORY"
           :key="i"
         >{{scales[keyboardMode].initKey+scales[keyboardMode].musicScale[i-1] | toNote}}</span>
@@ -575,22 +587,25 @@ export default {
     </div>
 
     <div class="control-panal">
-      <div>
-        <div @touchstart="menuAppear=true" id="menuicon" class="rotate"></div>
-        <div @touchstart="scrollToBegin" id="scrolltop" class="rotate"></div>
-        <div @touchstart="scrollup" id="scrollup" class="rotate"></div>
-        <div @touchstart="scrolldown" id="scrolldown" class="rotate"></div>
+      <div style="height:4rem;display:flex;flex-direction:column;">
+        <div v-show="!playing" @touchstart="scrollToBegin" id="scrolltop" class="rotate"></div>
+        <div v-show="!playing" @touchstart="scrollup" id="scrollup" class="rotate"></div>
+        <div v-show="!playing" @touchstart="scrolldown" id="scrolldown" class="rotate"></div>
+        <div
+          v-show="playing"
+          @touchstart="updateLoop"
+          :id="fullloop?'fullloop':'partloop'"
+          class="rotate"
+        ></div>
         <!-- <div @touchstart="scrollToEnd" id="scrollbottom" class="rotate"></div> -->
       </div>
-      <div
+      <!-- <div
         style="position:relative;display:flex;align-items:center;justify-content:center;transform:rotate(90deg);"
-      >
-        <pie-progress :progress="100*currentTime/MB_DUR"/>
+      >-->
+      <!-- <pie-progress :progress="100*currentTime/MB_DUR"/> -->
+      <!-- <another-pie-progress radius="30" :progress="currentTime*100/MB_DUR" stroke="4"/>
         <p style="position:absolute;font-size:12px;">{{currentTime|intTime}}</p>
-      </div>
-      <div style="position:relative;display:flex;align-items:center;justify-content:center;">
-        <div @touchstart="updateLoop" :id="fullloop?'fullloop':'partloop'" class="rotate"></div>
-      </div>
+      </div>-->
       <div>
         <div @touchstart="minusTempo" id="minustempo" class="rotate"></div>
         <div id="tempo-indicator">
@@ -601,6 +616,7 @@ export default {
       </div>
 
       <div class="btnContainer" @touchend.stop.prevent="btnEnd">
+        <another-pie-progress :radius="30" :progress="currentTime*100/MB_DUR" :stroke="4"/>
         <div :class="[playing?'pauseBtn':'playBtn', 'rotate']" @click="toggleReplay"></div>
       </div>
     </div>
@@ -657,9 +673,21 @@ export default {
 @import "../_common/style/_mixins.scss";
 @import "../_common/style/_reboot.scss";
 .roll {
+  background-color: white;
   position: absolute;
   right: 0;
   overflow: scroll;
+}
+#menuicon {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  right: 6px;
+  bottom: 6px;
+  background: url("../assets/menu.png") center center no-repeat;
+  background-size: cover;
+  z-index: 200;
+  // margin-bottom: 20px;
 }
 .control-panal {
   position: absolute;
@@ -682,13 +710,7 @@ export default {
     background-size: cover;
     margin-bottom: 20px;
   }
-  #menuicon {
-    width: 34px;
-    height: 34px;
-    background: url("../assets/menu.png") center center no-repeat;
-    background-size: cover;
-    margin-bottom: 20px;
-  }
+
   #scrolltop {
     width: 34px;
     height: 34px;
@@ -746,10 +768,11 @@ export default {
   #tempo-indicator {
     position: relative;
     display: flex;
+    margin: 0 auto;
     justify-content: center;
     align-items: center;
     width: 18px;
-    height: 104px;
+    height: 160px;
     // height: 60px;
     border-radius: 9px;
     border: 1px solid #25252b;
@@ -777,14 +800,14 @@ export default {
   #minustempo {
     margin-top: 0px; //todo more space here
     margin-bottom: 10px;
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     background: url("../assets/minus.png") center center;
     background-size: contain;
   }
   #addtempo {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     margin-top: 10px;
     background: url("../assets/plus.png") center center;
     background-size: contain;
@@ -988,7 +1011,8 @@ export default {
     position: absolute;
     padding: getRem(40);
     font-size: 0.5rem;
-    top: 0;
+    // top: 0;
+    bottom: -3.6rem;
     width: getRem(240 * 2);
     height: getRem(375 * 2);
     background-color: #3c3f4b;
@@ -1024,15 +1048,13 @@ export default {
 }
 .slide-enter-active {
   transition: all 0.3s ease-out;
-  top: 0px;
 }
 .slide-leave-active {
   transition: all 0.3s ease-out;
-  top: 0px;
 }
 .slide-enter, .slide-leave-to
 /* .slide-fade-leave-active below version 2.1.8 */ {
   opacity: 0;
-  top: -200px;
+  transform: translateY(300px);
 }
 </style>

@@ -120,11 +120,8 @@ export default {
       </div>
     </transition>
     <div class="preview-bg">
-      <img
-        class="cover"
-        :src="workInfo.cover||'https://cdn4.buysellads.net/uu/1/3386/1525189887-61450.png'"
-        alt
-      >
+      <img v-if="workInfo.cover.indexOf('//')>=0" class="cover" :src="workInfo.cover" alt>
+      <div v-if="workInfo.cover.indexOf('//')<0" class="dark-mask"></div>
       <img
         class="playBtn"
         @touchend="onPlayWork"
@@ -149,8 +146,8 @@ export default {
       <div class="detail-other">
         <div>{{(workInfo.lastModifiedDate||workInfo.createdDate)|getDateDiff}}</div>
         <div class="likes" @click="onToggleLike(workInfo)">
-          <img v-if="!workInfo.favStatus" src="../../assets/viewer/strokeheart.svg" alt>
-          <img v-if="workInfo.favStatus" src="../../assets/viewer/fillheart.svg" alt>
+          <img v-if="!workInfo.favStatus" src="../../assets/heartstroke.svg" alt>
+          <img v-if="workInfo.favStatus" src="../../assets/heartfill.svg" alt>
           {{workInfo.collectNum}}
         </div>
       </div>
@@ -169,10 +166,13 @@ export default {
   width: getRem(342);
   height: getRem(372);
   margin-bottom: getRem(16);
+  padding: getRem(16);
+  background-color: $dark-gray;
   // margin-right: getRem(16);
   .mask {
     z-index: 2;
     top: 0;
+    left: 0;
     position: absolute;
     background-color: $img-mask;
     width: 100%;
@@ -209,6 +209,8 @@ export default {
     align-items: center;
     width: 100%;
     height: getRem(208);
+    margin-bottom: getRem(16);
+    background: #262729;
     .playBtn {
       position: relative;
       width: getRem(30);
@@ -221,6 +223,16 @@ export default {
       bottom: -10px;
       left: -10px;
       right: -10px;
+    }
+    .dark-mask {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: getRem(40) getRem(40) 0 0;
+      overflow: hidden;
+      background: url("../../assets/notes.svg") center center no-repeat;
+      background-size: 1rem;
+      opacity: 0.2;
     }
     .cover {
       position: absolute;
@@ -237,15 +249,15 @@ export default {
     background-color: $dark-gray;
     color: $gray-text;
     text-align: left;
-    padding: getRem(16);
     .title {
       font-size: getRem(28);
+      line-height: getRem(40);
       color: #8c8c92;
     }
     .user {
       display: flex;
       align-items: center;
-      margin-bottom: getRem(16);
+      margin-bottom: getRem(14);
       .avatar {
         width: getRem(46);
         height: getRem(46);
@@ -263,6 +275,7 @@ export default {
       font-size: 10px;
       .likes {
         display: flex;
+        align-items: center;
         img {
           width: getRem(26);
           height: getRem(22);

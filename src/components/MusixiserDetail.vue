@@ -32,9 +32,23 @@ export default {
   },
   computed: {
     musixiserInfo() {
+      document.title = `${this.$store.state.musixiserInfo.realname}的作品`;
+      const fullPath = `${location.origin}${
+        location.pathname
+      }#/new-music-box-viewer?id=${self.$store.state.route.query.id}`;
+      WxShare.prepareShareConfig().then(() => {
+        WxShare.prepareShareContent({
+          title: "${this.$store.state.musixiserInfo.realname}的作品",
+          desc: "很好听哦～",
+          // fullPath:location.href.split('#')[0],
+          fullPath,
+          imgUrl: this.$store.state.musixiserInfo.smallAvatar
+        });
+      });
       return this.$store.state.musixiserInfo;
     },
     musixiserWorksObj() {
+      console.log(JSON.stringify(this.$store.state.musixiserWorksObj));
       return this.$store.state.musixiserWorksObj;
     },
     operatingWorkId() {
@@ -298,7 +312,7 @@ export default {
   justify-content: space-between;
   align-content: flex-start;
   flex-wrap: wrap;
-  padding: getRem(20);
+  padding: getRem(26);
   background-color: #404249;
   overflow: scroll;
 }

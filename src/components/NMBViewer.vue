@@ -59,13 +59,15 @@ export default {
             location.pathname
           }#/new-music-box-viewer?id=${this.$store.state.route.query.id}`;
           WxShare.prepareShareContent({
-            title: "MUSIXISE",
-            desc: `来听${this.projectInfo.userVO.realname}的作品-${
+            title: `来听${this.projectInfo.userVO.realname}的作品-${
               this.projectInfo.title
             }`,
+            desc: "一般人儿我不告诉TA",
             // fullPath:location.href.split('#')[0],
             fullPath,
-            imgUrl: "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
+            imgUrl:
+              this.projectInfo.cover ||
+              "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
           });
         });
       } else {
@@ -346,7 +348,7 @@ export default {
             <div class="title">配图</div>
             <img
               class="work-cover"
-              :src="newCover||'http://via.placeholder.com/150'"
+              :src="newCover||'https://cdn.cnbj1.fds.api.mi-img.com/mbox/img/default-s-bg.jpg'"
               @click="uploadPic"
               alt
             >

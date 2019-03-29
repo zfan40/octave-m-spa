@@ -70,12 +70,8 @@ export default {
 <template>
   <div class="card">
     <div class="preview-bg">
-      <img
-        class="cover"
-        :src="workInfo.cover||'https://cdn4.buysellads.net/uu/1/3386/1525189887-61450.png'"
-        alt
-      >
-      <div class="dark-mask"></div>
+      <img v-if="workInfo.cover.indexOf('//')>=0" class="cover" :src="workInfo.cover" alt>
+      <div v-if="workInfo.cover.indexOf('//')<0" class="dark-mask"></div>
       <p class="work-content">{{workInfo.content}}</p>
       <img
         class="playBtn"
@@ -105,8 +101,8 @@ export default {
       </div>
       <div class="like-info">
         <div class="likes" @click="onToggleLike(workInfo)">
-          <img v-if="!workInfo.favStatus" src="../../assets/viewer/strokeheart.svg" alt>
-          <img v-if="workInfo.favStatus" src="../../assets/viewer/fillheart.svg" alt>
+          <img v-if="!workInfo.favStatus" src="../../assets/heartstroke.svg" alt>
+          <img v-if="workInfo.favStatus" src="../../assets/heartfill.svg" alt>
           <p>{{workInfo.collectNum}}</p>
         </div>
       </div>
@@ -125,10 +121,12 @@ export default {
   width: getRem(670);
   height: getRem(920);
   margin-bottom: getRem(16);
-  background-color: $dark-gray;
+  border-radius: getRem(40);
   // margin-right: getRem(16);
   .mask {
     z-index: 2;
+    padding: getRem(40 / 2);
+
     top: 0;
     position: absolute;
     background-color: $img-mask;
@@ -165,19 +163,28 @@ export default {
     justify-content: center;
     align-items: center;
     width: 100%;
+    border-radius: getRem(40) getRem(40) 0 0;
     height: getRem(758);
+    background: linear-gradient(top, #444 0%, #222 100%);
+    background-size: 2rem;
+    // opacity: 0.5;
     .work-content {
       position: absolute;
       left: getRem(40);
       top: getRem(40);
       color: white;
+      opacity: 0.7;
       font-size: getRem(24);
     }
     .dark-mask {
       position: absolute;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.1);
+      border-radius: getRem(40) getRem(40) 0 0;
+      overflow: hidden;
+      background: url("../../assets/notes.svg") center center no-repeat;
+      background-size: 3rem;
+      opacity: 0.06;
     }
     .playBtn {
       position: relative;
@@ -193,13 +200,13 @@ export default {
       right: -10px;
     }
     .cover {
-      background-color: white;
       position: absolute;
       left: 0;
       top: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
+      border-radius: getRem(40) getRem(40) 0 0;
     }
   }
   .detail {
@@ -209,8 +216,10 @@ export default {
     width: 100%;
     height: getRem(162);
     color: $gray-text;
+    background-color: $dark-gray;
     text-align: left;
-    padding: getRem(32) getRem(16);
+    padding: getRem(32) getRem(40) getRem(20);
+    border-radius: 0 0 0.53333rem 0.53333rem;
     .title {
       font-size: getRem(28);
       color: #8c8c92;

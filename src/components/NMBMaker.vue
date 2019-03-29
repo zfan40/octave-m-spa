@@ -12,7 +12,6 @@ const Tone = require("tone");
 const touchIdKeyMap = {}; // touch move can have several threads, each thread only activate one note at most
 // e.g. {0:a4,1:b5}
 
-const MINI_KEY_LENGTH = 200; // px
 let extendBtnsTimeout;
 
 let piano = new Tone.Sampler(
@@ -88,7 +87,7 @@ export default {
         dotSize: 20,
         eventType: "auto",
         min: 0,
-        max: 200,
+        max: 2000,
         interval: 1,
         disabled: false,
         show: true,
@@ -118,7 +117,7 @@ export default {
         },
         formatter(value) {
           if (value) {
-            return `${(value / 10).toFixed(1)}s/20s`;
+            return `${(value / 100).toFixed(2)}s/20s`;
           }
           return "0.0s/20s";
         },
@@ -135,7 +134,7 @@ export default {
         //start progress bar
         replayInterval = setInterval(() => {
           this.vuetimeline += 1;
-          if (this.vuetimeline >= 200) {
+          if (this.vuetimeline >= 2000) {
             this.toggleReplay();
             this.vuetimeline = 0;
           }
@@ -167,17 +166,17 @@ export default {
       console.log(1);
       this.playing = !this.playing;
       if (this.playing) {
-        if (this.vuetimeline >= 200) {
+        if (this.vuetimeline >= 2000) {
           this.vuetimeline = 0;
         }
         // this.confirmRecordPart(!isLinger)
-        playOffset = performance.now() - this.vuetimeline * 100;
+        playOffset = performance.now() - this.vuetimeline * 10;
         console.log("播放开始");
         this.confirmRecordPart(0);
         console.log("kokokoko");
         recordStartTime = performance.now();
-        console.log(`activeOffsetTime${this.vuetimeline * 100}`);
-        Tone.Transport.start("+0.01", (this.vuetimeline * 100) / 1000); // TODO:有问题in case < context.currentTime
+        console.log(`activeOffsetTime${this.vuetimeline * 10}`);
+        Tone.Transport.start("+0.01", (this.vuetimeline * 10) / 1000); // TODO:有问题in case < context.currentTime
       } else {
         console.log("播放停了");
         Tone.Transport.stop(0); // TODO：必须stop才能start。。。有没有自动stop啊..
@@ -193,26 +192,27 @@ export default {
       if (!this.playing) {
         if (isLinger) {
           recordStartTime = performance.now();
-          lingerOffset = this.vuetimeline * 100;
+          lingerOffset = this.vuetimeline * 10;
           isLinger = false;
         }
         noteTime = performance.now() - recordStartTime + lingerOffset;
       } else {
         noteTime = performance.now() - playOffset;
-        // noteTime = this.vuetimeline * 100
-        // console.log('1', this.vuetimeline * 100)
+        // noteTime = this.vuetimeline * 10
+        // console.log('1', this.vuetimeline * 10)
         // console.log('2', performance.now() - recordStartTime + this.vuetimeline*100)
       }
       if (noteTime < 20000) {
-        this.vuetimeline = (10 * noteTime) / 1000;
+        this.vuetimeline = (10 * noteTime) / 100;
         this.recordPart.push({
           note: noteId,
           time: +(noteTime / 1000).toFixed(4)
         });
       } else {
-        this.vuetimeline = 20 * 10; // 颗粒度是0.1s => 200份
+        this.vuetimeline = 20 * 100; // 颗粒度是0.1s => 200份
         console.log("cannot record more than 20 seconds");
       }
+      console.log(noteTime);
     },
     handleNoteEnd(noteId) {
       piano.triggerRelease(noteId);
@@ -482,7 +482,7 @@ export default {
           );
           tutorTimeout.push(
             setTimeout(() => {
-              this.vuetimeline = 120;
+              this.vuetimeline = 700;
               this.handClass = "hand";
             }, 1500)
           );
