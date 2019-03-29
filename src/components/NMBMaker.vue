@@ -482,7 +482,7 @@ export default {
           );
           tutorTimeout.push(
             setTimeout(() => {
-              this.vuetimeline = 120;
+              this.vuetimeline = 700;
               this.handClass = "hand";
             }, 1500)
           );

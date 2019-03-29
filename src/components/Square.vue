@@ -1,9 +1,11 @@
 <script>
 import Card from "./common/BigCard";
 import { swiper, swiperSlide } from "vue-awesome-swiper";
+import * as Util from "../_common/js/util";
 import * as Magic from "../_common/js/magic";
 import * as Api from "../_common/js/api";
 import * as Cookies from "js-cookie";
+import * as WxShare from "../_common/js/wx_share";
 /**
  * 首页 component
  * 业务逻辑， 左滑动下一个， 右滑动点赞下一个， 双击点赞，点击中间播放， 点击下面按钮 （编曲页面 | 购买页面）
@@ -21,7 +23,8 @@ export default {
       cards: [], //to be commented
       userId: 0,
       bigCardListOption: [],
-      activeIndex: 0
+      activeIndex: 0,
+      everPlayFlag: false
     };
   },
   computed: {
@@ -53,6 +56,7 @@ export default {
     },
     playWork(work) {
       if (!work) return;
+      this.everPlayFlag = true;
       console.log("work going to play: ", work);
       if (work.id != this.playingWorkId) {
         this.playing = true;
@@ -136,7 +140,6 @@ export default {
   },
   created() {
     const self = this;
-
     this.bigCardListOption = {
       loop: false,
       // spaceBetween: 30,
@@ -151,11 +154,11 @@ export default {
           self.targetProduct = self.squareWorksObj.content[this.realIndex];
           self.activeIndex = this.realIndex;
           //TODO: first one need click, rest should be auto played.
-          self.playWork(self.squareWorksObj.content[this.realIndex]);
+          if (self.everPlayFlag)
+            self.playWork(self.squareWorksObj.content[this.realIndex]);
           if (self.activeIndex >= (size * current - 1) / 2) {
             self.loadWorks();
           }
-
         },
         progress(progress) {
           // this.activeIndex = progress;
@@ -170,8 +173,9 @@ export default {
     docElem.style.fontSize = window.rem + "px";
 
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase());
+    this.userId = 239;
+
     if (!inWechat) {
-      this.userId = this.$store.state.route.query.id || 239;
       self.loadWorks();
       return;
     }
@@ -180,7 +184,7 @@ export default {
     }#/new-music-box-viewer?id=${self.$store.state.route.query.id}`;
     WxShare.prepareShareConfig().then(() => {
       WxShare.prepareShareContent({
-        title: "MUSIXISE",
+        title: "ai",
         desc: "我的地盘你就dê听我的",
         // fullPath:location.href.split('#')[0],
         fullPath,
@@ -201,11 +205,11 @@ export default {
               )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
             );
           }
-          self.userId =
-            this.$store.state.route.query.id || res.data.data.userId;
-          self.isMe = self.userId == res.data.data.userId;
-          self.loadMusixiserById();
-
+          // self.userId =
+          //   this.$store.state.route.query.id || res.data.data.userId;
+          // self.isMe = self.userId == res.data.data.userId;
+          // self.loadMusixiserById();
+          self.loadWorks();
           console.log("get user info success", res.data.data);
         })
         .catch(err => {
@@ -228,7 +232,7 @@ export default {
 };
 </script>
 <template>
-  <div style="display:flex;padding-top:2rem;height: 100%;background:rgb(26, 28, 30)">
+  <div style="display:flex;padding-top:2rem;background:rgb(26, 28, 30)">
     <swiper :options="bigCardListOption" ref="bigCardList">
       <swiper-slide v-for="item in squareWorksObj.content" :key="item.id">
         <card
@@ -255,8 +259,8 @@ export default {
 .button_group {
   width: 100%;
   height: getRem(100);
-  position: fixed;
-  bottom: getRem(30);
+  position: absolute;
+  bottom: getRem(60);
   margin: auto;
   display: flex;
   flex-direction: row;
