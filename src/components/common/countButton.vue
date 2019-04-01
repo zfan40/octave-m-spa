@@ -99,16 +99,16 @@ export default {
     left: 0;
     // border-radius: 50%;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     color: white;
     align-items: center;
     justify-content: space-around;
     .heart {
-      width: getRem(39);
-      height: getRem(28);
+      width: getRem(56);
+      height: getRem(50);
     }
     p {
-      font-size: getRem(24);
+      font-size: getRem(36);
       // margin: 0 0 0.1rem 0;
       color: #707baa;
     }
@@ -122,16 +122,16 @@ export default {
     left: 0;
     // border-radius: 50%;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     color: white;
     align-items: center;
     justify-content: space-around;
     .heart {
-      width: getRem(39);
-      height: getRem(28);
+      width: getRem(56);
+      height: getRem(50);
     }
     p {
-      font-size: getRem(24);
+      font-size: getRem(36);
       // margin: 0 0 0.1rem 0;
       color: #7d839e;
     }

@@ -343,11 +343,16 @@ export default {
           iconImg
           :onClickCall="toggleFav"
         />
-        <div
+        <div class="button_group">
+          <button @click="redirectToMaker">我来试试</button>
+          <!-- FUTURE WORK: not all work can be built, disabled here on condition -->
+          <button :class="[projectInfo.machineNum>18?'':'']" @click="purchaseItem">制作八音盒</button>
+        </div>
+        <!-- <div
           :class="['purchaseBtn',projectInfo.machineNum>18?'disabled':'']"
           @click="purchaseItem"
         >购买</div>
-        <div class="makeBtn" @click="redirectToMaker">编曲</div>
+        <div class="makeBtn" @click="redirectToMaker">编曲</div>-->
       </div>
     </transition>
     <transition name="fade">
@@ -390,4 +395,30 @@ export default {
 @import "../_common/style/_mixins.scss";
 @import "../_common/style/_reboot.scss";
 @import "./NMBViewer.scss";
+.button_group {
+  display: flex;
+  width: 70%;
+  flex: 1;
+  padding-left: getRem(40);
+  .disabled {
+    background-color: gray;
+  }
+  button {
+    outline: 0;
+    border: 0;
+    display: block;
+    width: getRem(325);
+    color: #fff;
+    padding: getRem(20);
+    font-size: 16px;
+    &:first-of-type {
+      border-radius: getRem(50) 0 0 getRem(50);
+      background: rgb(113, 113, 230);
+    }
+    &:last-of-type {
+      border-radius: 0 getRem(50) getRem(50) 0;
+      background: rgb(69, 100, 215);
+    }
+  }
+}
 </style>

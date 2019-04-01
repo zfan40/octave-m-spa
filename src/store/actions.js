@@ -89,10 +89,10 @@ export default {
         resolve();
       });
     }),
-  FETCH_SQUARE_WORKS: ({ commit, state }, { id, page, size }) =>
+  FETCH_SQUARE_WORKS: ({ commit, state }, { page, size }) =>
     new Promise((resolve, reject) => {
       // 获取某id的音乐盒音乐内容
-      fetchSquareWorks({id, page, size}).then((works) => {
+      fetchSquareWorks({ page, size }).then((works) => {
         console.log('works list: ', works.data.data);
         commit('PUSH_SQUARE_WORKS', { squareWorksObj: works.data.data });
         resolve();

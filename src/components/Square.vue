@@ -100,17 +100,9 @@ export default {
         });
       });
     },
-    // initload(){
-    //    this.$store.dispatch('FETCH_SQUARE_WORKS', {
-    //      FETCH_SQUARE_WORKS
-    //    })
-    // },
     loadWorks() {
-      console.log("my id: ", this.userId);
-      const id = this.userId; // this.userId手传参id或当前用户id
       this.$store
         .dispatch("FETCH_SQUARE_WORKS", {
-          id,
           page: this.squareWorksObj.current
             ? this.squareWorksObj.current + 1
             : 1,

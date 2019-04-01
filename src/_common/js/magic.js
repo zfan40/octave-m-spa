@@ -235,7 +235,7 @@ export function preview(items, start) {
     if (lastNote.time >= 20) {
       musicPreview.loopEnd = lastNote.time + lastNote.duration + 2
     } else {
-      musicPreview.loopEnd = 21; // 20s的作品，多一秒喘息
+      musicPreview.loopEnd = 20; // 20s的作品，以前21秒，现在就20正好，弄啥样啥样，所听即所得
     }
     Tone.Transport.start('+0.01', 0);
   } else {
@@ -251,7 +251,7 @@ export function previewMidi(url, start) {
     oncePlayed = true;
   }
   // try {
-    console.log('midi---url', url)
+  console.log('midi---url', url)
   MidiConvert.load(url, (midi) => {
     console.log('dasdsad', midi)
     const mergeNotes = midi.tracks.reduce((a, b) => a.concat(b.notes), []);

@@ -467,6 +467,7 @@ export default {
         });
     },
     submitProject() {
+      this.menuAppear = false;
       if (this.rectArray.flat().length === 0) {
         this.$toast("作品不能为空");
         return;
@@ -637,16 +638,17 @@ export default {
         <div class="menu">
           <div
             @touchstart="chooseKeyboard('whitekey')"
-            :class="[keyboardMode=='whitekey'?'':'inactive']"
+            :class="['menu-op',keyboardMode=='whitekey'?'':'inactive']"
           >
             <div id="whitekey" class="rotate"></div>简单音符
           </div>
           <div
             @touchstart="chooseKeyboard('fullkey')"
-            :class="[keyboardMode=='fullkey'?'':'inactive']"
+            :class="['menu-op',keyboardMode=='fullkey'?'':'inactive']"
           >
             <div id="fullkey" class="rotate"></div>复杂音符
           </div>
+
           <div @touchstart="clearNotes" class>清空作品</div>
           <div @touchstart="submitProject" class>完成作品</div>
           <div @touchstart="menuAppear=false" class>退出</div>
@@ -680,11 +682,11 @@ export default {
 }
 #menuicon {
   position: absolute;
-  width: 34px;
-  height: 34px;
-  right: 6px;
-  bottom: 6px;
-  background: url("../assets/menu.png") center center no-repeat;
+  width: getRem(34);
+  height: getRem(28);
+  right: 10px;
+  bottom: 12px;
+  background: url("../assets/menu2.png") center center no-repeat;
   background-size: cover;
   z-index: 200;
   // margin-bottom: 20px;
@@ -755,14 +757,13 @@ export default {
   #fullkey {
     width: 34px;
     height: 34px;
-    background: url("../assets/viewer/fullkeyboard.png") center center no-repeat;
+    background: url("../assets/fullkey.png") center center no-repeat;
     background-size: contain;
   }
   #whitekey {
     width: 34px;
     height: 34px;
-    background: url("../assets/viewer/whitekeyboard.png") center center
-      no-repeat;
+    background: url("../assets/whitekey.png") center center no-repeat;
     background-size: contain;
   }
   #tempo-indicator {
@@ -856,8 +857,8 @@ export default {
     width: 34px;
     height: 34px;
     border-radius: 0.56rem;
-    background: url("../assets/play.svg") center center no-repeat;
-    background-size: 0.42667rem;
+    background: url("../assets/play.svg") 0.3rem 0.26rem no-repeat;
+    background-size: 0.38rem;
     background-color: #456aff;
   }
   .pauseBtn {
@@ -1009,33 +1010,34 @@ export default {
     justify-content: space-around;
     align-items: center;
     position: absolute;
-    padding: getRem(40);
+    // padding: getRem(40);
     font-size: 0.5rem;
     // top: 0;
     bottom: -3.6rem;
     width: getRem(240 * 2);
     height: getRem(375 * 2);
-    background-color: #3c3f4b;
+    background-color: $dark-gray;
     color: white;
     // important rotate
     left: 100%;
     transform-origin: 0% 0%;
     transform: rotate(90deg);
+    .menu-op {
+      background-color: #3c3f4b;
+    }
     #fullkey {
       width: 34px;
       height: 34px;
-      padding-right: 4px;
-      background: url("../assets/viewer/fullkeyboard.png") center center
-        no-repeat;
-      background-size: cover;
+      margin-right: 4px;
+      background: url("../assets/fullkey.png") center center no-repeat;
+      background-size: contain;
     }
     #whitekey {
       width: 34px;
       height: 34px;
-      padding-right: 4px;
-      background: url("../assets/viewer/whitekeyboard.png") center center
-        no-repeat;
-      background-size: cover;
+      margin-right: 4px;
+      background: url("../assets/whitekey.png") center center no-repeat;
+      background-size: contain;
     }
     .inactive {
       opacity: 0.4;
@@ -1043,6 +1045,10 @@ export default {
     > div {
       display: flex;
       align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      background-color: $dark-gray;
     }
   }
 }

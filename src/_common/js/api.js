@@ -13,7 +13,7 @@ const reqConfig = {
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',
-    'Authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjIzOSwic3ViIjoiMjM5IiwiZXhwIjoxNTU1MjIyNzcxLCJpYXQiOjE1NTI2MzA3NzEsImp0aSI6IjE1NTI2MzA3NzE2MzgifQ.J1WNccABxwadbcjF-GsCLUhBhyROpcxP52g6JXW0vKI'
+    // 'Authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjIzOSwic3ViIjoiMjM5IiwiZXhwIjoxNTU1MjIyNzcxLCJpYXQiOjE1NTI2MzA3NzEsImp0aSI6IjE1NTI2MzA3NzE2MzgifQ.J1WNccABxwadbcjF-GsCLUhBhyROpcxP52g6JXW0vKI'
   },
 };
 // const tokenObj = { access_token: '' };
@@ -234,7 +234,7 @@ export function fetchStacks({ page, size }) {
 
 export function fetchSquareWorks({ page, size, id }) {
   return axios.get(
-    `//api.octave-love.com/api/v1/work/getListByUid/${id}?page=${page}&size=${size}`,
+    `//api.octave-love.com/api/v1/home?page=${page}&size=${size}`,
     reqConfig,
   );
 }

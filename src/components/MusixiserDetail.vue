@@ -204,9 +204,9 @@ export default {
       self.loadMusixiserById();
       return;
     }
-    const fullPath = `${location.origin}${
-      location.pathname
-    }#/new-music-box-viewer?id=${self.$store.state.route.query.id}`;
+    const fullPath = `${location.origin}${location.pathname}#/musixiser?id=${
+      self.$store.state.route.query.id
+    }`;
     // WxShare.prepareShareConfig().then(() => {
     //   WxShare.prepareShareContent({
     //     title: "MUSIXISE",
