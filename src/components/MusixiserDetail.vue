@@ -54,10 +54,10 @@ export default {
           id
         })
         .then(() => {
-          document.title = `${this.$store.state.musixiserInfo.realname}的作品`;
           const fullPath = `${location.origin}${
             location.pathname
           }#/musixiser?id=${this.userId}`;
+          document.title = `${this.$store.state.musixiserInfo.realname}的作品`;
           WxShare.prepareShareConfig().then(() => {
             WxShare.prepareShareContent({
               title: `${this.$store.state.musixiserInfo.realname}的作品`,
@@ -199,6 +199,7 @@ export default {
     docElem.style.fontSize = window.rem + "px";
 
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase());
+    document.title = "作品集";
     if (!inWechat) {
       this.userId = this.$store.state.route.query.id || 239;
       self.loadMusixiserById();

@@ -389,11 +389,39 @@
     position: absolute;
     width: 100%;
     bottom: 0rem;
-    display: flex;
-    height: 2.4rem;
+    // display: flex;
+    height: 1.7rem;
     padding: 0 getRem(50);
     // justify-content: space-between;
     align-items: center;
+    .button_group {
+      position:absolute;
+      display: flex;
+      // flex: 1;
+      top: 0;
+      width: 67%;
+      margin-left: 20%;
+      .disabled {
+        background-color: gray;
+      }
+      button {
+        outline: 0;
+        border: 0;
+        display: block;
+        width: getRem(325);
+        color: #fff;
+        padding: getRem(20);
+        font-size: 16px;
+        &:first-of-type {
+          border-radius: getRem(50) 0 0 getRem(50);
+          background: rgb(113, 113, 230);
+        }
+        &:last-of-type {
+          border-radius: 0 getRem(50) getRem(50) 0;
+          background: rgb(69, 100, 215);
+        }
+      }
+    }
     .purchaseBtn {
       position: relative;
       width: getRem(250);

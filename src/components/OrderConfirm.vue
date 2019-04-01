@@ -35,6 +35,7 @@ export default {
   },
   watch: {},
   created() {
+    document.title = "确认订单";
     this.currentActive = this.initActive;
     this.currentActiveCount = this.currentActive
       ? this.initCount

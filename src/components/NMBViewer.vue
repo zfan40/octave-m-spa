@@ -55,6 +55,7 @@ export default {
           this.newCover = this.projectInfo.cover;
           // alert('load complete');
           // this.togglePlay();
+          document.title = this.newWorkTitle;
           const fullPath = `${location.origin}${
             location.pathname
           }#/new-music-box-viewer?id=${this.$store.state.route.query.id}`;
@@ -114,25 +115,35 @@ export default {
         title: this.newWorkTitle,
         cover: this.newCover,
         content: this.newMessage
-      });
-      this.finalNewWorkTitle = this.newWorkTitle;
-      const fullPath = `${location.origin}${
-        location.pathname
-      }#/new-music-box-viewer?id=${this.$store.state.route.query.id}`;
-      WxShare.prepareShareContent({
-        title: `${this.projectInfo.userVO.realname}做了个八音盒-${
-          this.newWorkTitle
-        }`,
-        desc: "一般人儿我不告诉TA",
-        // fullPath:location.href.split('#')[0],
-        fullPath,
-        imgUrl:
-          this.projectInfo.cover ||
-          "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
-      });
-      setTimeout(() => {
-        this.workUpdateAppear = false;
-      }, 300);
+      })
+        .then(
+          () => {
+            this.$toast("作品更新成功");
+            this.workUpdateAppear = false;
+            this.finalNewWorkTitle = this.newWorkTitle;
+            document.title = this.finalNewWorkTitle;
+            const fullPath = `${location.origin}${
+              location.pathname
+            }#/new-music-box-viewer?id=${this.$store.state.route.query.id}`;
+            WxShare.prepareShareContent({
+              title: `${this.projectInfo.userVO.realname}做了个八音盒-${
+                this.newWorkTitle
+              }`,
+              desc: "一般人儿我不告诉TA",
+              // fullPath:location.href.split('#')[0],
+              fullPath,
+              imgUrl:
+                this.projectInfo.cover ||
+                "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
+            });
+          },
+          () => {
+            this.$toast("作品更新失败");
+          }
+        )
+        .catch(() => {
+          this.$toast("作品更新失败");
+        });
     },
     redirectToMaker() {
       this.$router.push({
@@ -395,30 +406,4 @@ export default {
 @import "../_common/style/_mixins.scss";
 @import "../_common/style/_reboot.scss";
 @import "./NMBViewer.scss";
-.button_group {
-  display: flex;
-  width: 70%;
-  flex: 1;
-  padding-left: getRem(40);
-  .disabled {
-    background-color: gray;
-  }
-  button {
-    outline: 0;
-    border: 0;
-    display: block;
-    width: getRem(325);
-    color: #fff;
-    padding: getRem(20);
-    font-size: 16px;
-    &:first-of-type {
-      border-radius: getRem(50) 0 0 getRem(50);
-      background: rgb(113, 113, 230);
-    }
-    &:last-of-type {
-      border-radius: 0 getRem(50) getRem(50) 0;
-      background: rgb(69, 100, 215);
-    }
-  }
-}
 </style>

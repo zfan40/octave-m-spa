@@ -42,6 +42,7 @@ export default {
   watch: {},
   created() {
     const self = this;
+    document.title = "选择商品";
     //set upper big swiper
     this.bigProductListOption = {
       loop: false,

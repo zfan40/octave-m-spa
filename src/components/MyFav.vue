@@ -53,10 +53,10 @@ export default {
           id
         })
         .then(() => {
-          document.title = `${this.$store.state.musixiserInfo.realname}的收藏`;
           const fullPath = `${location.origin}${location.pathname}#/my-fav?id=${
             this.userId
           }`;
+          document.title = `${this.$store.state.musixiserInfo.realname}的收藏`;
           WxShare.prepareShareConfig().then(() => {
             WxShare.prepareShareContent({
               title: `${this.$store.state.musixiserInfo.realname}的收藏`,
@@ -190,7 +190,7 @@ export default {
     var docElem = document.documentElement;
     window.rem = docElem.getBoundingClientRect().width / 10;
     docElem.style.fontSize = window.rem + "px";
-
+    document.title = "收藏集";
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase());
     if (!inWechat) {
       this.userId = this.$store.state.route.query.id || 239;

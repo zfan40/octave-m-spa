@@ -215,6 +215,7 @@ export default {
       this.busy = false;
       return;
     }
+    document.title = "我的订单";
     if (Util.getUrlParam("code") || Cookies.get("serviceToken")) {
       //TODO:ajax call to get info
       Api.getUserInfo(Util.getUrlParam("code"))
