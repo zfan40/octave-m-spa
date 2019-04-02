@@ -44,7 +44,7 @@ export function getUserInfo(wxcode) {
             reqConfig.headers.Authorization = `${serviceToken}`;
             // tokenObj.access_token = serviceToken;
             Cookies.set('serviceToken', serviceToken, {
-              expires: 7,
+              expires: 30,
             });
             return axios.get('//api.octave-love.com/api/v1/user/getInfo', reqConfig);
           },

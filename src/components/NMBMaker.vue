@@ -409,6 +409,7 @@ export default {
     },
     btnStart(e) {
       console.log(e);
+      this.showExtendBtns = false;
       extendBtnsTimeout = setTimeout(() => {
         // show extend buttons
         this.showExtendBtns = true;
@@ -434,12 +435,9 @@ export default {
         (a.classList.contains("playBtn") || a.classList.contains("pauseBtn"))
       ) {
         // 播放
-        this.toggleReplay();
-        this.showExtendBtns = false;
-      } else if (
-        a &&
-        (a.classList.contains("playBtn") || a.classList.contains("cancelBtn"))
-      ) {
+        if (!this.showExtendBtns) this.toggleReplay();
+        // this.showExtendBtns = false;
+      } else if (a && a.classList.contains("cancelBtn")) {
         // hide extend buttons
         this.showExtendBtns = false;
       }
@@ -688,7 +686,7 @@ export default {
   mounted() {
     // this.startRecord();
     // pointer events以后可以使用
-    this.tutorStart();
+    if (!Cookies.get("serviceToken")) this.tutorStart();
   },
   updated() {}
 };
@@ -1000,7 +998,7 @@ export default {
       width: 100%;
       height: 100%;
       border-radius: getRem(42);
-      background: url("../assets/play.svg") center center no-repeat;
+      background: url("../assets/play.svg") 55% 46% no-repeat;
       background-size: getRem(32);
       background-color: rgb(69, 106, 255);
     }
