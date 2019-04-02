@@ -136,7 +136,8 @@ export default {
       // const fullNoteNumWithinDur = 10;
       // console.log('full note num', fullNoteNumWithinDur);
       // let lastTiming = 0;
-
+      let currentSector = this.sector;
+      console.log("sdfsdfsdf", currentSector);
       const partNoteNumStart = (this.sector - 1) * this.NOTE_NUM_PER_SECTOR;
       const partNoteNumEnd =
         partNoteNumStart + this.ONE_PAGE_NOTE_NUM <= fullNoteNumWithinDur
@@ -159,8 +160,26 @@ export default {
 
               // feat: cursor follow
               // this.sector = Math.ceil(this.activeJ / NOTE_NUM_PER_SECTOR);
-              this.sector =
-                2 * Math.floor(this.activeJ / this.ONE_PAGE_NOTE_NUM) + 1;
+              if (currentSector % 2 === 1) {
+                console.log("normal");
+                this.sector =
+                  2 * Math.floor(this.activeJ / this.ONE_PAGE_NOTE_NUM) + 1;
+              } else {
+                console.log("abnormal");
+                //这块是半拉
+                this.sector =
+                  2 *
+                    Math.floor(
+                      (this.activeJ - NOTE_NUM_PER_SECTOR) /
+                        this.ONE_PAGE_NOTE_NUM
+                    ) +
+                  2;
+                if (this.activeJ == fullNoteNumWithinDur - 1) {
+                  //如何判断到头，到头了复原
+                  currentSector = 1;
+                }
+              }
+              console.log(this.sector);
               this.currentTime = (i * TIME_PER_NOTE * 120) / this.tempo;
               // const now = performance.now();
               // console.log(now - lastTiming);
@@ -290,6 +309,7 @@ export default {
     },
     startloop() {
       // start from the current sector start(start,offset)
+      this.scheduleCursor(); //其实没什么用，只是为了更新下currentSector，翻页比较自然。。。其他没用
       console.log(this.rectArray);
       //issue: autoplay, https://github.com/Tonejs/Tone.js/issues/341
       if (Tone.context.state !== "running") {
@@ -560,7 +580,6 @@ export default {
 
 <template>
   <div class>
-    <div @touchstart="menuAppear=true" id="menuicon" class="rotate"></div>
     <div class="roll" v-bind:style="{width:controlWidth+'px'}">
       <div
         :style="{width:configKonva.width+'px'}"

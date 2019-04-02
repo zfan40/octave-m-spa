@@ -77,12 +77,13 @@ export default {
       tutorSession: 0,
       handClass: "", // hand or clickhand
       tutorClass: "", // hand positioning in different session
-      menuAppear: true,
+      menuAppear: false,
+      fuckReady: false,
       timelineConfig: {
         value: 0,
         width: 8,
         // height: `${window.screen.height * 0.9 - 20}px`,
-        height: `${window.innerHeight * 0.9 - 20}px`,
+        // height: `${window.innerHeight * 0.9 - 20}px`,
         // height: "90%",
         padding: "0",
         dotSize: 20,
@@ -528,7 +529,7 @@ export default {
             setTimeout(() => {
               this.handClass = "hand"; // clickhand
               this.tutorClass = "tutor4start";
-              this.showExtendBtns = true;
+              this.menuAppear = true;
             }, 1500)
           );
           tutorTimeout.push(
@@ -538,7 +539,7 @@ export default {
           );
           tutorTimeout.push(
             setTimeout(() => {
-              this.showExtendBtns = false;
+              this.menuAppear = false;
             }, 3000)
           );
           break;
@@ -603,9 +604,9 @@ export default {
     const self = this;
     setTimeout(() => {
       //ineresting... due to sb wechat webpage
-      alert(window.innerHeight);
-      self.timelineConfig.height = `${window.innerHeight * 0.9 - 20}px`;
-      self.$refs.timeline.refresh();
+      // alert(window.innerHeight);
+      self.timelineConfig.height = `${(window.innerHeight - 50) * 0.9}px`;
+      self.fuckReady = true;
     }, 100);
     Tone.Transport.cancel();
     tonepart = [];
@@ -693,7 +694,7 @@ export default {
     // this.startRecord();
     // pointer events以后可以使用
     if (!Cookies.get("serviceToken")) this.tutorStart();
-    this.$refs.timeline.refresh();
+    // this.$refs.timeline.refresh();
   },
   updated() {}
 };
@@ -780,7 +781,7 @@ export default {
                 v-if="activePartIndex===(PARTNUM-n)"
                 v-for="(item,index) in recordPart"
                 :x="2"
-                :y="100*item.time/20 + '%'"
+                :y="100*item.time/20-0.2 + '%'"
                 :width="mapNoteMidiToLength(item.note)"
                 height="3"
                 rx="2"
@@ -792,7 +793,7 @@ export default {
               <rect
                 v-for="(item,index) in recordParts[PARTNUM-n]"
                 :x="2"
-                :y="100*item.time/20 + '%'"
+                :y="100*item.time/20-0.2 + '%'"
                 :width="mapNoteMidiToLength(item.note)"
                 height="3"
                 rx="2"
@@ -811,7 +812,14 @@ export default {
     </div>
 
     <div class="g-controller">
+      <div
+        :class="[tutorSession===4?'tutorial-highlight':'']"
+        @touchstart="menuAppear=true"
+        id="menuicon"
+        class="rotate"
+      ></div>
       <vue-slider
+        v-if="fuckReady"
         ref="timeline"
         :class="[tutorSession===2?'tutorial-highlight':'']"
         :show="screenOrientation==='portrait'"
@@ -819,10 +827,7 @@ export default {
         v-bind="timelineConfig"
         @callback="adjustTimeline"
       ></vue-slider>
-      <div
-        class="btnContainer"
-        :class="[(tutorSession===3||tutorSession===4)?'tutorial-highlight':'']"
-      >
+      <div class="btnContainer" :class="[tutorSession===3?'tutorial-highlight':'']">
         <div :class="[playing?'pauseBtn':'playBtn', 'rotate']" @click="toggleReplay"></div>
         <!-- <div :class="[showExtendBtns?'extendBtnsShow':'extendBtnsHide','extendBtns']">
           <div class="bounceBtn rotate"></div>
@@ -857,7 +862,7 @@ export default {
       </div>
       <div v-show="tutorSession===4" class="hint-text" id="longpress-hint">
         <h3>功能按钮</h3>
-        <p>长按后点击：保存/取消</p>
+        <p>点击后点击：保存/取消</p>
       </div>
       <div v-show="tutorSession===5" class="hint-text" id="swipe-hint">
         <h3>多轨编曲</h3>
@@ -887,6 +892,7 @@ export default {
 @import "../_common/style/_variables.scss";
 @import "../_common/style/_mixins.scss";
 @import "../_common/style/_reboot.scss";
+
 #tutorhand {
   position: absolute;
   width: getRem(96);
@@ -896,12 +902,12 @@ export default {
   z-index: 500;
   transition: background 0.05s ease, transform 1s linear;
   &.tutor2start {
-    top: 0.5rem;
+    top: 1.4rem;
     right: 0.8rem;
     transition: none;
   }
   &.tutor2end {
-    top: 0.5rem;
+    top: 1.4rem;
     right: 0.8rem;
     transform: translateY(5rem);
   }
@@ -915,12 +921,12 @@ export default {
     right: 0.6rem;
   }
   &.tutor4start {
-    bottom: 0.1rem;
+    top: 0.1rem;
     right: 0.6rem;
     transition: none;
   }
   &.tutor4end {
-    bottom: 0.1rem;
+    top: 0.1rem;
     right: 0.6rem;
   }
   &.tutor5start {
@@ -974,7 +980,7 @@ export default {
   position: absolute;
   width: getRem(42);
   height: 100%;
-  padding-top: getRem(44);
+  // padding-top: 50px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -999,6 +1005,17 @@ export default {
   //         right: getRem(13);
   //     }
   // }
+  #menuicon {
+    // position: absolute;
+    // z-index: 50;
+    // right: 0;
+    // top: 0;
+    width: 34px;
+    height: 34px;
+    background: url("../assets/menu.png") center center no-repeat;
+    background-size: cover;
+    margin: 6px 0 10px 0;
+  }
   .btnContainer {
     position: absolute;
     width: getRem(80);
@@ -1159,7 +1176,7 @@ h2 {
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding-top: getRem(44);
+    padding-top: 50px;
     padding-left: getRem(18);
     svg {
       bottom: getRem(92);
@@ -1360,7 +1377,7 @@ h2 {
   }
   #longpress-hint {
     position: absolute;
-    bottom: 4rem;
+    top: 3rem;
     right: -1rem;
   }
   #swipe-hint {
@@ -1412,6 +1429,7 @@ h2 {
 .alert-mask {
   position: absolute;
   top: 0;
+  z-index: 100;
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.3);
