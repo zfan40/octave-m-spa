@@ -3,7 +3,7 @@ export function getDateDiff(dateTimeStamp) {
   let result = ''
   // some are"2019-03-12 22:54:36", some are 1552399367000
   // alert(+ new Date(dateTimeStamp))
-  const newdateTimeStamp = typeof dateTimeStamp === 'string' ? + new Date(dateTimeStamp.replace(' ', 'T')) : dateTimeStamp
+  const newdateTimeStamp = typeof dateTimeStamp === 'string' ? + new Date(dateTimeStamp.replace(/-/g, '/')) : dateTimeStamp
   var minute = 1000 * 60;
   var hour = minute * 60;
   var day = hour * 24;

@@ -144,7 +144,7 @@ export default {
         <p class="song-title">{{workInfo.userVO.realname}}</p>
       </div>
       <div class="detail-other">
-        <div>{{(workInfo.lastModifiedDate||workInfo.createdDate)|getDateDiff}}</div>
+        <div>{{workInfo.lastModifiedDate|getDateDiff}}更新</div>
         <div class="likes" @click="onToggleLike(workInfo)">
           <img v-if="!workInfo.favStatus" src="../../assets/heartstroke.svg" alt>
           <img v-if="workInfo.favStatus" src="../../assets/heartfill.svg" alt>
