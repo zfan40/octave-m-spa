@@ -25,7 +25,7 @@ window.cursorSchedules = [];
 let aInterval = undefined;
 let extendBtnsTimeout = undefined;
 const TIME_PER_NOTE = 0.25; // quarter note seemingly
-const FULL_NOTE_NUM = 120 + 10; // max tempo 180, 20seconds => 120 notes, :test 30. with 10 as extra space
+const FULL_NOTE_NUM = 120; // max tempo 180, 20seconds => 120 notes, :test 30.
 const NOTE_NUM_PER_SECTOR = 10; // :test 10
 const MB_DUR = 20; // 20 seconds length // :test 5
 const MIN_TEMPO = 60;
@@ -159,7 +159,8 @@ export default {
 
               // feat: cursor follow
               // this.sector = Math.ceil(this.activeJ / NOTE_NUM_PER_SECTOR);
-              this.sector = 2 * Math.floor(this.activeJ / MB_DUR) + 1;
+              this.sector =
+                2 * Math.floor(this.activeJ / this.ONE_PAGE_NOTE_NUM) + 1;
               this.currentTime = (i * TIME_PER_NOTE * 120) / this.tempo;
               // const now = performance.now();
               // console.log(now - lastTiming);
@@ -588,7 +589,8 @@ export default {
     </div>
 
     <div class="control-panal">
-      <div style="height:4rem;display:flex;flex-direction:column;">
+      <div style="height:6rem;display:flex;flex-direction:column;">
+        <div @touchstart="menuAppear=true" id="menuicon" class="rotate"></div>
         <div v-show="!playing" @touchstart="scrollToBegin" id="scrolltop" class="rotate"></div>
         <div v-show="!playing" @touchstart="scrollup" id="scrollup" class="rotate"></div>
         <div v-show="!playing" @touchstart="scrolldown" id="scrolldown" class="rotate"></div>
@@ -680,17 +682,6 @@ export default {
   right: 0;
   overflow: scroll;
 }
-#menuicon {
-  position: absolute;
-  width: getRem(34);
-  height: getRem(28);
-  right: 10px;
-  bottom: 12px;
-  background: url("../assets/menu2.png") center center no-repeat;
-  background-size: cover;
-  z-index: 200;
-  // margin-bottom: 20px;
-}
 .control-panal {
   position: absolute;
   display: flex;
@@ -710,6 +701,12 @@ export default {
     height: 34px;
     background: url("../assets/clear.png") center center no-repeat;
     background-size: contain;
+  }
+  #menuicon {
+    width: 34px;
+    height: 34px;
+    background: url("../assets/menu.png") center center no-repeat;
+    background-size: cover;
     margin-bottom: 20px;
   }
 
@@ -1005,7 +1002,7 @@ export default {
   }
   .menu {
     display: flex;
-    right: 0;
+    top: 0;
     flex-direction: column;
     justify-content: space-around;
     align-items: center;
@@ -1054,13 +1051,15 @@ export default {
 }
 .slide-enter-active {
   transition: all 0.3s ease-out;
+  top: 0px;
 }
 .slide-leave-active {
   transition: all 0.3s ease-out;
+  top: 0px;
 }
 .slide-enter, .slide-leave-to
 /* .slide-fade-leave-active below version 2.1.8 */ {
   opacity: 0;
-  transform: translateY(300px);
+  top: -200px;
 }
 </style>

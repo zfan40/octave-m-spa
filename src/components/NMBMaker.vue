@@ -77,6 +77,7 @@ export default {
       tutorSession: 0,
       handClass: "", // hand or clickhand
       tutorClass: "", // hand positioning in different session
+      menuAppear: true,
       timelineConfig: {
         value: 0,
         width: 8,
@@ -407,41 +408,41 @@ export default {
         }
       }
     },
-    btnStart(e) {
-      console.log(e);
-      this.showExtendBtns = false;
-      extendBtnsTimeout = setTimeout(() => {
-        // show extend buttons
-        this.showExtendBtns = true;
-      }, 200);
-    },
-    btnEnd(e) {
-      // console.log(e)
-      clearTimeout(extendBtnsTimeout);
-      const a = document.elementFromPoint(
-        e.changedTouches[0].clientX,
-        e.changedTouches[0].clientY
-      );
-      console.log(a);
-      if (a && a.classList.contains("bounceBtn")) {
-        // 导出
-        if (this.checkBouncibility()) {
-          this.bounceProject();
-        } else {
-          this.alertAppear = true;
-        }
-      } else if (
-        a &&
-        (a.classList.contains("playBtn") || a.classList.contains("pauseBtn"))
-      ) {
-        // 播放
-        if (!this.showExtendBtns) this.toggleReplay();
-        // this.showExtendBtns = false;
-      } else if (a && a.classList.contains("cancelBtn")) {
-        // hide extend buttons
-        this.showExtendBtns = false;
-      }
-    },
+    // btnStart(e) {
+    //   console.log(e);
+    //   this.showExtendBtns = false;
+    //   extendBtnsTimeout = setTimeout(() => {
+    //     // show extend buttons
+    //     this.showExtendBtns = true;
+    //   }, 200);
+    // },
+    // btnEnd(e) {
+    //   // console.log(e)
+    //   clearTimeout(extendBtnsTimeout);
+    //   const a = document.elementFromPoint(
+    //     e.changedTouches[0].clientX,
+    //     e.changedTouches[0].clientY
+    //   );
+    //   console.log(a);
+    //   if (a && a.classList.contains("bounceBtn")) {
+    //     // 导出
+    //     if (this.checkBouncibility()) {
+    //       this.bounceProject();
+    //     } else {
+    //       this.alertAppear = true;
+    //     }
+    //   } else if (
+    //     a &&
+    //     (a.classList.contains("playBtn") || a.classList.contains("pauseBtn"))
+    //   ) {
+    //     // 播放
+    //     if (!this.showExtendBtns) this.toggleReplay();
+    //     // this.showExtendBtns = false;
+    //   } else if (a && a.classList.contains("cancelBtn")) {
+    //     // hide extend buttons
+    //     this.showExtendBtns = false;
+    //   }
+    // },
     tutorStart() {
       // 0未开始，1黑屏,2键盘，3track，4时间线，5播放,
       this.tutorSession = 1;
@@ -599,8 +600,13 @@ export default {
   created() {
     // check cookie to get serviceToken first
     // if stoken not exist, go auth
-
     const self = this;
+    setTimeout(() => {
+      //ineresting... due to sb wechat webpage
+      alert(window.innerHeight);
+      self.timelineConfig.height = `${window.innerHeight * 0.9 - 20}px`;
+      self.$refs.timeline.refresh();
+    }, 100);
     Tone.Transport.cancel();
     tonepart = [];
     bouncepart = [];
@@ -687,6 +693,7 @@ export default {
     // this.startRecord();
     // pointer events以后可以使用
     if (!Cookies.get("serviceToken")) this.tutorStart();
+    this.$refs.timeline.refresh();
   },
   updated() {}
 };
@@ -811,23 +818,20 @@ export default {
         v-model="vuetimeline"
         v-bind="timelineConfig"
         @callback="adjustTimeline"
-        @drag-end
       ></vue-slider>
       <div
         class="btnContainer"
         :class="[(tutorSession===3||tutorSession===4)?'tutorial-highlight':'']"
-        @touchstart.stop.prevent="btnStart"
-        @touchend.stop.event="btnEnd"
       >
         <div :class="[playing?'pauseBtn':'playBtn', 'rotate']" @click="toggleReplay"></div>
-        <div :class="[showExtendBtns?'extendBtnsShow':'extendBtnsHide','extendBtns']">
+        <!-- <div :class="[showExtendBtns?'extendBtnsShow':'extendBtnsHide','extendBtns']">
           <div class="bounceBtn rotate"></div>
           <div class="cancelBtn"></div>
-        </div>
+        </div>-->
       </div>
     </div>
     <transition name="fade">
-      <div id="alert-mask" v-show="alertAppear">
+      <div class="alert-mask" v-show="alertAppear">
         <div class="mb-dialog">
           <div class="title">减少些音符才能做成音乐盒，是否继续上传</div>
           <div class="btns">
@@ -867,6 +871,14 @@ export default {
     <div id="tutorhand" :class="[tutorClass]" v-show="handClass!='hidehand'">
       <div :class="[handClass]"></div>
     </div>
+    <transition name="slide">
+      <div class="alert-mask" v-show="menuAppear">
+        <div class="menu">
+          <div @touchstart="bounceProject" class>完成作品</div>
+          <div @touchstart="menuAppear=false" class>退出</div>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -988,10 +1000,11 @@ export default {
   //     }
   // }
   .btnContainer {
-    position: relative;
-    width: getRem(84);
-    height: getRem(84);
-    margin-top: 0.3rem;
+    position: absolute;
+    width: getRem(80);
+    height: getRem(80);
+    // margin-top: 0.3rem;
+    bottom: 10px;
     .playBtn {
       z-index: 2;
       position: absolute;
@@ -1396,7 +1409,7 @@ h2 {
 .rotate {
   transform: rotate(90deg);
 }
-#alert-mask {
+.alert-mask {
   position: absolute;
   top: 0;
   width: 100%;
@@ -1483,5 +1496,67 @@ h2 {
       }
     }
   }
+  .menu {
+    display: flex;
+    top: 0;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    position: absolute;
+    // padding: getRem(40);
+    font-size: 0.5rem;
+    // top: 0;
+    bottom: -3.6rem;
+    width: getRem(240 * 2);
+    height: getRem(375 * 2);
+    background-color: $dark-gray;
+    color: white;
+    // important rotate
+    left: 100%;
+    transform-origin: 0% 0%;
+    transform: rotate(90deg);
+    .menu-op {
+      background-color: #3c3f4b;
+    }
+    #fullkey {
+      width: 34px;
+      height: 34px;
+      margin-right: 4px;
+      background: url("../assets/fullkey.png") center center no-repeat;
+      background-size: contain;
+    }
+    #whitekey {
+      width: 34px;
+      height: 34px;
+      margin-right: 4px;
+      background: url("../assets/whitekey.png") center center no-repeat;
+      background-size: contain;
+    }
+    .inactive {
+      opacity: 0.4;
+    }
+    > div {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      background-color: $dark-gray;
+    }
+  }
+}
+
+.slide-enter-active {
+  transition: all 0.3s ease-out;
+  top: 0px;
+}
+.slide-leave-active {
+  transition: all 0.3s ease-out;
+  top: 0px;
+}
+.slide-enter, .slide-leave-to
+/* .slide-fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+  top: -200px;
 }
 </style>
