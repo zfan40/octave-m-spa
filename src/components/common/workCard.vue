@@ -1,6 +1,7 @@
 
 
 <script>
+const status = [];
 export default {
   props: {
     // editing: bool. //instead of as state, can be passed in prop, to keep only one current editing card in a work card list
@@ -20,9 +21,9 @@ export default {
     onPlayWork: Function,
     onPurchaseWork: Function,
     onShareWork: Function,
-    onHideWork: Function,
-    onDeleteWork: Function,
+    onChangeWorkStatus: Function,
     onToggleLike: Function,
+    onClickTag: Function,
     onLongPress: {
       type: Function,
       default: function() {
@@ -44,6 +45,7 @@ export default {
       userId: 239,
       collectNum: 0,
       lastModifiedDate: "2019-01-17 11:51:03",
+      machineNum: 19,
       fileHash: "f0af50f723c10857ad5348fe52ee8f1c",
       userVO: {
         id: 108,
@@ -69,7 +71,8 @@ export default {
       }
     };
     return {
-      info: mock
+      info: mock,
+      workStatusMap: { 0: "公开", 1: "私密", 2: "删除" }
       // editing: false
     };
   },
@@ -115,10 +118,20 @@ export default {
       <div v-show="maskOn" class="mask" @touchstart.self="onTapMask">
         <div :class="['circle-btn',workInfo.machineNum>18?'gray':'pink']" @click="onPurchaseWork">购买</div>
         <!-- <div class="circle-btn purple" @click="onShareWork">分享</div> -->
-        <!-- <div v-if="isMine" class="circle-btn blue" @click="onHideWork">私密</div> -->
-        <!-- <div v-if="isMine" class="circle-btn gray" @click="onDeleteWork">删除</div> -->
+        <div
+          v-if="isMine"
+          class="circle-btn blue"
+          @click="onChangeWorkStatus(workInfo,workInfo.status==0?1:0)"
+        >{{workInfo.status==0?workStatusMap[1]:workStatusMap[0]}}</div>
+        <div v-if="isMine" class="circle-btn gray" @click="onChangeWorkStatus(workInfo,2)">删除</div>
       </div>
     </transition>
+    <img
+      v-if="workInfo.machineNum<=18"
+      class="mb-tag"
+      src="../../assets/mb-tag.svg"
+      @click="onClickTag"
+    >
     <div class="preview-bg">
       <img v-if="workInfo.cover.indexOf('//')>=0" class="cover" :src="workInfo.cover" alt>
       <div v-if="workInfo.cover.indexOf('//')<0" class="dark-mask"></div>
@@ -242,6 +255,13 @@ export default {
       width: 100%;
       height: 100%;
     }
+  }
+  .mb-tag {
+    position: absolute;
+    width: getRem(70);
+    top: 0;
+    right: 0;
+    z-index: 1;
   }
   .detail {
     position: relative;

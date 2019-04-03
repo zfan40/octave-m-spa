@@ -154,30 +154,22 @@ export default {
         });
       });
     },
-    hideWork() {
-      console.log("hide in");
-    },
-    deleteWork() {}
-    // togglePlay() {
-    //   // alert('111')
-    //   Magic.preview(this.project);
-    //   this.playing = !this.playing;
-    // },
-    // toggleFav() {
-    //   // this.favStatus = +!this.favStatus;
-    //   Api.toggleFavSong({
-    //     workId: this.$store.state.route.query.id,
-    //     status: this.favStatus
-    //   });
-    // },
-    // redirectToWork(id) {
-    //   this.$router.push({
-    //     path: "/new-music-box-viewer",
-    //     query: {
-    //       id
-    //     }
-    //   });
-    // }
+    changeWorkStatus(workInfo, status) {
+      Api.updateWork({
+        id: workInfo.id,
+        status: status
+      }).then(() => {
+        this.$toast(`已将作品${workStatusMap[status]}`);
+        this.cancelOperate();
+        this.$store.commit("LOCAL_UPDATE_LIST", {
+          type: "musixiserWorksObj",
+          item: {
+            id: workInfo.id,
+            status
+          }
+        });
+      });
+    }
   },
   beforeRouteLeave(to, from, next) {
     Magic.clearTone();
@@ -280,8 +272,7 @@ export default {
         :onPlayWork="()=>playWork(item)"
         :onPurchaseWork="()=>purchaseWork(item)"
         :onShareWork="shareWork"
-        :onHideWork="hideWork"
-        :onDeleteWork="deleteWork"
+        :onChangeWorkStatus="changeWorkStatus"
         :onTapMask="cancelOperate"
         :onToggleLike="toggleLike"
       />

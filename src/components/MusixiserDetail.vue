@@ -5,17 +5,19 @@ import * as Api from "../_common/js/api";
 import * as Cookies from "js-cookie";
 import * as Magic from "../_common/js/magic";
 import workCard from "./common/workCard";
+import tagDialog from "./common/tagDialog";
 import * as WxShare from "../_common/js/wx_share";
 import infiniteScroll from "vue-infinite-scroll";
 
 let musicPart = undefined;
-
+const workStatusMap = { 0: "公开", 1: "私密", 2: "删除" };
 export default {
   directives: {
     infiniteScroll
   },
   components: {
-    workCard
+    workCard,
+    tagDialog
   },
   data() {
     return {
@@ -27,7 +29,8 @@ export default {
       favStatus: false,
       newWorkTitle: "",
       finalNewWorkTitle: "",
-      busy: true
+      busy: true,
+      tagAppear: false
     };
   },
   computed: {
@@ -161,30 +164,22 @@ export default {
     shareWork() {
       console.log("share in");
     },
-    hideWork() {
-      console.log("hide in");
-    },
-    deleteWork() {}
-    // togglePlay() {
-    //   // alert('111')
-    //   Magic.preview(this.project);
-    //   this.playing = !this.playing;
-    // },
-    // toggleFav() {
-    //   // this.favStatus = +!this.favStatus;
-    //   Api.toggleFavSong({
-    //     workId: this.$store.state.route.query.id,
-    //     status: this.favStatus
-    //   });
-    // },
-    // redirectToWork(id) {
-    //   this.$router.push({
-    //     path: "/new-music-box-viewer",
-    //     query: {
-    //       id
-    //     }
-    //   });
-    // }
+    changeWorkStatus(workInfo, status) {
+      Api.updateWork({
+        id: workInfo.id,
+        status: status
+      }).then(() => {
+        this.$toast(`已将作品${workStatusMap[status]}`);
+        this.cancelOperate();
+        this.$store.commit("LOCAL_UPDATE_LIST", {
+          type: "musixiserWorksObj",
+          item: {
+            id: workInfo.id,
+            status
+          }
+        });
+      });
+    }
   },
   beforeRouteLeave(to, from, next) {
     Magic.clearTone();
@@ -193,6 +188,7 @@ export default {
   created() {
     //check cookie to get serviceToken first
     // if stoken not exist, go auth
+    alert(3);
     const self = this;
     var docElem = document.documentElement;
     window.rem = docElem.getBoundingClientRect().width / 10;
@@ -287,11 +283,12 @@ export default {
         :onLongPress="()=>operateWork(item)"
         :onPlayWork="()=>playWork(item)"
         :onPurchaseWork="()=>purchaseWork(item)"
+        :onClickTag="()=>{tagAppear=true}"
         :onShareWork="shareWork"
-        :onHideWork="hideWork"
-        :onDeleteWork="deleteWork"
+        :onChangeWorkStatus="changeWorkStatus"
         :onTapMask="cancelOperate"
         :onToggleLike="toggleLike"
+        :isMine="isMe"
       />
     </div>
     <!-- <div class="emptysection" v-show="!loading && musixiserWorksObj.content.length==0">
@@ -300,6 +297,7 @@ export default {
         <img src="../assets/oops.png" style="width:6rem;" alt>
       </div>
     </div>-->
+    <tag-dialog :appear="tagAppear" :handleClose="()=>{tagAppear=false}"/>
   </div>
 </template>
 
@@ -316,6 +314,7 @@ export default {
   background-color: #404249;
 }
 .worklist {
+  z-index: 0;
   position: relative;
   height: 100%;
   display: flex;

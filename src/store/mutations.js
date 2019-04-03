@@ -116,6 +116,22 @@ export default {
       }
     })
   },
+  LOCAL_UPDATE_LIST: (state, { type, item }) => {
+    // { 0: "公开", 1: "私密", 2: "删除" };
+    console.log(item)
+    if (item.status != 2) { //更新状态
+      state[type].content.forEach((work) => {
+        if (work.id == item.id) {
+          work.status = item.status
+        }
+      })
+    } else {//删除
+      const index = state[type].content.findIndex(work => work.id == item.id)
+      state[type].content.splice(index, 1)
+      // state[type].content = state[type].content.filter(i => i.status != item.status)
+    }
+
+  },
   LOCAL_UPDATE_ORDER_STATUS: (state, { orderId, status }) => {
     state.orders.content.forEach((order) => {
       if (order.orderId == orderId) {

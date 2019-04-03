@@ -94,9 +94,7 @@ export default {
         <div style="display:flex;align-items:center;" @click="gotoMusixiser(workInfo.userId)">
           <img class="avatar" :src="workInfo.userVO.smallAvatar" alt>
           <p class="song-title">{{workInfo.userVO.realname}}</p>
-          <p
-            class="update-info"
-          >&nbsp;· 更新于{{(workInfo.lastModifiedDate||workInfo.createdDate)|getDateDiff}}</p>
+          <p class="update-info">&nbsp;· 更新于{{workInfo.lastModifiedDate|getDateDiff}}</p>
         </div>
       </div>
       <div class="like-info">
