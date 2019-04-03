@@ -72,6 +72,9 @@ export default {
     state.favWorksObj.size = favWorksObj.size;
     state.favWorksObj.current = favWorksObj.current;
   },
+  RESET_WORK_LIST: (state, { type }) => {
+    state[type] = { content: [] }
+  },
   // SET_FINAL_WORK: (state, { type }) => { // 储存成品信息
   //   state.activeType = type;
   // },

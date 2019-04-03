@@ -183,12 +183,15 @@ export default {
   },
   beforeRouteLeave(to, from, next) {
     Magic.clearTone();
+    this.$store.commit("RESET_WORK_LIST", {
+      type: "musixiserWorksObj"
+    });
     next();
   },
   created() {
     //check cookie to get serviceToken first
     // if stoken not exist, go auth
-    alert(3);
+
     const self = this;
     var docElem = document.documentElement;
     window.rem = docElem.getBoundingClientRect().width / 10;

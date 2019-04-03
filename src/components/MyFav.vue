@@ -162,7 +162,7 @@ export default {
         this.$toast(`已将作品${workStatusMap[status]}`);
         this.cancelOperate();
         this.$store.commit("LOCAL_UPDATE_LIST", {
-          type: "musixiserWorksObj",
+          type: "favWorksObj",
           item: {
             id: workInfo.id,
             status
@@ -173,6 +173,9 @@ export default {
   },
   beforeRouteLeave(to, from, next) {
     Magic.clearTone();
+    this.$store.commit("RESET_WORK_LIST", {
+      type: "favWorksObj"
+    });
     next();
   },
   created() {
