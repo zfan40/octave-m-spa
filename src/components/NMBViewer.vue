@@ -50,12 +50,13 @@ export default {
           console.log("workPart", this.project);
           console.log("work info", this.projectInfo);
           this.favStatus = this.projectInfo.favStatus;
-          this.newWorkTitle = this.projectInfo.title;
+          this.newWorkTitle =
+            this.projectInfo.title === "尚未起名" ? "" : this.projectInfo.title;
           this.newMessage = this.projectInfo.content;
           this.newCover = this.projectInfo.cover;
           // alert('load complete');
           // this.togglePlay();
-          document.title = this.newWorkTitle;
+          document.title = this.projectInfo.title;
           const fullPath = `${location.origin}${
             location.pathname
           }#/new-music-box-viewer?id=${this.$store.state.route.query.id}`;
@@ -110,6 +111,10 @@ export default {
       );
     },
     updateWork() {
+      if (!this.newWorkTitle) {
+        this.$toast("作品名称不能为空");
+        return;
+      }
       Api.updateWork({
         id: this.$store.state.route.query.id,
         title: this.newWorkTitle,
@@ -152,6 +157,9 @@ export default {
         //   id
         // }
       });
+    },
+    guideShare() {
+      this.$toast("作品取名后，点击右上角分享哦～");
     },
     redirectToMusixiser(id) {
       if (id) {
@@ -349,14 +357,15 @@ export default {
         </div>
         </div>-->
         <count-button
+          style="top:.05rem;"
           :initCount="projectInfo.collectNum?projectInfo.collectNum:0"
           :initActive="projectInfo.favStatus?true:false"
           iconImg
           :onClickCall="toggleFav"
         />
         <div class="button_group">
-          <button @click="redirectToMaker">我来试试</button>
-          <!-- FUTURE WORK: not all work can be built, disabled here on condition -->
+          <button v-if="userId !== projectInfo.userId" @click="redirectToMaker">我来试试</button>
+          <button v-if="userId === projectInfo.userId" @click="guideShare">分享</button>
           <button :class="[projectInfo.machineNum>18?'':'']" @click="purchaseItem">制作八音盒</button>
         </div>
         <!-- <div
@@ -382,7 +391,7 @@ export default {
           <div class="dialog-sector">
             <div class="title">曲名</div>
             <div class="input">
-              <input v-model="newWorkTitle" @blur="positionWindow" type="text" placeholder="ss">
+              <input v-model="newWorkTitle" @blur="positionWindow" type="text" placeholder="曲名">
             </div>
           </div>
           <div class="splitter"></div>

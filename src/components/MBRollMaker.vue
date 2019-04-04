@@ -444,6 +444,7 @@ export default {
     },
     bounceProject() {
       // finally get something like [{note:'A4',time:0},{note:'A5',time:0.3227}]
+      alert("bouncing");
       const result = [];
       for (let i = 0; i <= this.NOTE_CATEGORY - 1; i++) {
         for (let j = 0; j <= FULL_NOTE_NUM - 1; j++) {
@@ -459,6 +460,7 @@ export default {
           }
         }
       }
+      alert("data ready to submit");
       this.$store
         .dispatch("BOUNCE_PROJECT", {
           record: result,
@@ -494,10 +496,10 @@ export default {
         return;
       }
       if (this.checkBouncibility()) {
-        // alert(1);
+        alert(1);
         this.bounceProject();
       } else {
-        // alert(2);
+        alert(2);
         this.alertAppear = true;
       }
     },
@@ -646,7 +648,7 @@ export default {
     <transition name="fade">
       <div class="alert-mask" v-show="alertAppear">
         <div class="mb-dialog">
-          <div class="title">减少些音符才能做成音乐盒，是否继续上传</div>
+          <div class="title">作品音符太多啦，目前无法做成音乐盒，是否继续上传</div>
           <div class="btns">
             <span class="btn cancel" @click="alertAppear=false">再调整</span>
             <span class="btn confirm" @click="bounceProject">任性上传</span>
@@ -817,14 +819,14 @@ export default {
   #minustempo {
     margin-top: 0px; //todo more space here
     margin-bottom: 10px;
-    width: 24px;
-    height: 24px;
+    width: 34px;
+    height: 34px;
     background: url("../assets/minus.png") center center;
     background-size: contain;
   }
   #addtempo {
-    width: 24px;
-    height: 24px;
+    width: 34px;
+    height: 34px;
     margin-top: 10px;
     background: url("../assets/plus.png") center center;
     background-size: contain;
