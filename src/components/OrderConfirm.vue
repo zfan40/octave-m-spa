@@ -100,17 +100,16 @@ export default {
   <div class="container">
     <div class="order-confirm">
       <div class="address" @click="editAddress">
-        <div id="basic-info">
-          收件人：
-          <span>{{userName}}</span>
-          <span style="flex:1">{{telNum}}</span>
-        </div>
-        <div id="address-info">
-          收件地址：
-          <span>{{address}}</span>
+        <div id="basic-info">收件人：</div>
+        <div id="address-info">收件地址：
           <div class="address-underline" id="underline1"></div>
           <div class="address-underline" id="underline2"></div>
         </div>
+        <div id="wx-info">
+          <span>{{userName}}</span>
+          <span>&nbsp;{{telNum}}</span>
+        </div>
+        <div id="wx-address">{{address}}</div>
       </div>
     </div>
     <div class="item">
@@ -157,9 +156,7 @@ export default {
         <li>· 如有其他疑问可在公众号的【留言】版块留言，我们将尽快为您解答</li>
       </ul>
     </div>
-    <div
-      style="position:absolute;bottom:40px;width:100%;display: flex;align-items: center;justify-content: center;"
-    >
+    <div class="purchase-area">
       <div class="purchaseBtn" @click="toConfirmOrder">付款 ¥{{amount*targetProduct.price}}</div>
     </div>
   </div>
@@ -176,8 +173,9 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: scroll;
   background-color: $darker-gray;
+  padding-bottom: getRem(180);
 }
 .order-confirm {
   position: relative;
@@ -194,10 +192,39 @@ export default {
     position: relative;
     color: #8c8c92;
     display: flex;
+    line-height: 1rem;
     font-size: 14px;
     width: 100%;
     height: getRem(100);
     padding-top: getRem(32);
+  }
+  #wx-info {
+    position: absolute;
+    padding-top: getRem(32);
+    text-align: left;
+    top: 0rem;
+    left: 2.3rem;
+    width: 5.5rem;
+    height: 1rem;
+    color: #8c8c92;
+    font-size: 16px;
+    line-height: 1rem;
+  }
+
+  #wx-address {
+    position: absolute;
+    text-align: left;
+    top: 1rem;
+    left: 2.3rem;
+    width: 5.5rem;
+    height: 2rem;
+    color: #6d6e75;
+    font-size: 12px;
+    line-height: 1rem;
+    // text-overflow: ellipsis;
+    // /* Required for text-overflow to do anything */
+    // white-space: nowrap;
+    overflow: scroll;
   }
   #address-info {
     position: relative;
@@ -280,16 +307,28 @@ export default {
   top: 0;
   left: 0;
 }
-.purchaseBtn {
-  background-color: #4564d7;
-  width: getRem(640);
-  height: getRem(92);
-  font-size: 16px;
-  color: white;
-  text-align: center;
-  line-height: getRem(92);
-  border-radius: getRem(46);
+.purchase-area {
+  position: fixed;
+  bottom: 0px;
+  padding-bottom: getRem(40);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $darker-gray;
+  .purchaseBtn {
+    position: relative;
+    background-color: #4564d7;
+    width: getRem(640);
+    height: getRem(92);
+    font-size: 16px;
+    color: white;
+    text-align: center;
+    line-height: getRem(92);
+    border-radius: getRem(46);
+  }
 }
+
 .readme {
   margin: 0 getRem(48);
   color: #6d6e75;

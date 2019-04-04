@@ -216,7 +216,7 @@ export default {
 </script>
 <template>
   <div
-    style="position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;background:rgb(26, 28, 30);height:100%;"
+    style="position:relative;display:flex;flex-direction:column;justify-content:space-around;align-items:center;background:rgb(26, 28, 30);height:100%;"
   >
     <div id="swiper-container">
       <swiper :options="bigCardListOption" ref="bigCardList">
