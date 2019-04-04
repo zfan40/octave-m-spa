@@ -444,7 +444,6 @@ export default {
     },
     bounceProject() {
       // finally get something like [{note:'A4',time:0},{note:'A5',time:0.3227}]
-      alert("bouncing");
       const result = [];
       for (let i = 0; i <= this.NOTE_CATEGORY - 1; i++) {
         for (let j = 0; j <= FULL_NOTE_NUM - 1; j++) {
@@ -460,7 +459,6 @@ export default {
           }
         }
       }
-      alert("data ready to submit");
       this.$store
         .dispatch("BOUNCE_PROJECT", {
           record: result,
@@ -491,15 +489,15 @@ export default {
     },
     submitProject() {
       this.menuAppear = false;
-      if (this.rectArray.flat().length === 0) {
+      if (
+        this.rectArray.reduce((acc, val) => acc.concat(val), []).length === 0 //flat方法摩羯浏览器不支持
+      ) {
         this.$toast("作品不能为空");
         return;
       }
       if (this.checkBouncibility()) {
-        alert(1);
         this.bounceProject();
       } else {
-        alert(2);
         this.alertAppear = true;
       }
     },
