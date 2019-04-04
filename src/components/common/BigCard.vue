@@ -114,11 +114,11 @@ export default {
 @import "../../_common/style/_mixins.scss";
 @import "../../_common/style/_reboot.scss";
 .card {
-  display: inline-block;
+  // display: inline-block;
   position: relative;
   width: getRem(670);
   height: getRem(920);
-  margin-bottom: getRem(16);
+  margin: 0 auto getRem(16);
   border-radius: getRem(40);
   // margin-right: getRem(16);
   .mask {
@@ -173,6 +173,9 @@ export default {
       color: white;
       opacity: 0.7;
       font-size: getRem(24);
+      width: 40%;
+      text-align: left;
+      line-height: getRem(40);
     }
     .dark-mask {
       position: absolute;
@@ -219,7 +222,7 @@ export default {
     padding: getRem(32) getRem(40) getRem(20);
     border-radius: 0 0 0.53333rem 0.53333rem;
     .title {
-      font-size: getRem(28);
+      font-size: getRem(32);
       color: #8c8c92;
       margin-bottom: getRem(16);
     }
@@ -250,6 +253,7 @@ export default {
       .likes {
         // display: flex;
         text-align: center;
+        font-size: getRem(28);
         img {
           width: getRem(52);
           height: getRem(42);

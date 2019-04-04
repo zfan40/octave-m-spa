@@ -215,18 +215,22 @@ export default {
 };
 </script>
 <template>
-  <div style="display:flex;padding-top:2rem;background:rgb(26, 28, 30);height:100%;">
-    <swiper :options="bigCardListOption" ref="bigCardList">
-      <swiper-slide v-for="item in squareWorksObj.content" :key="item.id">
-        <card
-          :workInfo="item"
-          :onPlayWork="()=>playWork(item)"
-          :playingStatus="item.id==playingWorkId"
-          :onPurchaseWork="()=>purchaseWork(item)"
-          :onToggleLike="toggleLike"
-        ></card>
-      </swiper-slide>
-    </swiper>
+  <div
+    style="position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;background:rgb(26, 28, 30);height:100%;"
+  >
+    <div id="swiper-container">
+      <swiper :options="bigCardListOption" ref="bigCardList">
+        <swiper-slide v-for="item in squareWorksObj.content" :key="item.id">
+          <card
+            :workInfo="item"
+            :onPlayWork="()=>playWork(item)"
+            :playingStatus="item.id==playingWorkId"
+            :onPurchaseWork="()=>purchaseWork(item)"
+            :onToggleLike="toggleLike"
+          ></card>
+        </swiper-slide>
+      </swiper>
+    </div>
     <div class="button_group">
       <button @click="redirectToMaker">我来试试</button>
       <!-- FUTURE WORK: not all work can be built, disabled here on condition -->
@@ -239,12 +243,17 @@ export default {
 @import "../_common/style/_variables.scss";
 @import "../_common/style/_mixins.scss";
 @import "../_common/style/_reboot.scss";
+#swiper-container {
+  position: relative;
+  width: 100%;
+  height: getRem(920);
+}
 .button_group {
   width: 100%;
   height: getRem(100);
-  position: absolute;
+  // position: absolute;
   bottom: getRem(60);
-  margin: auto;
+  margin: 0 auto;
   display: flex;
   flex-direction: row;
   justify-content: center;
