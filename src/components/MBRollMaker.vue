@@ -78,7 +78,8 @@ export default {
         width: 0,
         height: 0
       },
-      configNoteRect: {},
+      borderConfig: {},
+      noteRectConfig: {},
       activeJ: -1, // highlight timeline
       sector: 1, // 2*4-1,可以滚动7次，营造处4页的氛围
       rectArray: Array(18).fill([]),
@@ -88,6 +89,7 @@ export default {
       showExtendBtns: false,
       playing: false,
       fullloop: true,
+      beat: 4, // only 3 or 4, only for view
       keyboardMode: DEFAULT_KEYBOARD_MODE,
       currentTime: 0
     };
@@ -117,15 +119,31 @@ export default {
             : this.NOTE_CATEGORY * 36,
         height: window.innerHeight
       };
-      this.configNoteRect = {
-        width:
-          this.NOTE_CATEGORY <= NOTE_CATEGORY_PAGE_LIMIT
-            ? this.controlWidth / this.NOTE_CATEGORY
-            : 36,
-        height: window.innerHeight / this.ONE_PAGE_NOTE_NUM,
+      this.RECTWIDTH =
+        this.NOTE_CATEGORY <= NOTE_CATEGORY_PAGE_LIMIT
+          ? this.controlWidth / this.NOTE_CATEGORY
+          : 36;
+      this.RECTHEIGHT = window.innerHeight / this.ONE_PAGE_NOTE_NUM;
+      this.noteRectConfig = {
+        width: this.RECTWIDTH,
+        height: this.RECTHEIGHT,
         fill: "#fff",
         stroke: "#000",
-        strokeWidth: 0.5
+        strokeWidth: 2,
+        dash: [
+          this.RECTWIDTH + this.RECTHEIGHT,
+          this.RECTWIDTH,
+          this.RECTHEIGHT,
+          0
+        ]
+      };
+      this.borderConfig = {
+        width: this.RECTWIDTH,
+        height: this.RECTHEIGHT,
+        // fill: "none",
+        stroke: "#ffff00",
+        strokeWidth: 1,
+        dash: [0, this.RECTWIDTH + this.RECTHEIGHT, this.RECTWIDTH, 0]
       };
       this.scheduleCursor();
     },
@@ -220,6 +238,44 @@ export default {
       console.log(cursorSchedules);
       console.log(Tone.Transport._scheduledEvents);
     },
+    // setupBeatText(i, sector) {
+    //   return {
+    //     x: 14,
+    //     y: (i * this.configKonva.width) / this.NOTE_CATEGORY,
+    //     fill: "#ffff00",
+    //     text: i / this.beat
+    //   };
+    // },
+    setupBeat(i, j, sector) {
+      let fill = "";
+      // split NOTE_NUM_PER_SECTOR and this.NOTE_NUM_PER_SECTOR for ANIMATION!!!
+      const index =
+        j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR;
+      const withinDur = (index * TIME_PER_NOTE * 120) / this.tempo < MB_DUR;
+      if (index == this.activeJ && this.rectArray[i][index]) {
+        // active current note: lighter color
+        fill = withinDur ? "#6477b1" : "#A9B9FF";
+      } else if (index == this.activeJ && !this.rectArray[i][index]) {
+        // inactive current light blue
+        fill = withinDur ? "#292B3A" : "#2B2E3D";
+      } else if (this.rectArray[i][index]) {
+        // active non-current note
+        fill = withinDur ? "#9FB2CF" : "#333740";
+      } else {
+        // incative non-current note
+        fill = withinDur
+          ? `rgba(0,0,0,${0.9 - (i * 0.22) / this.NOTE_CATEGORY})`
+          : "#131315";
+      }
+      return {
+        ...this.noteRectConfig,
+        x: (i * this.configKonva.width) / this.NOTE_CATEGORY,
+        y: (j * this.configKonva.height) / this.ONE_PAGE_NOTE_NUM,
+        fill
+        // stroke: index % this.beat === 0 ? "#ffff00" : "#000",
+        // dash: index % this.beat === 0 ? [0] : [0]
+      };
+    },
     setupRect(i, j, sector) {
       let fill = "";
       // split NOTE_NUM_PER_SECTOR and this.NOTE_NUM_PER_SECTOR for ANIMATION!!!
@@ -242,10 +298,12 @@ export default {
           : "#131315";
       }
       return {
-        ...this.configNoteRect,
+        ...this.noteRectConfig,
         x: (i * this.configKonva.width) / this.NOTE_CATEGORY,
         y: (j * this.configKonva.height) / this.ONE_PAGE_NOTE_NUM,
         fill
+        // stroke: index % this.beat === 0 ? "#ffff00" : "#000",
+        // dash: index % this.beat === 0 ? [0] : [0]
       };
     },
     handleTouchRect(i, j, sector) {
@@ -595,13 +653,22 @@ export default {
       <v-stage :config="configKonva">
         <v-layer>
           <template v-for="i in NOTE_CATEGORY">
-            <v-rect
-              v-for="j in ONE_PAGE_NOTE_NUM"
-              :key="`i${i}j${j}`"
-              @touchstart="handleTouchRect(i-1,j-1,sector)"
-              @touchmove="handleMoveRect(i-1,j-1,sector)"
-              :config="setupRect(i-1,j-1,sector)"
-            />
+            <template v-for="j in ONE_PAGE_NOTE_NUM">
+              <v-rect
+                :key="`i${i}j${j}`"
+                @touchstart="handleTouchRect(i-1,j-1,sector)"
+                @touchmove="handleMoveRect(i-1,j-1,sector)"
+                :config="setupRect(i-1,j-1,sector)"
+              />
+              <v-rect
+                v-if="j%beat ===1"
+                :key="`borderi${i}j${j}`"
+                @touchstart="handleTouchRect(i-1,j-1,sector)"
+                @touchmove="handleMoveRect(i-1,j-1,sector)"
+                :config="setupRect(i-1,j-1,sector)"
+              />
+            </template>
+            <!-- <v-text v-if="i%beat ==0" :key="`beat${i}`" :config="setupBeatText(i,sector)"/> -->
           </template>
         </v-layer>
       </v-stage>
@@ -657,6 +724,8 @@ export default {
     <transition name="slide">
       <div class="alert-mask" v-show="menuAppear">
         <div class="menu">
+          <div @touchstart="()=>this.beat=4" :class="['menu-op',beat===4?'':'inactive']">4拍</div>
+          <div @touchstart="()=>this.beat=3" :class="['menu-op',beat===3?'':'inactive']">3拍</div>
           <div
             @touchstart="chooseKeyboard('whitekey')"
             :class="['menu-op',keyboardMode=='whitekey'?'':'inactive']"
