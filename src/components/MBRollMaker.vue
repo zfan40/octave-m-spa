@@ -73,7 +73,7 @@ export default {
       NOTE_NUM_PER_SECTOR,
       CONST_NOTE_NUM_PER_SECTOR: NOTE_NUM_PER_SECTOR,
       MB_DUR,
-      tempo: 140,
+      tempo: 120,
       controlWidth: 0, // will be whole width - 50(left bar)
       configKonva: {
         width: 0,
@@ -90,7 +90,7 @@ export default {
       showExtendBtns: false,
       playing: false,
       fullloop: true,
-      beat: 4, // only 3 or 4, only for view
+      beat: 8, // only 3 or 4, only for view
       keyboardMode: DEFAULT_KEYBOARD_MODE,
       currentTime: 0
     };
@@ -706,8 +706,8 @@ export default {
     <transition name="slide">
       <div class="alert-mask" v-show="menuAppear">
         <div class="menu">
-          <div @touchstart="()=>this.beat=4" :class="['menu-op',beat===4?'':'inactive']">4拍</div>
-          <div @touchstart="()=>this.beat=3" :class="['menu-op',beat===3?'':'inactive']">3拍</div>
+          <div @touchstart="()=>this.beat=4*2" :class="['menu-op',beat===4*2?'':'inactive']">4拍</div>
+          <div @touchstart="()=>this.beat=3*2" :class="['menu-op',beat===3*2?'':'inactive']">3拍</div>
           <div
             @touchstart="chooseKeyboard('whitekey')"
             :class="['menu-op',keyboardMode=='whitekey'?'':'inactive']"
