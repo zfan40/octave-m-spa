@@ -71,6 +71,7 @@ export default {
       NOTE_CATEGORY: scales[DEFAULT_KEYBOARD_MODE].musicScale.length,
       ONE_PAGE_NOTE_NUM: 20,
       NOTE_NUM_PER_SECTOR,
+      CONST_NOTE_NUM_PER_SECTOR: NOTE_NUM_PER_SECTOR,
       MB_DUR,
       tempo: 140,
       controlWidth: 0, // will be whole width - 50(left bar)
@@ -129,7 +130,7 @@ export default {
         height: this.RECTHEIGHT,
         fill: "#fff",
         stroke: "#000",
-        strokeWidth: 2,
+        strokeWidth: 0.5,
         dash: [
           this.RECTWIDTH + this.RECTHEIGHT,
           this.RECTWIDTH,
@@ -141,9 +142,9 @@ export default {
         width: this.RECTWIDTH,
         height: this.RECTHEIGHT,
         // fill: "none",
-        stroke: "#ffff00",
-        strokeWidth: 1,
-        dash: [0, this.RECTWIDTH + this.RECTHEIGHT, this.RECTWIDTH, 0]
+        stroke: "#000",
+        strokeWidth: 2,
+        dash: [this.RECTWIDTH, this.RECTWIDTH + 2 * this.RECTHEIGHT]
       };
       this.scheduleCursor();
     },
@@ -247,33 +248,14 @@ export default {
     //   };
     // },
     setupBeat(i, j, sector) {
-      let fill = "";
       // split NOTE_NUM_PER_SECTOR and this.NOTE_NUM_PER_SECTOR for ANIMATION!!!
       const index =
         j + (sector - 2) * NOTE_NUM_PER_SECTOR + 1 * this.NOTE_NUM_PER_SECTOR;
-      const withinDur = (index * TIME_PER_NOTE * 120) / this.tempo < MB_DUR;
-      if (index == this.activeJ && this.rectArray[i][index]) {
-        // active current note: lighter color
-        fill = withinDur ? "#6477b1" : "#A9B9FF";
-      } else if (index == this.activeJ && !this.rectArray[i][index]) {
-        // inactive current light blue
-        fill = withinDur ? "#292B3A" : "#2B2E3D";
-      } else if (this.rectArray[i][index]) {
-        // active non-current note
-        fill = withinDur ? "#9FB2CF" : "#333740";
-      } else {
-        // incative non-current note
-        fill = withinDur
-          ? `rgba(0,0,0,${0.9 - (i * 0.22) / this.NOTE_CATEGORY})`
-          : "#131315";
-      }
+      // if (index % this.beat == 0)
       return {
-        ...this.noteRectConfig,
+        ...this.borderConfig,
         x: (i * this.configKonva.width) / this.NOTE_CATEGORY,
-        y: (j * this.configKonva.height) / this.ONE_PAGE_NOTE_NUM,
-        fill
-        // stroke: index % this.beat === 0 ? "#ffff00" : "#000",
-        // dash: index % this.beat === 0 ? [0] : [0]
+        y: (j * this.configKonva.height) / this.ONE_PAGE_NOTE_NUM
       };
     },
     setupRect(i, j, sector) {
@@ -661,11 +643,11 @@ export default {
                 :config="setupRect(i-1,j-1,sector)"
               />
               <v-rect
-                v-if="j%beat ===1"
+                v-if="(j + (sector - 2) * CONST_NOTE_NUM_PER_SECTOR + 1 * NOTE_NUM_PER_SECTOR)%beat===1"
                 :key="`borderi${i}j${j}`"
                 @touchstart="handleTouchRect(i-1,j-1,sector)"
                 @touchmove="handleMoveRect(i-1,j-1,sector)"
-                :config="setupRect(i-1,j-1,sector)"
+                :config="setupBeat(i-1,j-1,sector)"
               />
             </template>
             <!-- <v-text v-if="i%beat ==0" :key="`beat${i}`" :config="setupBeatText(i,sector)"/> -->
