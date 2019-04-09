@@ -80,6 +80,7 @@ export default {
         height: 0
       },
       borderConfig: {},
+      halfConfig: {},
       noteRectConfig: {},
       activeJ: -1, // highlight timeline
       sector: 1, // 2*4-1,可以滚动7次，营造处4页的氛围
@@ -143,6 +144,14 @@ export default {
         height: this.RECTHEIGHT,
         // fill: "none",
         stroke: "#000",
+        strokeWidth: 2,
+        dash: [this.RECTWIDTH, this.RECTWIDTH + 2 * this.RECTHEIGHT]
+      };
+      this.halfConfig = {
+        width: this.RECTWIDTH,
+        height: this.RECTHEIGHT,
+        // fill: "none",
+        stroke: "#333",
         strokeWidth: 2,
         dash: [this.RECTWIDTH, this.RECTWIDTH + 2 * this.RECTHEIGHT]
       };
@@ -254,6 +263,13 @@ export default {
       // if (index % this.beat == 0)
       return {
         ...this.borderConfig,
+        x: (i * this.configKonva.width) / this.NOTE_CATEGORY,
+        y: (j * this.configKonva.height) / this.ONE_PAGE_NOTE_NUM
+      };
+    },
+    setupHalf(i, j, sector) {
+      return {
+        ...this.halfConfig,
         x: (i * this.configKonva.width) / this.NOTE_CATEGORY,
         y: (j * this.configKonva.height) / this.ONE_PAGE_NOTE_NUM
       };
@@ -642,6 +658,15 @@ export default {
                 @touchmove="handleMoveRect(i-1,j-1,sector)"
                 :config="setupRect(i-1,j-1,sector)"
               />
+              <!-- measure line -->
+              <v-rect
+                v-if="(j + (sector - 2) * CONST_NOTE_NUM_PER_SECTOR + 1 * NOTE_NUM_PER_SECTOR)%2===1"
+                :key="`halfi${i}j${j}`"
+                @touchstart="handleTouchRect(i-1,j-1,sector)"
+                @touchmove="handleMoveRect(i-1,j-1,sector)"
+                :config="setupHalf(i-1,j-1,sector)"
+              />
+              <!-- quarter note line -->
               <v-rect
                 v-if="(j + (sector - 2) * CONST_NOTE_NUM_PER_SECTOR + 1 * NOTE_NUM_PER_SECTOR)%beat===1"
                 :key="`borderi${i}j${j}`"

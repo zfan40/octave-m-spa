@@ -5,6 +5,7 @@ import * as Api from "../_common/js/api";
 import * as Cookies from "js-cookie";
 import * as Magic from "../_common/js/magic";
 import workCard from "./common/workCard";
+import tagDialog from "./common/tagDialog";
 import * as WxShare from "../_common/js/wx_share";
 import infiniteScroll from "vue-infinite-scroll";
 
@@ -15,7 +16,8 @@ export default {
     infiniteScroll
   },
   components: {
-    workCard
+    workCard,
+    tagDialog
   },
   data() {
     return {
@@ -27,7 +29,8 @@ export default {
       favStatus: false,
       newWorkTitle: "",
       finalNewWorkTitle: "",
-      busy: true
+      busy: true,
+      tagAppear: false
     };
   },
   computed: {
@@ -274,6 +277,7 @@ export default {
         :onLongPress="()=>operateWork(item)"
         :onPlayWork="()=>playWork(item)"
         :onPurchaseWork="()=>purchaseWork(item)"
+        :onClickTag="()=>{tagAppear=true}"
         :onShareWork="shareWork"
         :onChangeWorkStatus="changeWorkStatus"
         :onTapMask="cancelOperate"
@@ -286,6 +290,7 @@ export default {
         <img src="../assets/oops.png" style="width:6rem;" alt>
       </div>
     </div>-->
+    <tag-dialog :appear="tagAppear" :handleClose="()=>{tagAppear=false}"/>
   </div>
 </template>
 <style lang="scss" scoped>
