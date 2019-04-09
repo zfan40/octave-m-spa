@@ -86,6 +86,9 @@ export function RealMagic(items) {
   // then we focus on each task
   const taskTypes = Object.keys(tasksObj); // [659,784,...]  freq array, 排好序的（object.keys）
   const taskTimeArrays = Object.values(tasksObj); // [[2.66]，[1.0295,1.39,2.6713]] 顺序跟上面对应的
+  // const taskTimeArraysCycle = taskTimeArrays.map(a => a.map(b => [b, b + 20]).flat().sort((a, b) => a - b)) //考虑首位交接[[2.66,22.66],[1.0295,1.39,2.6713,21.0295,21.39,22.6713]]
+  const taskTimeArraysCycle = taskTimeArrays.map(a => a.map(b => [b, b + 20]).reduce((acc, val) => acc.concat(val), []).sort((a, b) => a - b)) //flat方法摩羯浏览器不支持
+
   const machines = []; // init with existing types, will add more machines
   const groups = []; // will final be [[1],[1,2,1],...], corespond to taskTimeArrays
 
@@ -94,7 +97,7 @@ export function RealMagic(items) {
     return false;
   }
 
-  taskTimeArrays.forEach((timeArray) => {
+  taskTimeArraysCycle.forEach((timeArray) => {
     const final = [];
     timeArray.forEach((time, j) => {
       const test = []; // 校验当前final里不能用的序号， final里序号种类和test种类相同则证明不行
