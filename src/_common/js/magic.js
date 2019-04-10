@@ -50,7 +50,9 @@ let oncePlayed = false;
 //   release: 1,
 //   baseUrl: '/static/audio/',
 // }).toMaster();
-
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 const mbox = new Tone.Sampler(
   {
     B3: 'B3.[mp3|ogg]',
@@ -271,28 +273,30 @@ export function previewMidi(url, start) {
 export function bounceToWav(url) {
   MidiConvert.load(url, (midi) => {
     Tone.Offline(Transport => {
-      const mbox = new Tone.Sampler(
-        {
-          B3: 'B3.[mp3|ogg]',
-          E4: 'E4.[mp3|ogg]',
-          G4: 'G4.[mp3|ogg]',
-          B4: 'B4.[mp3|ogg]',
-          'C#5': 'Cs5.[mp3|ogg]',
-          E5: 'E5.[mp3|ogg]',
-          G5: 'G5.[mp3|ogg]',
-          B5: 'B5.[mp3|ogg]',
-          'C#6': 'Cs6.[mp3|ogg]',
-        },
-        () => {
-          console.log('合情合理加载完毕')
-          new Tone.Sequence(function (time, note) {
-            mbox.triggerAttackRelease(note, "1n", time);
-          }, ["C2", "C2", "F1", "F1"], "4n").start(0);
-          bassSeq.loop = false;
-          Transport.start();
-        },
-        '//cnbj1.fds.api.xiaomi.com/mbox/audio/mbox/',
-      ).toMaster();
+      // const mboxoffline = new Tone.Sampler(
+      //   {
+      //     B3: 'B3.[mp3|ogg]',
+      //     E4: 'E4.[mp3|ogg]',
+      //     G4: 'G4.[mp3|ogg]',
+      //     B4: 'B4.[mp3|ogg]',
+      //     'C#5': 'Cs5.[mp3|ogg]',
+      //     E5: 'E5.[mp3|ogg]',
+      //     G5: 'G5.[mp3|ogg]',
+      //     B5: 'B5.[mp3|ogg]',
+      //     'C#6': 'Cs6.[mp3|ogg]',
+      //   },
+      //   () => {
+      //     console.log('合情合理加载完毕')
+      //     // new Tone.Sequence(function (time, note) {
+      //     //   mbox.triggerAttackRelease(note, "1n", time);
+      //     // }, ["C2", "C2", "F1", "F1"], "4n").start(0);
+      //     // bassSeq.loop = false;
+      //     // Transport.start();
+      //   },
+      //   '//cnbj1.fds.api.xiaomi.com/mbox/audio/mbox/',
+      // ).toMaster();
+
+      // await sleep(2000);
 
       const pulseOptions = {
         oscillator: {
