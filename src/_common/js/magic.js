@@ -272,80 +272,74 @@ export function previewMidi(url, start) {
 }
 export function bounceToWav(url) {
   MidiConvert.load(url, (midi) => {
-    Tone.Offline(Transport => {
-      // const mboxoffline = new Tone.Sampler(
-      //   {
-      //     B3: 'B3.[mp3|ogg]',
-      //     E4: 'E4.[mp3|ogg]',
-      //     G4: 'G4.[mp3|ogg]',
-      //     B4: 'B4.[mp3|ogg]',
-      //     'C#5': 'Cs5.[mp3|ogg]',
-      //     E5: 'E5.[mp3|ogg]',
-      //     G5: 'G5.[mp3|ogg]',
-      //     B5: 'B5.[mp3|ogg]',
-      //     'C#6': 'Cs6.[mp3|ogg]',
-      //   },
-      //   () => {
-      //     console.log('合情合理加载完毕')
-      //     // new Tone.Sequence(function (time, note) {
-      //     //   mbox.triggerAttackRelease(note, "1n", time);
-      //     // }, ["C2", "C2", "F1", "F1"], "4n").start(0);
-      //     // bassSeq.loop = false;
-      //     // Transport.start();
-      //   },
-      //   '//cnbj1.fds.api.xiaomi.com/mbox/audio/mbox/',
-      // ).toMaster();
+    // https://github.com/Tonejs/Tone.js/issues/368
+    function renderOffline(callback, duration) {
+      // Set the OfflineAudioContext
+      let sampleRate = Tone.context.sampleRate
+      let originalContext = Tone.context
+      // Make sure to preserve original Transport if it has not be cached on the context yet
+      if (!originalContext.Transport) originalContext.Transport = Tone.Transport
+      // Create new OfflineContext and make it the default context
+      let context = new Tone.OfflineContext(2, duration, sampleRate)
+      Tone.context = context
+      function onReady() {
+        // process the audio
+        var rendered = context.render()
+        // return the original AudioContext
+        Tone.context = originalContext
+        // return the audio
+        return rendered.then(function (buffer) {
+          // wrap it in a Tone.Buffer
+          return new Tone.Buffer(buffer)
+        })
+      }
+      // invoke the callback/scheduling
+      callback(Tone.Transport, onReady)
+    }
 
-      // await sleep(2000);
 
-      const pulseOptions = {
-        oscillator: {
-          type: "pulse"
-        },
-        envelope: {
-          release: 0.07
-        }
-      };
-      const pulseSynth = new Tone.PolySynth(6, Tone.Synth, pulseOptions).toMaster();;
-      const mergeNotes = midi.tracks.reduce((a, b) => a.concat(b.notes), []);
+    renderOffline((Transport, render) => {
+      const synth = new Tone.Sampler({
+        B3: 'B3.[mp3]',
+        E4: 'E4.[mp3]',
+        G4: 'G4.[mp3]',
+        B4: 'B4.[mp3]',
+        'C#5': 'Cs5.[mp3]',
+        E5: 'E5.[mp3]',
+        G5: 'G5.[mp3]',
+        B5: 'B5.[mp3]',
+        'C#6': 'Cs6.[mp3]',
+      }, onSynthLoaded, '//cnbj1.fds.api.xiaomi.com/mbox/audio/mbox/').toMaster();
 
-      // 方法一：sequence
-      // var bassSeq = new Tone.Sequence(function (time, note) {
-      //   console.log(note);
-      //   bass.triggerAttackRelease(note, "1n", time);
-      // }, ["C2", "D2", "E2", "F2", "G2", "A2", "B2", "A2", "G2", "F2", "E2", "D2", "C2", "C2", "D2", "E2", "F2", "G2", "A2", "B2", "A2", "G2", "F2", "E2", "D2", "C2", "C2", "D2", "E2", "F2", "G2", "A2", "B2", "A2", "G2", "F2", "E2", "D2", "C2", "C2", "D2", "E2", "F2", "G2", "A2", "B2", "A2", "G2", "F2", "E2", "D2", "C2", "C2", "D2", "E2", "F2", "G2", "A2", "B2", "A2", "G2", "F2", "E2", "D2", "C2", "C2", "D2", "E2", "F2", "G2", "A2", "B2", "A2", "G2", "F2", "E2", "D2", "C2"], "8n").start(0);
-      // 方法二：part
-      // var bassSeq = new Tone.Part(function (time, note) {
-      //   console.log(note)
-      //   pulseSynth.triggerAttackRelease(Tone.Frequency(note.midi, 'midi'), '4n', note.time);
-      // }, mergeNotes).start(0);
-      // bassSeq.loop = false;
-      //方法三：硬来
-      mergeNotes.forEach(note => {
-        pulseSynth.triggerAttackRelease(Tone.Frequency(note.midi, 'midi'), '2n', note.time);
-      })
-      Transport.start();
-    }, 20).then(function (buffer) {
-      //do something with the output buffer
-      var anchor = document.createElement('a')
-      document.body.appendChild(anchor)
-      anchor.style = 'display: none'
-      // alert('CONG')
-      console.log(buffer)
-      console.log(buffer.getChannelData())
-      buffer.sampleRate = 44100 // 我艹这神了。。。没这个不行，不然读不出来sampleRate
-      var wav = toWav(buffer)
-      var blob = new window.Blob([new DataView(wav)], {
-        type: 'audio/wav'
-      })
+      function onSynthLoaded() {
+        const mergeNotes = midi.tracks.reduce((a, b) => a.concat(b.notes), []);
+        mergeNotes.forEach(note => {
+          synth.triggerAttackRelease(Tone.Frequency(note.midi, 'midi'), '2n', note.time);
+        })
+        render().then((buffer) => {
+          //do something with the output buffer
+          var anchor = document.createElement('a')
+          document.body.appendChild(anchor)
+          anchor.style = 'display: none'
+          // alert('CONG')
+          console.log(buffer)
+          console.log(buffer.getChannelData())
+          buffer.sampleRate = 44100 // 我艹这神了。。。没这个不行，不然读不出来sampleRate
+          var wav = toWav(buffer)
+          var blob = new window.Blob([new DataView(wav)], {
+            type: 'audio/wav'
+          })
 
-      var url = window.URL.createObjectURL(blob)
+          var url = window.URL.createObjectURL(blob)
 
-      anchor.href = url
-      anchor.download = 'audio.wav'
-      anchor.click()
-      window.URL.revokeObjectURL(url)
-    })
+          anchor.href = url
+          anchor.download = 'audio.wav'
+          anchor.click()
+          window.URL.revokeObjectURL(url)
+        })
+      }
+    }, 20)
+
   });
 }
 
