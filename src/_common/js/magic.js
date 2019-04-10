@@ -1,4 +1,5 @@
 const Tone = require('tone');
+var toWav = require('audiobuffer-to-wav')
 
 Tone.Transport.cancel();
 const SAME_NOTE_INTERVAL = 1; // 同一个音不能相距小于1秒，不然音片打击出问题
@@ -265,8 +266,83 @@ export function previewMidi(url, start) {
   //   console.log(3333)
   //   alert(error)
   // }
+}
+export function bounceToWav(url) {
+  MidiConvert.load(url, (midi) => {
+    Tone.Offline(Transport => {
+      // const mbox = new Tone.Sampler(
+      //   {
+      //     B3: 'B3.[mp3|ogg]',
+      //     E4: 'E4.[mp3|ogg]',
+      //     G4: 'G4.[mp3|ogg]',
+      //     B4: 'B4.[mp3|ogg]',
+      //     'C#5': 'Cs5.[mp3|ogg]',
+      //     E5: 'E5.[mp3|ogg]',
+      //     G5: 'G5.[mp3|ogg]',
+      //     B5: 'B5.[mp3|ogg]',
+      //     'C#6': 'Cs6.[mp3|ogg]',
+      //   },
+      //   {
+      //     release: 1,
+      //     // baseUrl: '/static/audio/mbox/',
+      //     baseUrl: '//cnbj1.fds.api.xiaomi.com/mbox/audio/mbox/',
+      //   },
+      // ).toMaster();
+      const pulseOptions = {
+        oscillator: {
+          type: "pulse"
+        },
+        envelope: {
+          release: 0.07
+        }
+      };
+      const pulseSynth = new Tone.PolySynth(6, Tone.Synth, pulseOptions);
+      const mergeNotes = midi.tracks.reduce((a, b) => a.concat(b.notes), []);
+      //TODO 此处应改写喂example2，用Transport.schedule
+      console.log(mergeNotes)
+      // mergeNotes.forEach(note => {
+      //   Transport.schedule(time => {
+      //     // osc.start(time)
+      //     pulseSynth.triggerAttackRelease(Tone.Frequency(note.midi, 'midi'), '2n', time)
+      //   }, note.time)
+      // })
+      var osc = new Tone.Oscillator().toMaster()
+      Transport.schedule(function (time) {
+        osc.start(time).stop(time + 0.1)
+      }, 1)
+      Transport.schedule(function (time) {
+        osc.start(time).stop(time + 0.1)
+      }, 3)
+      Transport.schedule(function (time) {
+        osc.start(time).stop(time + 0.1)
+      }, 5)
+      Transport.schedule(function (time) {
+        pulseSynth.triggerAttackRelease(Tone.Frequency(60, 'midi'), '2n', time)
+      }, 2)
+      // Transport.start('+0.01', 0);
+      Transport.start(0.01);
+      // var oscillator = new Tone.Oscillator().toMaster().start(0) //example
+    }, 20).then(function (buffer) {
+      //do something with the output buffer
+      var anchor = document.createElement('a')
+      document.body.appendChild(anchor)
+      anchor.style = 'display: none'
+      // alert('CONG')
+      console.log(buffer)
+      console.log(buffer.getChannelData())
+      buffer.sampleRate = 44100 // 我艹这神了。。。没这个不行，不然读不出来sampleRate
+      var wav = toWav(buffer)
+      var blob = new window.Blob([new DataView(wav)], {
+        type: 'audio/wav'
+      })
 
-
+      var url = window.URL.createObjectURL(blob)
+      anchor.href = url
+      anchor.download = 'audio.wav'
+      anchor.click()
+      window.URL.revokeObjectURL(url)
+    })
+  });
 }
 
 export function canMakePaper30(items) {

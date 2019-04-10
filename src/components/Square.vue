@@ -74,6 +74,8 @@ export default {
     },
     purchaseWork(work) {
       // TODO: need check if order matches current work
+      Magic.bounceToWav(work.url);
+      return;
       if (work.machineNum > 18) {
         this.$toast("该作品目前无法制作");
         return;
