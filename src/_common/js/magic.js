@@ -241,6 +241,7 @@ export function preview(items, start) {
     } else {
       musicPreview.loopEnd = 20; // 20s的作品，以前21秒，现在就20正好，弄啥样啥样，所听即所得
     }
+    Tone.Transport.position = 0;
     Tone.Transport.start('+0.01', 0);
   } else {
     Tone.Transport.stop(0);
@@ -270,24 +271,29 @@ export function previewMidi(url, start) {
 export function bounceToWav(url) {
   MidiConvert.load(url, (midi) => {
     Tone.Offline(Transport => {
-      // const mbox = new Tone.Sampler(
-      //   {
-      //     B3: 'B3.[mp3|ogg]',
-      //     E4: 'E4.[mp3|ogg]',
-      //     G4: 'G4.[mp3|ogg]',
-      //     B4: 'B4.[mp3|ogg]',
-      //     'C#5': 'Cs5.[mp3|ogg]',
-      //     E5: 'E5.[mp3|ogg]',
-      //     G5: 'G5.[mp3|ogg]',
-      //     B5: 'B5.[mp3|ogg]',
-      //     'C#6': 'Cs6.[mp3|ogg]',
-      //   },
-      //   {
-      //     release: 1,
-      //     // baseUrl: '/static/audio/mbox/',
-      //     baseUrl: '//cnbj1.fds.api.xiaomi.com/mbox/audio/mbox/',
-      //   },
-      // ).toMaster();
+      const mbox = new Tone.Sampler(
+        {
+          B3: 'B3.[mp3|ogg]',
+          E4: 'E4.[mp3|ogg]',
+          G4: 'G4.[mp3|ogg]',
+          B4: 'B4.[mp3|ogg]',
+          'C#5': 'Cs5.[mp3|ogg]',
+          E5: 'E5.[mp3|ogg]',
+          G5: 'G5.[mp3|ogg]',
+          B5: 'B5.[mp3|ogg]',
+          'C#6': 'Cs6.[mp3|ogg]',
+        },
+        () => {
+          console.log('合情合理加载完毕')
+          new Tone.Sequence(function (time, note) {
+            mbox.triggerAttackRelease(note, "1n", time);
+          }, ["C2", "C2", "F1", "F1"], "4n").start(0);
+          bassSeq.loop = false;
+          Transport.start();
+        },
+        '//cnbj1.fds.api.xiaomi.com/mbox/audio/mbox/',
+      ).toMaster();
+
       const pulseOptions = {
         oscillator: {
           type: "pulse"
@@ -296,32 +302,25 @@ export function bounceToWav(url) {
           release: 0.07
         }
       };
-      const pulseSynth = new Tone.PolySynth(6, Tone.Synth, pulseOptions);
+      const pulseSynth = new Tone.PolySynth(6, Tone.Synth, pulseOptions).toMaster();;
       const mergeNotes = midi.tracks.reduce((a, b) => a.concat(b.notes), []);
-      //TODO 此处应改写喂example2，用Transport.schedule
-      console.log(mergeNotes)
-      // mergeNotes.forEach(note => {
-      //   Transport.schedule(time => {
-      //     // osc.start(time)
-      //     pulseSynth.triggerAttackRelease(Tone.Frequency(note.midi, 'midi'), '2n', time)
-      //   }, note.time)
-      // })
-      var osc = new Tone.Oscillator().toMaster()
-      Transport.schedule(function (time) {
-        osc.start(time).stop(time + 0.1)
-      }, 1)
-      Transport.schedule(function (time) {
-        osc.start(time).stop(time + 0.1)
-      }, 3)
-      Transport.schedule(function (time) {
-        osc.start(time).stop(time + 0.1)
-      }, 5)
-      Transport.schedule(function (time) {
-        pulseSynth.triggerAttackRelease(Tone.Frequency(60, 'midi'), '2n', time)
-      }, 2)
-      // Transport.start('+0.01', 0);
-      Transport.start(0.01);
-      // var oscillator = new Tone.Oscillator().toMaster().start(0) //example
+
+      // 方法一：sequence
+      // var bassSeq = new Tone.Sequence(function (time, note) {
+      //   console.log(note);
+      //   bass.triggerAttackRelease(note, "1n", time);
+      // }, ["C2", "D2", "E2", "F2", "G2", "A2", "B2", "A2", "G2", "F2", "E2", "D2", "C2", "C2", "D2", "E2", "F2", "G2", "A2", "B2", "A2", "G2", "F2", "E2", "D2", "C2", "C2", "D2", "E2", "F2", "G2", "A2", "B2", "A2", "G2", "F2", "E2", "D2", "C2", "C2", "D2", "E2", "F2", "G2", "A2", "B2", "A2", "G2", "F2", "E2", "D2", "C2", "C2", "D2", "E2", "F2", "G2", "A2", "B2", "A2", "G2", "F2", "E2", "D2", "C2", "C2", "D2", "E2", "F2", "G2", "A2", "B2", "A2", "G2", "F2", "E2", "D2", "C2"], "8n").start(0);
+      // 方法二：part
+      // var bassSeq = new Tone.Part(function (time, note) {
+      //   console.log(note)
+      //   pulseSynth.triggerAttackRelease(Tone.Frequency(note.midi, 'midi'), '4n', note.time);
+      // }, mergeNotes).start(0);
+      // bassSeq.loop = false;
+      //方法三：硬来
+      mergeNotes.forEach(note => {
+        pulseSynth.triggerAttackRelease(Tone.Frequency(note.midi, 'midi'), '2n', note.time);
+      })
+      Transport.start();
     }, 20).then(function (buffer) {
       //do something with the output buffer
       var anchor = document.createElement('a')
@@ -337,6 +336,7 @@ export function bounceToWav(url) {
       })
 
       var url = window.URL.createObjectURL(blob)
+
       anchor.href = url
       anchor.download = 'audio.wav'
       anchor.click()
