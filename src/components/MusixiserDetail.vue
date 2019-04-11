@@ -132,6 +132,18 @@ export default {
     cancelOperate() {
       this.$store.commit("OPERATE_WORK", { work: { id: -1 } });
     },
+    downloadWork(work) {
+      Magic.bounceAsWavBlob(work.url)
+        .then(blob => {
+          return Api.downloadAsWav(blob);
+        })
+        .then(url => {
+          this.$toast(`url is ${url}`);
+        })
+        .catch(() => {
+          this.$toast("fail downloading");
+        });
+    },
     purchaseWork(work) {
       if (work.machineNum > 18) {
         this.$toast("该作品目前无法制作");
@@ -286,6 +298,7 @@ export default {
         :onLongPress="()=>operateWork(item)"
         :onPlayWork="()=>playWork(item)"
         :onPurchaseWork="()=>purchaseWork(item)"
+        :onDownloadWork="()=>downloadWork(item)"
         :onClickTag="()=>{tagAppear=true}"
         :onShareWork="shareWork"
         :onChangeWorkStatus="changeWorkStatus"

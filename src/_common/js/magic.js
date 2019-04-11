@@ -136,9 +136,9 @@ export function RealMagic(items) {
     });
     groups.push(final);
   });
-  console.log(taskTypes);
-  console.log(taskTimeArrays);
-  console.log('hehe', groups); // [[1],[1,2,1],...], corespond to taskTimeArrays
+  // console.log(taskTypes);
+  // console.log(taskTimeArrays);
+  // console.log('hehe', groups); // [[1],[1,2,1],...], corespond to taskTimeArrays
 
   // now we have groups, let's build machines based on this
   groups.forEach((group, index) => {
@@ -257,7 +257,6 @@ export function previewMidi(url, start) {
     mbox.triggerAttack('E6', 0, 0);
     oncePlayed = true;
   }
-  // try {
   console.log('midi---url', url)
   MidiConvert.load(url, (midi) => {
     console.log('dasdsad', midi)
@@ -265,81 +264,87 @@ export function previewMidi(url, start) {
     // alert(mergeNotes)
     preview(mergeNotes, start)
   });
-  // } catch (error) {
-  //   console.log(3333)
-  //   alert(error)
-  // }
 }
-export function bounceToWav(url) {
-  MidiConvert.load(url, (midi) => {
-    // https://github.com/Tonejs/Tone.js/issues/368
-    function renderOffline(callback, duration) {
-      // Set the OfflineAudioContext
-      let sampleRate = Tone.context.sampleRate
-      let originalContext = Tone.context
-      // Make sure to preserve original Transport if it has not be cached on the context yet
-      if (!originalContext.Transport) originalContext.Transport = Tone.Transport
-      // Create new OfflineContext and make it the default context
-      let context = new Tone.OfflineContext(2, duration, sampleRate)
-      Tone.context = context
-      function onReady() {
-        // process the audio
-        var rendered = context.render()
-        // return the original AudioContext
-        Tone.context = originalContext
-        // return the audio
-        return rendered.then(function (buffer) {
-          // wrap it in a Tone.Buffer
-          return new Tone.Buffer(buffer)
-        })
-      }
-      // invoke the callback/scheduling
-      callback(Tone.Transport, onReady)
-    }
-
-
-    renderOffline((Transport, render) => {
-      const synth = new Tone.Sampler({
-        B3: 'B3.[mp3]',
-        E4: 'E4.[mp3]',
-        G4: 'G4.[mp3]',
-        B4: 'B4.[mp3]',
-        'C#5': 'Cs5.[mp3]',
-        E5: 'E5.[mp3]',
-        G5: 'G5.[mp3]',
-        B5: 'B5.[mp3]',
-        'C#6': 'Cs6.[mp3]',
-      }, onSynthLoaded, '//cnbj1.fds.api.xiaomi.com/mbox/audio/mbox/').toMaster();
-
-      function onSynthLoaded() {
-        const mergeNotes = midi.tracks.reduce((a, b) => a.concat(b.notes), []);
-        mergeNotes.forEach(note => {
-          synth.triggerAttackRelease(Tone.Frequency(note.midi, 'midi'), '2n', note.time);
-        })
-        render().then((buffer) => {
-          //do something with the output buffer
-          var anchor = document.createElement('a')
-          document.body.appendChild(anchor)
-          anchor.style = 'display: none'
-          // alert('CONG')
-          console.log(buffer)
-          console.log(buffer.getChannelData())
-          buffer.sampleRate = 44100 // 我艹这神了。。。没这个不行，不然读不出来sampleRate
-          var wav = toWav(buffer)
-          var blob = new window.Blob([new DataView(wav)], {
-            type: 'audio/wav'
+export function bounceAsWavBlob(url) {
+  return new Promise((resolve, reject) => {
+    MidiConvert.load(url, (midi) => {
+      // https://github.com/Tonejs/Tone.js/issues/368
+      function renderOffline(callback, duration) {
+        // Set the OfflineAudioContext
+        let sampleRate = Tone.context.sampleRate
+        let originalContext = Tone.context
+        // Make sure to preserve original Transport if it has not be cached on the context yet
+        if (!originalContext.Transport) originalContext.Transport = Tone.Transport
+        // Create new OfflineContext and make it the default context
+        let context = new Tone.OfflineContext(2, duration, sampleRate)
+        Tone.context = context
+        function onReady() {
+          // process the audio
+          var rendered = context.render()
+          // return the original AudioContext
+          Tone.context = originalContext
+          // return the audio
+          return rendered.then(function (buffer) {
+            // wrap it in a Tone.Buffer
+            return new Tone.Buffer(buffer)
           })
-
-          var url = window.URL.createObjectURL(blob)
-
-          anchor.href = url
-          anchor.download = 'audio.wav'
-          anchor.click()
-          window.URL.revokeObjectURL(url)
-        })
+        }
+        // invoke the callback/scheduling
+        callback(Tone.Transport, onReady)
       }
-    }, 20)
 
+
+      renderOffline((Transport, render) => {
+        const synth = new Tone.Sampler({
+          B3: 'B3.[mp3]',
+          E4: 'E4.[mp3]',
+          G4: 'G4.[mp3]',
+          B4: 'B4.[mp3]',
+          'C#5': 'Cs5.[mp3]',
+          E5: 'E5.[mp3]',
+          G5: 'G5.[mp3]',
+          B5: 'B5.[mp3]',
+          'C#6': 'Cs6.[mp3]',
+        }, onSynthLoaded, '//cnbj1.fds.api.xiaomi.com/mbox/audio/mbox/').toMaster();
+
+        function onSynthLoaded() {
+          const mergeNotes = midi.tracks.reduce((a, b) => a.concat(b.notes), []);
+          mergeNotes.forEach(note => {
+            synth.triggerAttackRelease(Tone.Frequency(note.midi, 'midi'), '2n', note.time);
+          })
+          render().then((buffer) => {
+            // below is local generate download
+            // var anchor = document.createElement('a')
+            // document.body.appendChild(anchor)
+            // anchor.style = 'display: none'
+            // // alert('CONG')
+            // console.log(buffer)
+            // console.log(buffer.getChannelData())
+            // buffer.sampleRate = 44100 // 我艹这神了。。。没这个不行，不然读不出来sampleRate
+            // var wav = toWav(buffer)
+            // var blob = new window.Blob([new DataView(wav)], {
+            //   type: 'audio/wav'
+            // })
+
+            // var url = window.URL.createObjectURL(blob)
+
+            // anchor.href = url
+            // anchor.download = 'audio.wav'
+            // anchor.click()
+            // window.URL.revokeObjectURL(url)
+
+            // below is upload to have server return url
+            buffer.sampleRate = 44100 // 我艹这神了。。。没这个不行，不然读不出来sampleRate
+            var wav = toWav(buffer)
+            var blob = new window.Blob([new DataView(wav)], {
+              type: 'audio/wav'
+            })
+            console.log('blob generated successfully')
+            resolve(blob)
+          })
+        }
+      }, 20)
+    })
   });
 }
 

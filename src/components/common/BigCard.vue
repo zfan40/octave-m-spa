@@ -19,6 +19,7 @@ export default {
     onHideWork: Function,
     onDeleteWork: Function,
     onToggleLike: Function,
+    onDownloadWork: Function,
     onLongPress: {
       type: Function,
       default: function() {
@@ -95,6 +96,12 @@ export default {
           <img class="avatar" :src="workInfo.userVO.smallAvatar" alt>
           <p class="song-title">{{workInfo.userVO.realname}}</p>
           <p class="update-info">&nbsp;· 更新于{{workInfo.lastModifiedDate|getDateDiff}}</p>
+        </div>
+      </div>
+      <div class="download-info">
+        <div class="likes" @click="onDownloadWork(workInfo)">
+          <img src="../../assets/heartstroke.svg" alt>
+          <p>下载</p>
         </div>
       </div>
       <div class="like-info">
@@ -243,6 +250,23 @@ export default {
         font-size: 12px;
         color: #6d6e75;
         opacity: 0.5;
+      }
+    }
+    .download-info {
+      display: flex;
+      justify-content: space-between;
+      // padding: getRem(40) getRem(16);
+      padding-right: getRem(40);
+      font-size: 10px;
+      .likes {
+        // display: flex;
+        text-align: center;
+        font-size: getRem(28);
+        img {
+          width: getRem(52);
+          height: getRem(42);
+          // margin-right: getRem(8);
+        }
       }
     }
     .like-info {

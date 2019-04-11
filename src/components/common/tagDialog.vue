@@ -25,15 +25,15 @@ export default {
 <template>
   <transition>
     <div
-      style="display:flex;align-items:center;justify-content:center;position:absolute;top:0;width:100%;height:100%;background-color:rgba(0,0,0,.6);z-index:1;"
+      style="display:flex;align-items:center;justify-content:center;position:absolute;top:0;width:100%;height:100%;background-color:rgba(0,0,0,.6);z-index:3;"
       v-show="appear"
     >
       <div id="tag-spec">
         <div class="header">标记说明</div>
         <div class="body">该标志表示本作品当前可制作成实体八音盒。能制作成八音盒的乐曲通常具备以下条件
           <ul>
-            <li>作品音符数量适中</li>
-            <li>作品音高比较分散</li>
+            <li>· 作品音符数量适中</li>
+            <li>· 作品音符音高比较分散</li>
           </ul>
         </div>
         <div class="footer" @click="handleClose">关闭</div>

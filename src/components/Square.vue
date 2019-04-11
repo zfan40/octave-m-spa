@@ -72,10 +72,21 @@ export default {
         query: {}
       });
     },
+    downloadWork(work) {
+      Magic.bounceAsWavBlob(work.url)
+        .then(blob => {
+          return Api.downloadAsWav(blob);
+        })
+        .then(url => {
+          console.log(url);
+        })
+        .catch(() => {
+          console.log("fail getting url");
+        });
+      return;
+    },
     purchaseWork(work) {
       // TODO: need check if order matches current work
-      Magic.bounceToWav(work.url);
-      return;
       if (work.machineNum > 18) {
         this.$toast("该作品目前无法制作");
         return;
@@ -227,6 +238,7 @@ export default {
             :workInfo="item"
             :onPlayWork="()=>playWork(item)"
             :playingStatus="item.id==playingWorkId"
+            :onDownloadWork="downloadWork(item)"
             :onPurchaseWork="()=>purchaseWork(item)"
             :onToggleLike="toggleLike"
           ></card>
