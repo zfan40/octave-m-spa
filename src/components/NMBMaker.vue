@@ -191,6 +191,7 @@ export default {
       piano.triggerAttack(noteId);
       // console.log('midi no. :', Tone.Frequency(noteId).toMidi())
       this.$set(this.activeNote, noteId, 1);
+
       if (!this.playing) {
         if (isLinger) {
           recordStartTime = performance.now();
@@ -198,12 +199,14 @@ export default {
           isLinger = false;
         }
         noteTime = performance.now() - recordStartTime + lingerOffset;
+        this.toggleReplay();
       } else {
         noteTime = performance.now() - playOffset;
         // noteTime = this.vuetimeline * 10
         // console.log('1', this.vuetimeline * 10)
         // console.log('2', performance.now() - recordStartTime + this.vuetimeline*100)
       }
+
       if (noteTime < 20000) {
         this.vuetimeline = (10 * noteTime) / 100;
         this.recordPart.push({
@@ -365,8 +368,10 @@ export default {
     onMiniKeyboardStart(e) {
       console.log(e);
     },
-    removeNoteInRecordPart(index) {
-      this.recordPart.splice(index, 1);
+    removeNoteInRecordPart(index, partIndex) {
+      // console.log("dd");
+      if (partIndex === undefined) this.recordPart.splice(index, 1);
+      else this.recordParts[partIndex].splice(index, 1);
     },
     keng(e) {
       // console.log(e)
@@ -800,6 +805,7 @@ export default {
                 ry="2"
                 :fill="activePartIndex===(PARTNUM-n)?mapNoteTimeToColor(item.time):'rgb(120,120,120)'"
                 :filter="activePartIndex===(PARTNUM-n)?'url(#glowing)':''"
+                @click="removeNoteInRecordPart(index,PARTNUM-n)"
               ></rect>
             </svg>
             <div class="temp" @click="clearRecordPart(PARTNUM-n)"></div>
