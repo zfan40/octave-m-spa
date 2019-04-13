@@ -131,10 +131,11 @@ export default {
           return Api.downloadAsWav(blob);
         })
         .then(url => {
-          this.$toast(`url is ${url}`);
+          // this.$toast(`url is ${url}`);
+          location.href = url;
         })
         .catch(() => {
-          this.$toast("fail downloading");
+          this.$toast("下载失败请稍后再试");
         });
     },
     purchaseWork(work) {

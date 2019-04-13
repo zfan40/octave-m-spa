@@ -78,10 +78,11 @@ export default {
           return Api.downloadAsWav(blob);
         })
         .then(url => {
-          console.log(url);
+          // this.$toast(`url is ${url}`);
+          location.href = url;
         })
         .catch(() => {
-          console.log("fail getting url");
+          this.$toast("下载失败请稍后再试");
         });
       return;
     },
@@ -238,7 +239,7 @@ export default {
             :workInfo="item"
             :onPlayWork="()=>playWork(item)"
             :playingStatus="item.id==playingWorkId"
-            :onDownloadWork="downloadWork(item)"
+            :onDownloadWork="downloadWork"
             :onPurchaseWork="()=>purchaseWork(item)"
             :onToggleLike="toggleLike"
           ></card>

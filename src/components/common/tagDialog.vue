@@ -30,7 +30,8 @@ export default {
     >
       <div id="tag-spec">
         <div class="header">标记说明</div>
-        <div class="body">该标志表示本作品当前可制作成实体八音盒。能制作成八音盒的乐曲通常具备以下条件
+        <div class="body">表示本作品当前可制作成实体八音盒。
+          <br>能制作成八音盒的乐曲通常具备以下条件:
           <ul>
             <li>· 作品音符数量适中</li>
             <li>· 作品音符音高比较分散</li>

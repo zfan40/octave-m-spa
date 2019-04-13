@@ -152,27 +152,40 @@ export function downloadAsWav(blob) {
       Authorization: reqConfig.headers.Authorization,
     },
   };
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      const fd = new FormData();
-      // fd.append('fname', 'test.txt');
-      fd.append('fname', 'output.mid');
-      fd.append('data', event.target.result);
-      // fd.append('access_token', tokenObj.access_token);
-      let postFix = '';
-      try {
-        // important, othereise dispatch won't be stoped here...
-        postFix = await axios.post('//api.octave-love.com/api/v1/picture/uploadPic', fd, formReqConfig);
-      } catch (e) {
-        console.log(e);
-        reject(e);
-      }
+  return new Promise(async (resolve, reject) => {
+    const fd = new FormData();
+    fd.append('files', blob)
+    try {
+      // important, othereise dispatch won't be stoped here...
+      const postFix = await axios.post('//api.octave-love.com/api/v1/picture/uploadPic', fd, formReqConfig);
       const wavURL = `${postFix.data.data}`;
       console.log(wavURL);
       resolve(wavURL)
-    };
-    reader.readAsDataURL(blob);
+    } catch (e) {
+      console.log(e);
+      reject(e);
+    }
+
+    /*****底下没jb用，uploadPic直接等着文件流，不需要读成base64 */
+    //const reader = new FileReader();
+    // reader.onload = async (event) => {
+    //   const fd = new FormData();
+    //   // fd.append('fname', 'output.wav');
+    //   // fd.append('data', event.target.result);
+    //   // fd.append('access_token', tokenObj.access_token);
+    //   let postFix = '';
+    //   try {
+    //     // important, othereise dispatch won't be stoped here...
+    //     postFix = await axios.post('//api.octave-love.com/api/v1/picture/uploadPic', fd, formReqConfig);
+    //   } catch (e) {
+    //     console.log(e);
+    //     reject(e);
+    //   }
+    //   const wavURL = `${postFix.data.data}`;
+    //   console.log(wavURL);
+    //   resolve(wavURL)
+    // };
+    // reader.readAsDataURL(blob);
   })
 }
 export function fetchMbox(id) {

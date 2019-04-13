@@ -100,7 +100,8 @@ export default {
       </div>
       <div class="download-info">
         <div class="likes" @click="onDownloadWork(workInfo)">
-          <img src="../../assets/heartstroke.svg" alt>
+          <img v-if="!workInfo.wavAccess" src="../../assets/download1.svg" alt>
+          <img v-if="workInfo.wavAccess" src="../../assets/download2.svg" alt>
           <p>下载</p>
         </div>
       </div>
@@ -240,6 +241,7 @@ export default {
       .avatar {
         width: getRem(46);
         height: getRem(46);
+        border-radius: getRem(23);
         margin-right: getRem(8);
       }
       .song-title {

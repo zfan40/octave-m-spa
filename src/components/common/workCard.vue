@@ -283,6 +283,7 @@ export default {
       .avatar {
         width: getRem(46);
         height: getRem(46);
+        border-radius: getRem(23);
         margin-right: getRem(8);
       }
       .song-title {
