@@ -883,7 +883,7 @@ export default {
       <div :class="[handClass]"></div>
     </div>
     <transition name="slide">
-      <div class="alert-mask" v-show="menuAppear">
+      <div class="alert-mask" v-show="menuAppear" @click.self="menuAppear=false">
         <div class="menu">
           <div @touchstart="bounceProject" class>完成作品</div>
           <div @touchstart="menuAppear=false" class>退出</div>

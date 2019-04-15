@@ -127,6 +127,8 @@ export default {
           : 36;
       this.RECTHEIGHT = window.innerHeight / this.ONE_PAGE_NOTE_NUM;
       this.noteRectConfig = {
+        perfectDrawEnabled: false,
+        transformsEnabled: "position",
         width: this.RECTWIDTH,
         height: this.RECTHEIGHT,
         fill: "#fff",
@@ -140,6 +142,8 @@ export default {
         ]
       };
       this.borderConfig = {
+        perfectDrawEnabled: false,
+        transformsEnabled: "position",
         width: this.RECTWIDTH,
         height: this.RECTHEIGHT,
         // fill: "none",
@@ -148,6 +152,8 @@ export default {
         dash: [this.RECTWIDTH, this.RECTWIDTH + 2 * this.RECTHEIGHT]
       };
       this.halfConfig = {
+        perfectDrawEnabled: false,
+        transformsEnabled: "position",
         width: this.RECTWIDTH,
         height: this.RECTHEIGHT,
         // fill: "none",
@@ -324,10 +330,10 @@ export default {
         j + (sector - 1) * this.NOTE_NUM_PER_SECTOR
       ];
       this.$set(this.rectArray, i, newRow);
-
       // update last
       last_i = i;
       last_j = j;
+      this.saveProjectToLocaoStorage();
     },
     handleMoveRect(i, j, sector) {
       const fullJ = j + (sector - 1) * this.NOTE_NUM_PER_SECTOR;
@@ -414,33 +420,34 @@ export default {
       }
     },
     scrolldown() {
-      clearInterval(aInterval);
-      this.sector == FULL_NOTE_NUM / NOTE_NUM_PER_SECTOR - 1
-        ? (this.NOTE_NUM_PER_SECTOR = NOTE_NUM_PER_SECTOR - 2)
-        : (this.NOTE_NUM_PER_SECTOR = 1); // for animation,
+      // clearInterval(aInterval);
+      // this.sector == FULL_NOTE_NUM / NOTE_NUM_PER_SECTOR - 1
+      //   ? (this.NOTE_NUM_PER_SECTOR = NOTE_NUM_PER_SECTOR - 2)
+      //   : (this.NOTE_NUM_PER_SECTOR = 1); // for animation,
       this.sector <= FULL_NOTE_NUM / NOTE_NUM_PER_SECTOR - 2
         ? (this.sector += 1)
         : ""; // this line is real scroll down
       // below is for animation
-      aInterval = setInterval(() => {
-        this.NOTE_NUM_PER_SECTOR += 1;
-        if (this.NOTE_NUM_PER_SECTOR == 10) {
-          clearInterval(aInterval);
-        }
-      }, 50);
+      // aInterval = setInterval(() => {
+      //   this.NOTE_NUM_PER_SECTOR += 1;
+      //   if (this.NOTE_NUM_PER_SECTOR == 10) {
+      //     clearInterval(aInterval);
+      //   }
+      // }, 50);
     },
     scrollup() {
-      clearInterval(aInterval);
-      this.sector == 1
-        ? (this.NOTE_NUM_PER_SECTOR = NOTE_NUM_PER_SECTOR + 2)
-        : (this.NOTE_NUM_PER_SECTOR = 20); // for animation,
+      // clearInterval(aInterval);
+      // this.sector == 1
+      //   ? (this.NOTE_NUM_PER_SECTOR = NOTE_NUM_PER_SECTOR + 2)
+      //   : (this.NOTE_NUM_PER_SECTOR = 20); // for animation,
       this.sector >= 2 ? (this.sector -= 1) : "";
-      aInterval = setInterval(() => {
-        this.NOTE_NUM_PER_SECTOR -= 1;
-        if (this.NOTE_NUM_PER_SECTOR == 10) {
-          clearInterval(aInterval);
-        }
-      }, 50);
+      // below is for animation
+      // aInterval = setInterval(() => {
+      //   this.NOTE_NUM_PER_SECTOR -= 1;
+      //   if (this.NOTE_NUM_PER_SECTOR == 10) {
+      //     clearInterval(aInterval);
+      //   }
+      // }, 50);
     },
     scrollToBegin() {
       clearInterval(aInterval);
@@ -466,6 +473,11 @@ export default {
     chooseKeyboard(keyboardMode) {
       if (this.keyboardMode == keyboardMode) return;
       this.alertAppear2 = true;
+      this.saveProjectToLocaoStorage();
+    },
+    updateBeat(newbeat) {
+      this.beat = newbeat;
+      this.saveProjectToLocaoStorage();
     },
     updateKeyboard() {
       //肯定是切换了嘛
@@ -478,6 +490,7 @@ export default {
       this.setupCanvas();
       this.alertAppear2 = false;
       this.menuAppear = false;
+      this.saveProjectToLocaoStorage();
     },
     checkBouncibility() {
       const result = [];
@@ -559,6 +572,14 @@ export default {
     },
     btnEnd(e) {
       this.toggleReplay();
+    },
+    saveProjectToLocaoStorage() {
+      const work = {
+        keyboardMode: this.keyboardMode,
+        rectArray: this.rectArray,
+        beat: this.beat
+      };
+      window.localStorage.setItem("rollwork", JSON.stringify(work));
     }
   },
   beforeRouteLeave(to, from, next) {
@@ -572,10 +593,22 @@ export default {
     // test, load a demo work
     console.log(RollDemo.demo1);
     // 有id 代表是某个模版的再创作
+    const workInCookie = window.localStorage.getItem("rollwork");
     if (this.$store.state.route.query.id) {
       this.keyboardMode = RollDemo.demo1.keyboardMode;
       this.tempo = RollDemo.demo1.tempo;
       this.rectArray = RollDemo.demo1.rectArray;
+      this.beat = RollDemo.demo1.beat;
+      this.scheduleCursor();
+    } else if (workInCookie) {
+      console.log("kiokiokio");
+      console.log(workInCookie);
+      console.log(typeof workInCookie);
+      const workInCookieObj = JSON.parse(workInCookie);
+      this.keyboardMode = workInCookieObj.keyboardMode || "whitekey";
+      this.tempo = workInCookieObj.tempo || 120;
+      this.rectArray = workInCookieObj.rectArray || Array(18).fill([]);
+      this.beat = workInCookieObj.beat || 8;
       this.scheduleCursor();
     }
     // regular setup
@@ -729,10 +762,10 @@ export default {
       </div>
     </transition>
     <transition name="slide">
-      <div class="alert-mask" v-show="menuAppear">
+      <div class="alert-mask" v-show="menuAppear" @click.self="menuAppear=false">
         <div class="menu">
-          <div @touchstart="()=>this.beat=4*2" :class="['menu-op',beat===4*2?'':'inactive']">4拍</div>
-          <div @touchstart="()=>this.beat=3*2" :class="['menu-op',beat===3*2?'':'inactive']">3拍</div>
+          <div @touchstart="updateBeat(8)" :class="['menu-op',beat===4*2?'':'inactive']">4拍</div>
+          <div @touchstart="updateBeat(6)" :class="['menu-op',beat===3*2?'':'inactive']">3拍</div>
           <div
             @touchstart="chooseKeyboard('whitekey')"
             :class="['menu-op',keyboardMode=='whitekey'?'':'inactive']"
