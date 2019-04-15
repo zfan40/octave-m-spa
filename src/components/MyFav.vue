@@ -99,19 +99,21 @@ export default {
     playWork(work) {
       console.log("work going to play: ", work);
       if (work.id != this.playingWorkId) {
+        ga("set", "metric1", work.id);
         this.playing = true;
         Magic.previewMidi(work.url, this.playing);
-
         this.$store.commit("PLAY_WORK", { work });
       } else {
         //操作的同一个
         if (this.playing) {
           //正播着这个呢
+          ga("set", "metric2", work.id);
           this.playing = false;
           Magic.previewMidi(work.url, this.playing);
           this.$store.commit("PLAY_WORK", { work: { id: -1 } });
         } else {
           //这个已经被停了
+          ga("set", "metric1", work.id);
           this.playing = true;
           Magic.previewMidi(work.url, 1);
           this.$store.commit("PLAY_WORK", { work });
@@ -126,19 +128,25 @@ export default {
       this.$store.commit("OPERATE_WORK", { work: { id: -1 } });
     },
     downloadWork(work) {
+      ga("set", "metric5", work.id);
+      this.$loading("下载中...");
       Magic.bounceAsWavBlob(work.url)
         .then(blob => {
           return Api.downloadAsWav(blob);
         })
         .then(url => {
           // this.$toast(`url is ${url}`);
+          ga("set", "metric6", work.id);
+          this.$loading.close();
           location.href = url;
         })
         .catch(() => {
+          this.$loading.close();
           this.$toast("下载失败请稍后再试");
         });
     },
     purchaseWork(work) {
+      ga("set", "metric3", work.id);
       if (work.machineNum > 18) {
         this.$toast("该作品目前无法制作");
         return;

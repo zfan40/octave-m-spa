@@ -85,10 +85,14 @@ export default {
     },
     togglePlay() {
       // alert('111')
+      this.playing
+        ? ga("set", "metric2", this.projectInfo.id)
+        : ga("set", "metric1", this.projectInfo.id);
       Magic.preview(this.project, !this.playing);
       this.playing = !this.playing;
     },
     toggleFav() {
+      if (!this.favStatus) ga("set", "metric7", this.projectInfo.id);
       this.favStatus = +!this.favStatus;
       Api.toggleFavSong({
         workId: this.$store.state.route.query.id,
@@ -174,7 +178,26 @@ export default {
     positionWindow() {
       window.scroll(0, 0);
     },
+    downloadWork(work) {
+      ga("set", "metric5", work.id);
+      this.$loading("下载中...");
+      Magic.bounceAsWavBlob(work.url)
+        .then(blob => {
+          return Api.downloadAsWav(blob);
+        })
+        .then(url => {
+          // this.$toast(`url is ${url}`);
+          ga("set", "metric6", work.id);
+          this.$loading.close();
+          location.href = url;
+        })
+        .catch(() => {
+          this.$loading.close();
+          this.$toast("下载失败请稍后再试");
+        });
+    },
     purchaseItem() {
+      ga("set", "metric3", `${this.projectInfo.id}`);
       if (this.projectInfo.machineNum > 18) {
         this.$toast("该作品目前无法制作");
         return;
@@ -363,6 +386,13 @@ export default {
           iconImg
           :onClickCall="toggleFav"
         />
+        <div class="download-info">
+          <div class="likes" @click="downloadWork(projectInfo)">
+            <img v-if="!projectInfo.wavAccess" src="../assets/download1.svg" alt>
+            <img v-if="projectInfo.wavAccess" src="../assets/download2.svg" alt>
+            <p>.wav</p>
+          </div>
+        </div>
         <div class="button_group">
           <button v-if="userId !== projectInfo.userId" @click="redirectToMaker">我来试试</button>
           <button v-if="userId === projectInfo.userId" @click="guideShare">分享</button>
