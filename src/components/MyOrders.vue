@@ -185,18 +185,35 @@ export default {
       console.log("work going to play: ", work);
       work.id = work.wid; //简单转换一下
       if (work.id != this.playingWorkId) {
+        this.$ga.event({
+          eventCategory: "Song",
+          eventAction: "play_20s",
+          eventLabel: work.id,
+          eventValue: ""
+        });
         this.playing = true;
         Magic.previewMidi(work.url, this.playing);
-
         this.$store.commit("PLAY_WORK", { work });
       } else {
         //操作的同一个
         if (this.playing) {
+          this.$ga.event({
+            eventCategory: "Song",
+            eventAction: "stop_20s",
+            eventLabel: work.id,
+            eventValue: ""
+          });
           //正播着这个呢
           this.playing = false;
           Magic.previewMidi(work.url, this.playing);
           this.$store.commit("PLAY_WORK", { work: { id: -1 } });
         } else {
+          this.$ga.event({
+            eventCategory: "Song",
+            eventAction: "play_20s",
+            eventLabel: work.id,
+            eventValue: ""
+          });
           //这个已经被停了
           this.playing = true;
           Magic.previewMidi(work.url, 1);

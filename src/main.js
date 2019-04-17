@@ -11,8 +11,13 @@ import App from './App';
 import router from './router';
 import { getDateDiff } from './_common/js/filters';
 import { longpress } from './_common/js/directives';
+import VueAnalytics from 'vue-analytics'
 
 // Vue.use(VueTouch, { name: 'v-touch' });
+Vue.use(VueAnalytics, {
+  id: 'UA-138246971-1',
+  router
+})
 Vue.use(Toast, { defaultType: 'center', duration: 2500, wordWrap: false, width: 'auto' });
 // Vue.use(infiniteScroll)
 Vue.config.productionTip = false;

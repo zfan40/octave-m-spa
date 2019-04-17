@@ -275,7 +275,13 @@ export function fetchStacks({ page, size }) {
   )
 }
 
-export function fetchSquareWorks({ page, size, id }) {
+export function fetchSquareWorks({ page, size, category, orderCategory, id }) {
+  if (category && orderCategory) {
+    return axios.get(
+      `//api.octave-love.com/api/v1/home?page=${page}&size=${size}&category=${category}&orderCategory=${orderCategory}`,
+      reqConfig,
+    );
+  }
   return axios.get(
     `//api.octave-love.com/api/v1/home?page=${page}&size=${size}`,
     reqConfig,

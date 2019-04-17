@@ -10,7 +10,7 @@ import * as WxShare from "../_common/js/wx_share";
 import infiniteScroll from "vue-infinite-scroll";
 
 let musicPart = undefined;
-const workStatusMap = { 0: "公开", 1: "私密", 2: "删除" };
+
 export default {
   directives: {
     infiniteScroll
@@ -37,9 +37,8 @@ export default {
     musixiserInfo() {
       return this.$store.state.musixiserInfo;
     },
-    musixiserWorksObj() {
-      console.log(JSON.stringify(this.$store.state.musixiserWorksObj));
-      return this.$store.state.musixiserWorksObj;
+    boardWorksObj() {
+      return this.$store.state.boardWorksObj;
     },
     operatingWorkId() {
       return this.$store.state.operatingWorkId;
@@ -49,56 +48,53 @@ export default {
     }
   },
   methods: {
-    loadMusixiserById() {
-      console.log("my id: ", this.userId);
-      const id = this.userId; // this.userId手传参id或当前用户id
-      this.$store
-        .dispatch("FETCH_MUSIXISER", {
-          id
-        })
-        .then(() => {
-          const fullPath = `${location.origin}${
-            location.pathname
-          }#/musixiser?id=${this.userId}`;
-          document.title = `${this.$store.state.musixiserInfo.realname}的作品`;
-          WxShare.prepareShareConfig().then(() => {
-            WxShare.prepareShareContent({
-              title: `${this.$store.state.musixiserInfo.realname}的作品`,
-              desc: "很好听哦～",
-              // fullPath:location.href.split('#')[0],
-              fullPath,
-              imgUrl:
-                `http:${this.$store.state.musixiserInfo.smallAvatar}` ||
-                "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
-            });
-          });
-        });
-      this.busy = false;
-      // this.$store.dispatch('FETCH_WORKS_FROM_MUSIXISER', {
-      //   id,
-      //   page:1
-      // })
-    },
+    // loadMusixiserById() {
+    //   console.log("my id: ", this.userId);
+    //   const id = this.userId; // this.userId手传参id或当前用户id
+    //   this.$store
+    //     .dispatch("FETCH_MUSIXISER", {
+    //       id
+    //     })
+    //     .then(() => {
+    //       const fullPath = `${location.origin}${location.pathname}#/my-fav?id=${
+    //         this.userId
+    //       }`;
+    //       document.title = `${this.$store.state.musixiserInfo.realname}的收藏`;
+    //       WxShare.prepareShareConfig().then(() => {
+    //         WxShare.prepareShareContent({
+    //           title: `${this.$store.state.musixiserInfo.realname}的收藏`,
+    //           desc: "口味不太一样哦～",
+    //           // fullPath:location.href.split('#')[0],
+    //           fullPath,
+    //           imgUrl:
+    //             `http:${this.$store.state.musixiserInfo.smallAvatar}` ||
+    //             "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
+    //         });
+    //       });
+    //     });
+    //   this.busy = false;
+    //   // this.$store.dispatch('FETCH_WORKS_FROM_MUSIXISER', {
+    //   //   id,
+    //   //   page:1
+    //   // })
+    // },
     loadMore() {
+      alert("jb");
       //will call automatically when enter!
       const id = this.userId;
       // alert(id)
       this.busy = true;
-      console.log("1111111", this.musixiserWorksObj.current);
+      console.log("1111111", this.boardWorksObj.current);
       this.$store
-        .dispatch("FETCH_WORKS_FROM_MUSIXISER", {
-          id,
-          page: this.musixiserWorksObj.current
-            ? this.musixiserWorksObj.current + 1
-            : 1
+        .dispatch("FETCH_BOARD_WORKS", {
+          page: this.boardWorksObj.current ? this.boardWorksObj.current + 1 : 1,
+          size: 10,
+          category: 1,
+          orderCategory: 2
         })
         .then(() => {
-          console.log("2222222", this.musixiserWorksObj);
-          if (
-            +this.musixiserWorksObj.content.length <
-            +this.musixiserWorksObj.total
-          ) {
-            //otherwise no more content
+          console.log("2222222", this.boardWorksObj);
+          if (+this.boardWorksObj.content.length < +this.boardWorksObj.total) {
             this.busy = false;
           }
         });
@@ -197,6 +193,9 @@ export default {
         }
       });
     },
+    shareWork() {
+      console.log("share in");
+    },
     toggleLike(workInfo) {
       // console.log('current work info',workInfo.favStatus)
       if (!workInfo.status)
@@ -211,16 +210,13 @@ export default {
         status: +!workInfo.favStatus
       }).then(() => {
         this.$store.commit("LOCAL_UPDATE_LIST_FAV", {
-          type: "musixiserWorksObj",
+          type: "boardWorksObj",
           item: {
             id: workInfo.id,
             favStatus: +!workInfo.favStatus
           }
         });
       });
-    },
-    shareWork() {
-      console.log("share in");
     },
     changeWorkStatus(workInfo, status) {
       Api.updateWork({
@@ -230,7 +226,7 @@ export default {
         this.$toast(`已将作品${workStatusMap[status]}`);
         this.cancelOperate();
         this.$store.commit("LOCAL_UPDATE_LIST", {
-          type: "musixiserWorksObj",
+          type: "boardWorksObj",
           item: {
             id: workInfo.id,
             status
@@ -242,7 +238,7 @@ export default {
   beforeRouteLeave(to, from, next) {
     Magic.clearTone();
     this.$store.commit("RESET_WORK_LIST", {
-      type: "musixiserWorksObj"
+      type: "boardWorksObj"
     });
     next();
   },
@@ -251,18 +247,17 @@ export default {
     // if stoken not exist, go auth
 
     const self = this;
+    this.busy = false;
     var docElem = document.documentElement;
     window.rem = docElem.getBoundingClientRect().width / 10;
     docElem.style.fontSize = window.rem + "px";
-
+    document.title = "排行榜";
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase());
-    document.title = "作品集";
     if (!inWechat) {
-      this.userId = this.$store.state.route.query.id || 239;
-      self.loadMusixiserById();
+      // this.userId = this.$store.state.route.query.id || 239;
       return;
     }
-    const fullPath = `${location.origin}${location.pathname}#/musixiser?id=${
+    const fullPath = `${location.origin}${location.pathname}#/my-fav?id=${
       self.$store.state.route.query.id
     }`;
     // WxShare.prepareShareConfig().then(() => {
@@ -289,10 +284,10 @@ export default {
               )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
             );
           }
-          self.userId =
-            this.$store.state.route.query.id || res.data.data.userId;
-          self.isMe = self.userId == res.data.data.userId;
-          self.loadMusixiserById();
+          self.userId = res.data.data.userId;
+          // self.isMe = self.userId == res.data.data.userId;
+          // self.loadMusixiserById();
+          this.busy = false;
 
           console.log("get user info success", res.data.data);
         })
@@ -336,21 +331,20 @@ export default {
       class="worklist"
     >
       <work-card
-        v-for="item in musixiserWorksObj.content"
+        v-for="item in boardWorksObj.content"
         :workInfo="item"
         :key="item.id"
         :playingStatus="item.id==playingWorkId"
         :maskOn="item.id==operatingWorkId"
         :onLongPress="()=>operateWork(item)"
         :onPlayWork="()=>playWork(item)"
-        :onPurchaseWork="()=>purchaseWork(item)"
         :onDownloadWork="()=>downloadWork(item)"
+        :onPurchaseWork="()=>purchaseWork(item)"
         :onClickTag="()=>{tagAppear=true}"
         :onShareWork="shareWork"
         :onChangeWorkStatus="changeWorkStatus"
         :onTapMask="cancelOperate"
         :onToggleLike="toggleLike"
-        :isMine="isMe"
       />
     </div>
     <!-- <div class="emptysection" v-show="!loading && musixiserWorksObj.content.length==0">
@@ -362,7 +356,6 @@ export default {
     <tag-dialog :appear="tagAppear" :handleClose="()=>{tagAppear=false}"/>
   </div>
 </template>
-
 <style lang="scss" scoped>
 @import "../_common/style/_functions.scss";
 @import "../_common/style/_variables.scss";
@@ -376,14 +369,13 @@ export default {
   background-color: #404249;
 }
 .worklist {
-  z-index: 0;
   position: relative;
   height: 100%;
   display: flex;
   justify-content: space-between;
   align-content: flex-start;
   flex-wrap: wrap;
-  padding: getRem(26);
+  padding: getRem(20);
   background-color: #404249;
   overflow: scroll;
 }

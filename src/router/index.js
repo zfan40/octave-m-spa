@@ -15,6 +15,7 @@ import MyFav from '@/components/MyFav';
 import ProductList from '@/components/ProductList';
 import OrderConfirm from '@/components/OrderConfirm';
 import MyOrders from '@/components/MyOrders';
+import RankBoard from '@/components/RankBoard';
 
 Vue.use(Router);
 
@@ -65,6 +66,11 @@ export default new Router({
       path: '/my-fav',
       name: 'MyFav',
       component: MyFav,
+    },
+    {
+      path: '/rank-board',
+      name: 'RankBoard',
+      component: RankBoard,
     },
     // {
     //   path: '/recommend',

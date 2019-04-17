@@ -99,7 +99,12 @@ export default {
     playWork(work) {
       console.log("work going to play: ", work);
       if (work.id != this.playingWorkId) {
-        ga("set", "metric1", work.id);
+        this.$ga.event({
+          eventCategory: "Song",
+          eventAction: "play_20s",
+          eventLabel: work.id,
+          eventValue: ""
+        });
         this.playing = true;
         Magic.previewMidi(work.url, this.playing);
         this.$store.commit("PLAY_WORK", { work });
@@ -107,13 +112,23 @@ export default {
         //操作的同一个
         if (this.playing) {
           //正播着这个呢
-          ga("set", "metric2", work.id);
+          this.$ga.event({
+            eventCategory: "Song",
+            eventAction: "stop_20s",
+            eventLabel: work.id,
+            eventValue: ""
+          });
           this.playing = false;
           Magic.previewMidi(work.url, this.playing);
           this.$store.commit("PLAY_WORK", { work: { id: -1 } });
         } else {
           //这个已经被停了
-          ga("set", "metric1", work.id);
+          this.$ga.event({
+            eventCategory: "Song",
+            eventAction: "play_20s",
+            eventLabel: work.id,
+            eventValue: ""
+          });
           this.playing = true;
           Magic.previewMidi(work.url, 1);
           this.$store.commit("PLAY_WORK", { work });
@@ -128,7 +143,12 @@ export default {
       this.$store.commit("OPERATE_WORK", { work: { id: -1 } });
     },
     downloadWork(work) {
-      ga("set", "metric5", work.id);
+      this.$ga.event({
+        eventCategory: "Download",
+        eventAction: "tap",
+        eventLabel: work.id,
+        eventValue: ""
+      });
       this.$loading("下载中...");
       Magic.bounceAsWavBlob(work.url)
         .then(blob => {
@@ -136,7 +156,12 @@ export default {
         })
         .then(url => {
           // this.$toast(`url is ${url}`);
-          ga("set", "metric6", work.id);
+          this.$ga.event({
+            eventCategory: "Download",
+            eventAction: "success",
+            eventLabel: work.id,
+            eventValue: ""
+          });
           this.$loading.close();
           location.href = url;
         })
@@ -146,7 +171,12 @@ export default {
         });
     },
     purchaseWork(work) {
-      ga("set", "metric3", work.id);
+      this.$ga.event({
+        eventCategory: "MakeMB",
+        eventAction: "tap",
+        eventLabel: work.id,
+        eventValue: ""
+      });
       if (work.machineNum > 18) {
         this.$toast("该作品目前无法制作");
         return;

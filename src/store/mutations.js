@@ -72,6 +72,18 @@ export default {
     state.favWorksObj.size = favWorksObj.size;
     state.favWorksObj.current = favWorksObj.current;
   },
+  PUSH_BOARD_WORKS: (state, { boardWorksObj }) => {
+    // 储存录制信息
+    console.log('xxxxxxx', boardWorksObj);
+    if (+boardWorksObj.current === 1) {
+      state.boardWorksObj.content = boardWorksObj.list;
+    } else {
+      state.boardWorksObj.content = state.boardWorksObj.content.concat(boardWorksObj.list);
+    }
+    state.boardWorksObj.total = boardWorksObj.total;
+    state.boardWorksObj.size = boardWorksObj.size;
+    state.boardWorksObj.current = boardWorksObj.current;
+  },
   RESET_WORK_LIST: (state, { type }) => {
     state[type] = { content: [] }
   },

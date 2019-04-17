@@ -84,15 +84,30 @@ export default {
       }
     },
     togglePlay() {
-      // alert('111')
       this.playing
-        ? ga("set", "metric2", this.projectInfo.id)
-        : ga("set", "metric1", this.projectInfo.id);
+        ? this.$ga.event({
+            eventCategory: "Song",
+            eventAction: "stop_20s",
+            eventLabel: this.projectInfo.id,
+            eventValue: ""
+          })
+        : this.$ga.event({
+            eventCategory: "Song",
+            eventAction: "play_20s",
+            eventLabel: this.projectInfo.id,
+            eventValue: ""
+          });
       Magic.preview(this.project, !this.playing);
       this.playing = !this.playing;
     },
     toggleFav() {
-      if (!this.favStatus) ga("set", "metric7", this.projectInfo.id);
+      if (!this.favStatus)
+        this.$ga.event({
+          eventCategory: "Song",
+          eventAction: "fav",
+          eventLabel: this.projectInfo.id,
+          eventValue: ""
+        });
       this.favStatus = +!this.favStatus;
       Api.toggleFavSong({
         workId: this.$store.state.route.query.id,
@@ -155,6 +170,12 @@ export default {
         });
     },
     redirectToMaker() {
+      this.$ga.event({
+        eventCategory: "Work",
+        eventAction: "create",
+        eventLabel: "fromSharePage",
+        eventValue: ""
+      });
       this.$router.push({
         path: "/new-music-box-maker"
         // query: {
@@ -179,7 +200,12 @@ export default {
       window.scroll(0, 0);
     },
     downloadWork(work) {
-      ga("set", "metric5", work.id);
+      this.$ga.event({
+        eventCategory: "Download",
+        eventAction: "tap",
+        eventLabel: work.id,
+        eventValue: ""
+      });
       this.$loading("下载中...");
       Magic.bounceAsWavBlob(work.url)
         .then(blob => {
@@ -187,7 +213,12 @@ export default {
         })
         .then(url => {
           // this.$toast(`url is ${url}`);
-          ga("set", "metric6", work.id);
+          this.$ga.event({
+            eventCategory: "Download",
+            eventAction: "success",
+            eventLabel: work.id,
+            eventValue: ""
+          });
           this.$loading.close();
           location.href = url;
         })
@@ -197,7 +228,12 @@ export default {
         });
     },
     purchaseItem() {
-      ga("set", "metric3", `${this.projectInfo.id}`);
+      this.$ga.event({
+        eventCategory: "MakeMB",
+        eventAction: "tap",
+        eventLabel: this.projectInfo.id,
+        eventValue: ""
+      });
       if (this.projectInfo.machineNum > 18) {
         this.$toast("该作品目前无法制作");
         return;

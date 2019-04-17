@@ -17,6 +17,7 @@ export function createStore() {
       squareWorksObj: { content: [] },
       musixiserWorksObj: { content: [] },
       favWorksObj: { content: [] },
+      boardWorksObj: { content: [] },
       targetProduct: {},
       targetWork: {},
       orders: { content: [] },

@@ -91,16 +91,22 @@ export default {
     }),
   FETCH_SQUARE_WORKS: ({ commit, state }, { page, size }) =>
     new Promise((resolve, reject) => {
-      // 获取某id的音乐盒音乐内容
       fetchSquareWorks({ page, size }).then((works) => {
         console.log('works list: ', works.data.data);
         commit('PUSH_SQUARE_WORKS', { squareWorksObj: works.data.data });
         resolve();
       });
     }),
+  FETCH_BOARD_WORKS: ({ commit, state }, { page, size, category, orderCategory }) =>
+    new Promise((resolve, reject) => {
+      fetchSquareWorks({ page, size, category, orderCategory }).then((works) => {
+        console.log('works list: ', works.data.data);
+        commit('PUSH_BOARD_WORKS', { boardWorksObj: works.data.data });
+        resolve();
+      });
+    }),
   FETCH_WORKS_FROM_MUSIXISER: ({ commit, state }, { id, page }) =>
     new Promise((resolve, reject) => {
-      // 获取某id的音乐盒音乐内容
       fetchWorksFromMusixiser(id, page).then((works) => {
         console.log('works list: ', works.data.data);
         commit('PUSH_MUSIXISER_WORKS', { musixiserWorksObj: works.data.data });
@@ -134,13 +140,6 @@ export default {
         resolve();
       });
     }),
-  FETCH_STACKS: ({ commit, state }, { page, size }) =>
-    new Promise((resolve, reject) => {
-      fetchStacks({ page, size }).then((stacks) => {
-        commit('PUSH_STACKS', { stacks: stacks.data.list });
-        resolve();
-      })
-    })
   //   // ensure data for rendering given list type
   //   FETCH_LIST_DATA: ({ commit, dispatch, state }, { type }) => {
   //     commit('SET_ACTIVE_TYPE', { type });
