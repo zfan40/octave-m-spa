@@ -102,7 +102,7 @@ export default {
         <div class="likes" @click="onDownloadWork(workInfo)">
           <img v-if="!workInfo.wavAccess" src="../../assets/download1.svg" alt>
           <img v-if="workInfo.wavAccess" src="../../assets/download2.svg" alt>
-          <p>下载</p>
+          <p>.wav</p>
         </div>
       </div>
       <div class="like-info">

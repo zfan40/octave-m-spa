@@ -3,6 +3,7 @@ import Card from "./common/BigCard";
 import { swiper, swiperSlide } from "vue-awesome-swiper";
 import * as Util from "../_common/js/util";
 import * as Magic from "../_common/js/magic";
+import { mbMixin } from "../_common/js/mixin.js";
 import * as Api from "../_common/js/api";
 import * as Cookies from "js-cookie";
 import * as WxShare from "../_common/js/wx_share";
@@ -13,6 +14,7 @@ import * as WxShare from "../_common/js/wx_share";
  */
 export default {
   name: "Square",
+  mixins: [mbMixin],
   components: {
     Card,
     swiper,
@@ -42,120 +44,10 @@ export default {
     }
   },
   methods: {
-    playWork(work) {
-      if (!work) return;
-      this.everPlayFlag = true;
-      console.log("work going to play: ", work);
-      if (work.id != this.playingWorkId) {
-        this.$ga.event({
-          eventCategory: "Song",
-          eventAction: "play_20s",
-          eventLabel: work.id,
-          eventValue: ""
-        });
-        this.playing = true;
-        Magic.previewMidi(work.url, this.playing);
-        this.$store.commit("PLAY_WORK", { work });
-      } else {
-        //操作的同一个
-        if (this.playing) {
-          //正播着这个呢
-          this.$ga.event({
-            eventCategory: "Song",
-            eventAction: "stop_20s",
-            eventLabel: work.id,
-            eventValue: ""
-          });
-          this.playing = false;
-          Magic.previewMidi(work.url, this.playing);
-          this.$store.commit("PLAY_WORK", { work: { id: -1 } });
-        } else {
-          //这个已经被停了
-          this.$ga.event({
-            eventCategory: "Song",
-            eventAction: "play_20s",
-            eventLabel: work.id,
-            eventValue: ""
-          });
-          this.playing = true;
-          Magic.previewMidi(work.url, 1);
-          this.$store.commit("PLAY_WORK", { work });
-        }
-      }
-    },
     redirectToMaker() {
       this.$router.push({
         path: "/new-music-box-maker",
         query: {}
-      });
-    },
-    downloadWork(work) {
-      this.$ga.event({
-        eventCategory: "Download",
-        eventAction: "tap",
-        eventLabel: work.id,
-        eventValue: ""
-      });
-      this.$loading("loading...");
-      Magic.bounceAsWavBlob(work.url)
-        .then(blob => {
-          return Api.downloadAsWav(blob);
-        })
-        .then(url => {
-          // this.$toast(`url is ${url}`);
-          this.$ga.event({
-            eventCategory: "Download",
-            eventAction: "success",
-            eventLabel: work.id,
-            eventValue: ""
-          });
-          this.$loading.close();
-          location.href = url;
-        })
-        .catch(() => {
-          this.$loading.close();
-          this.$toast("下载失败请稍后再试");
-        });
-    },
-    purchaseWork(work) {
-      // TODO: need check if order matches current work
-      this.$ga.event({
-        eventCategory: "MakeMB",
-        eventAction: "tap",
-        eventLabel: work.id,
-        eventValue: ""
-      });
-      if (work.machineNum > 18) {
-        this.$toast("该作品目前无法制作");
-        return;
-      }
-      console.log("purchase in");
-      this.$store.commit("SAVE_ORDER_INFO", { work }); // store current workId
-      this.$router.push({
-        path: "/product-list",
-        query: {}
-      });
-    },
-    toggleLike(work) {
-      // console.log('current work info',work.favStatus)
-      if (!work.status)
-        this.$ga.event({
-          eventCategory: "Song",
-          eventAction: "fav",
-          eventLabel: work.id,
-          eventValue: ""
-        });
-      Api.toggleFavSong({
-        workId: work.id,
-        status: +!work.favStatus
-      }).then(() => {
-        this.$store.commit("LOCAL_UPDATE_LIST_FAV", {
-          type: "squareWorksObj",
-          item: {
-            id: work.id,
-            favStatus: +!work.favStatus
-          }
-        });
       });
     },
     loadWorks() {
@@ -285,7 +177,7 @@ export default {
             :playingStatus="item.id==playingWorkId"
             :onDownloadWork="downloadWork"
             :onPurchaseWork="()=>purchaseWork(item)"
-            :onToggleLike="toggleLike"
+            :onToggleLike="()=>toggleLike(item,'squareWorksObj')"
           ></card>
         </swiper-slide>
       </swiper>

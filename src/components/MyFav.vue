@@ -4,6 +4,7 @@ import * as Util from "../_common/js/util";
 import * as Api from "../_common/js/api";
 import * as Cookies from "js-cookie";
 import * as Magic from "../_common/js/magic";
+import { mbMixin } from "../_common/js/mixin.js";
 import workCard from "./common/workCard";
 import tagDialog from "./common/tagDialog";
 import * as WxShare from "../_common/js/wx_share";
@@ -12,6 +13,7 @@ import infiniteScroll from "vue-infinite-scroll";
 let musicPart = undefined;
 
 export default {
+  mixins: [mbMixin],
   directives: {
     infiniteScroll
   },
@@ -96,45 +98,7 @@ export default {
           }
         });
     },
-    playWork(work) {
-      console.log("work going to play: ", work);
-      if (work.id != this.playingWorkId) {
-        this.$ga.event({
-          eventCategory: "Song",
-          eventAction: "play_20s",
-          eventLabel: work.id,
-          eventValue: ""
-        });
-        this.playing = true;
-        Magic.previewMidi(work.url, this.playing);
-        this.$store.commit("PLAY_WORK", { work });
-      } else {
-        //操作的同一个
-        if (this.playing) {
-          //正播着这个呢
-          this.$ga.event({
-            eventCategory: "Song",
-            eventAction: "stop_20s",
-            eventLabel: work.id,
-            eventValue: ""
-          });
-          this.playing = false;
-          Magic.previewMidi(work.url, this.playing);
-          this.$store.commit("PLAY_WORK", { work: { id: -1 } });
-        } else {
-          //这个已经被停了
-          this.$ga.event({
-            eventCategory: "Song",
-            eventAction: "play_20s",
-            eventLabel: work.id,
-            eventValue: ""
-          });
-          this.playing = true;
-          Magic.previewMidi(work.url, 1);
-          this.$store.commit("PLAY_WORK", { work });
-        }
-      }
-    },
+
     operateWork(work) {
       console.log("operate in");
       this.$store.commit("OPERATE_WORK", { work });
@@ -142,71 +106,9 @@ export default {
     cancelOperate() {
       this.$store.commit("OPERATE_WORK", { work: { id: -1 } });
     },
-    downloadWork(work) {
-      this.$ga.event({
-        eventCategory: "Download",
-        eventAction: "tap",
-        eventLabel: work.id,
-        eventValue: ""
-      });
-      this.$loading("下载中...");
-      Magic.bounceAsWavBlob(work.url)
-        .then(blob => {
-          return Api.downloadAsWav(blob);
-        })
-        .then(url => {
-          // this.$toast(`url is ${url}`);
-          this.$ga.event({
-            eventCategory: "Download",
-            eventAction: "success",
-            eventLabel: work.id,
-            eventValue: ""
-          });
-          this.$loading.close();
-          location.href = url;
-        })
-        .catch(() => {
-          this.$loading.close();
-          this.$toast("下载失败请稍后再试");
-        });
-    },
-    purchaseWork(work) {
-      this.$ga.event({
-        eventCategory: "MakeMB",
-        eventAction: "tap",
-        eventLabel: work.id,
-        eventValue: ""
-      });
-      if (work.machineNum > 18) {
-        this.$toast("该作品目前无法制作");
-        return;
-      }
-      console.log("purchase in");
-      this.$store.commit("SAVE_ORDER_INFO", { work }); // store current workId
-      this.$router.push({
-        path: "/product-list",
-        query: {
-          // id
-        }
-      });
-    },
+
     shareWork() {
       console.log("share in");
-    },
-    toggleLike(work) {
-      // console.log('current work info',work.favStatus)
-      Api.toggleFavSong({
-        workId: work.id,
-        status: +!work.favStatus
-      }).then(() => {
-        this.$store.commit("LOCAL_UPDATE_LIST_FAV", {
-          type: "favWorksObj",
-          item: {
-            id: work.id,
-            favStatus: +!work.favStatus
-          }
-        });
-      });
     },
     changeWorkStatus(work, status) {
       Api.updateWork({
@@ -333,7 +235,7 @@ export default {
         :onShareWork="shareWork"
         :onChangeWorkStatus="changeWorkStatus"
         :onTapMask="cancelOperate"
-        :onToggleLike="toggleLike"
+        :onToggleLike="()=>toggleLike(item,'favWorksObj')"
       />
     </div>
     <!-- <div class="emptysection" v-show="!loading && musixiserWorksObj.content.length==0">

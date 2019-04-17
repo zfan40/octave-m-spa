@@ -4,12 +4,14 @@ import * as Util from "../_common/js/util";
 import * as Api from "../_common/js/api";
 import * as Cookies from "js-cookie";
 import * as Magic from "../_common/js/magic";
+import { mbMixin } from "../_common/js/mixin.js";
 import CountButton from "./common/countButton";
 import * as WxShare from "../_common/js/wx_share";
 
 // const musicPart;
 
 export default {
+  mixins: [mbMixin],
   components: {
     CountButton
   },
@@ -199,34 +201,6 @@ export default {
     positionWindow() {
       window.scroll(0, 0);
     },
-    downloadWork(work) {
-      this.$ga.event({
-        eventCategory: "Download",
-        eventAction: "tap",
-        eventLabel: work.id,
-        eventValue: ""
-      });
-      this.$loading("下载中...");
-      Magic.bounceAsWavBlob(work.url)
-        .then(blob => {
-          return Api.downloadAsWav(blob);
-        })
-        .then(url => {
-          // this.$toast(`url is ${url}`);
-          this.$ga.event({
-            eventCategory: "Download",
-            eventAction: "success",
-            eventLabel: work.id,
-            eventValue: ""
-          });
-          this.$loading.close();
-          location.href = url;
-        })
-        .catch(() => {
-          this.$loading.close();
-          this.$toast("下载失败请稍后再试");
-        });
-    },
     purchaseItem() {
       this.$ga.event({
         eventCategory: "MakeMB",
@@ -254,15 +228,6 @@ export default {
           // id
         }
       });
-      // WxShare.newMakeWxOrder(
-      //   { pid: 1, wid: this.projectInfo.id, amount: 1 },
-      //   () => {
-      //     console.log("pay succeed");
-      //   },
-      //   () => {
-      //     console.log("pay fail");
-      //   }
-      // );
     }
   },
   beforeRouteLeave(to, from, next) {
@@ -272,7 +237,6 @@ export default {
   created() {
     // check cookie to get serviceToken first
     // if stoken not exist, go auth
-    // alert(1);
     const self = this;
     const docElem = document.documentElement;
     window.rem = docElem.getBoundingClientRect().width / 10;

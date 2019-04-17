@@ -160,7 +160,7 @@ export default {
       </div>
       <div class="detail-other">
         <div>{{workInfo.lastModifiedDate|getDateDiff}}更新</div>
-        <div class="likes" @click="onToggleLike(workInfo)">
+        <div class="likes" @click="onToggleLike">
           <img v-if="!workInfo.favStatus" src="../../assets/heartstroke.svg" alt>
           <img v-if="workInfo.favStatus" src="../../assets/heartfill.svg" alt>
           {{workInfo.collectNum}}
