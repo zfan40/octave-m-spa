@@ -136,24 +136,24 @@ export default {
         query: {}
       });
     },
-    toggleLike(workInfo) {
-      // console.log('current work info',workInfo.favStatus)
-      if (!workInfo.status)
+    toggleLike(work) {
+      // console.log('current work info',work.favStatus)
+      if (!work.status)
         this.$ga.event({
           eventCategory: "Song",
           eventAction: "fav",
-          eventLabel: workInfo.id,
+          eventLabel: work.id,
           eventValue: ""
         });
       Api.toggleFavSong({
-        workId: workInfo.id,
-        status: +!workInfo.favStatus
+        workId: work.id,
+        status: +!work.favStatus
       }).then(() => {
         this.$store.commit("LOCAL_UPDATE_LIST_FAV", {
           type: "squareWorksObj",
           item: {
-            id: workInfo.id,
-            favStatus: +!workInfo.favStatus
+            id: work.id,
+            favStatus: +!work.favStatus
           }
         });
       });

@@ -196,31 +196,31 @@ export default {
     shareWork() {
       console.log("share in");
     },
-    toggleLike(workInfo) {
-      // console.log('current work info',workInfo.favStatus)
-      if (!workInfo.status)
+    toggleLike(work) {
+      // console.log('current work info',work.favStatus)
+      if (!work.status)
         this.$ga.event({
           eventCategory: "Song",
           eventAction: "fav",
-          eventLabel: workInfo.id,
+          eventLabel: work.id,
           eventValue: ""
         });
       Api.toggleFavSong({
-        workId: workInfo.id,
-        status: +!workInfo.favStatus
+        workId: work.id,
+        status: +!work.favStatus
       }).then(() => {
         this.$store.commit("LOCAL_UPDATE_LIST_FAV", {
           type: "boardWorksObj",
           item: {
-            id: workInfo.id,
-            favStatus: +!workInfo.favStatus
+            id: work.id,
+            favStatus: +!work.favStatus
           }
         });
       });
     },
-    changeWorkStatus(workInfo, status) {
+    changeWorkStatus(work, status) {
       Api.updateWork({
-        id: workInfo.id,
+        id: work.id,
         status: status
       }).then(() => {
         this.$toast(`已将作品${workStatusMap[status]}`);
@@ -228,7 +228,7 @@ export default {
         this.$store.commit("LOCAL_UPDATE_LIST", {
           type: "boardWorksObj",
           item: {
-            id: workInfo.id,
+            id: work.id,
             status
           }
         });
