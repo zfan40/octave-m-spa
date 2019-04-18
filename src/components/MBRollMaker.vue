@@ -762,7 +762,7 @@ export default {
       </div>
     </transition>
     <transition name="slide">
-      <div class="alert-mask" v-show="menuAppear" @click.self="menuAppear=false">
+      <div class="alert-mask" v-show="menuAppear" @touchstart.self="menuAppear=false">
         <div class="menu">
           <div @touchstart="updateBeat(8)" :class="['menu-op',beat===4*2?'':'inactive']">4拍</div>
           <div @touchstart="updateBeat(6)" :class="['menu-op',beat===3*2?'':'inactive']">3拍</div>

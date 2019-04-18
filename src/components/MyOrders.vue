@@ -192,8 +192,11 @@ export default {
           eventValue: ""
         });
         this.playing = true;
-        Magic.previewMidi(work.url, this.playing);
-        this.$store.commit("PLAY_WORK", { work });
+        Magic.previewMidi(work.url, this.playing)
+          .then(() => this.$store.commit("PLAY_WORK", { work }))
+          .catch(() => {
+            this.$toast("作品损坏，无法播放");
+          });
       } else {
         //操作的同一个
         if (this.playing) {
@@ -205,8 +208,11 @@ export default {
           });
           //正播着这个呢
           this.playing = false;
-          Magic.previewMidi(work.url, this.playing);
-          this.$store.commit("PLAY_WORK", { work: { id: -1 } });
+          Magic.previewMidi(work.url, this.playing)
+            .then(() => this.$store.commit("PLAY_WORK", { work: { id: -1 } }))
+            .catch(() => {
+              this.$toast("作品损坏，无法播放");
+            });
         } else {
           this.$ga.event({
             eventCategory: "Song",
@@ -216,8 +222,11 @@ export default {
           });
           //这个已经被停了
           this.playing = true;
-          Magic.previewMidi(work.url, 1);
-          this.$store.commit("PLAY_WORK", { work });
+          Magic.previewMidi(work.url, this.playing)
+            .then(() => this.$store.commit("PLAY_WORK", { work }))
+            .catch(() => {
+              this.$toast("作品损坏，无法播放");
+            });
         }
       }
     }

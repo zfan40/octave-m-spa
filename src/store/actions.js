@@ -97,9 +97,9 @@ export default {
         resolve();
       });
     }),
-  FETCH_BOARD_WORKS: ({ commit, state }, { page, size, category, orderCategory }) =>
+  FETCH_BOARD_WORKS: ({ commit, state }, { page, size, category, orderStrategy }) =>
     new Promise((resolve, reject) => {
-      fetchSquareWorks({ page, size, category, orderCategory }).then((works) => {
+      fetchSquareWorks({ page, size, category, orderStrategy }).then((works) => {
         console.log('works list: ', works.data.data);
         commit('PUSH_BOARD_WORKS', { boardWorksObj: works.data.data });
         resolve();

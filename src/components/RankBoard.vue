@@ -4,7 +4,7 @@ import * as Util from "../_common/js/util";
 import * as Api from "../_common/js/api";
 import * as Cookies from "js-cookie";
 import * as Magic from "../_common/js/magic";
-import workCard from "./common/workCard";
+import workCard from "./common/workFlatCard";
 import { mbMixin } from "../_common/js/mixin.js";
 import tagDialog from "./common/tagDialog";
 import * as WxShare from "../_common/js/wx_share";
@@ -32,7 +32,10 @@ export default {
       newWorkTitle: "",
       finalNewWorkTitle: "",
       busy: true,
-      tagAppear: false
+      tagAppear: false,
+      playerGold: {},
+      playerSilver: {},
+      playerBronze: {}
     };
   },
   computed: {
@@ -40,7 +43,29 @@ export default {
       return this.$store.state.musixiserInfo;
     },
     boardWorksObj() {
-      return this.$store.state.boardWorksObj;
+      const a = this.$store.state.boardWorksObj;
+      this.playerGold = a.content[0]
+        ? a.content[0].userVO
+        : {
+            smallAvatar:
+              "//pic.xiami.net/images/default/xiami_7/avatar_new.png@!c-100-100",
+            realname: "虚位以待"
+          };
+      this.playerSilver = a.content[1]
+        ? a.content[1].userVO
+        : {
+            smallAvatar:
+              "//pic.xiami.net/images/default/xiami_7/avatar_new.png@!c-100-100",
+            realname: "虚位以待"
+          };
+      this.playerBronze = a.content[2]
+        ? a.content[2].userVO
+        : {
+            smallAvatar:
+              "//pic.xiami.net/images/default/xiami_7/avatar_new.png@!c-100-100",
+            realname: "虚位以待"
+          };
+      return a;
     },
     operatingWorkId() {
       return this.$store.state.operatingWorkId;
@@ -81,7 +106,6 @@ export default {
     //   // })
     // },
     loadMore() {
-      alert("jb");
       //will call automatically when enter!
       const id = this.userId;
       // alert(id)
@@ -89,10 +113,10 @@ export default {
       console.log("1111111", this.boardWorksObj.current);
       this.$store
         .dispatch("FETCH_BOARD_WORKS", {
-          page: this.boardWorksObj.current ? this.boardWorksObj.current + 1 : 1,
-          size: 10,
-          category: 1,
-          orderCategory: 2
+          page: 1,
+          size: 30,
+          // category: 1,
+          orderStrategy: 2
         })
         .then(() => {
           console.log("2222222", this.boardWorksObj);
@@ -148,6 +172,7 @@ export default {
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase());
     if (!inWechat) {
       // this.userId = this.$store.state.route.query.id || 239;
+      this.loadMore();
       return;
     }
     const fullPath = `${location.origin}${location.pathname}#/my-fav?id=${
@@ -181,6 +206,7 @@ export default {
           // self.isMe = self.userId == res.data.data.userId;
           // self.loadMusixiserById();
           this.busy = false;
+          this.loadMore();
 
           console.log("get user info success", res.data.data);
         })
@@ -218,25 +244,56 @@ export default {
     {{musixiserInfo.realname}}
     </div>-->
     <div
-      v-infinite-scroll="loadMore"
-      infinite-scroll-disabled="busy"
-      infinite-scroll-distance="10"
-      class="worklist"
-    >
+      style="position:absolute; left:-1rem; top: -2.5rem;width:7rem;height:7rem;border-radius:3.5rem;background:linear-gradient(125deg, #7995EE, rgba(69,100,215,0));"
+    ></div>
+    <div
+      style="position:absolute; right:-.4rem; top: 4.5rem;width:4rem;height:4rem;border-radius:2rem;background:linear-gradient(-45deg, #7996EE, rgba(69,100,215,.7));"
+    ></div>
+    <div id="winner-sector">
+      <div class="winner-avatar" id="gold">
+        <img
+          class="avatar"
+          :src="playerGold.smallAvatar"
+          @error="playerGold.smallAvatar='//pic.xiami.net/images/default/xiami_7/avatar_new.png@!c-100-100'"
+          alt
+        >
+        <p class="name">{{playerGold.realname}}</p>
+        <img class="crown" src="../assets/crowngold.png" alt>
+      </div>
+      <div class="winner-avatar" id="silver">
+        <img
+          class="avatar"
+          :src="playerSilver.smallAvatar"
+          @error="playerSilver.smallAvatar='//pic.xiami.net/images/default/xiami_7/avatar_new.png@!c-100-100'"
+          alt
+        >
+        <p class="name">{{playerSilver.realname}}</p>
+        <img class="crown" src="../assets/crownsilver.png" alt>
+      </div>
+      <div class="winner-avatar" id="bronze">
+        <img
+          class="avatar"
+          :src="playerBronze.smallAvatar"
+          @error="playerBronze.smallAvatar='//pic.xiami.net/images/default/xiami_7/avatar_new.png@!c-100-100'"
+          alt
+        >
+        <p class="name">{{playerBronze.realname}}</p>
+        <img class="crown" src="../assets/crownbronze.png" alt>
+      </div>
+    </div>
+    <p id="specs">母亲节活动说明：
+      <br>在5月14日14:00前，获赞排名前三的符合制作标准的八音盒，即可获赠对应乐曲的定制音乐盒，快来参加吧
+    </p>
+    <div class="worklist">
       <work-card
-        v-for="item in boardWorksObj.content"
+        v-for="(item,index) in boardWorksObj.content"
         :workInfo="item"
         :key="item.id"
+        :rank="index+1"
         :playingStatus="item.id==playingWorkId"
         :maskOn="item.id==operatingWorkId"
-        :onLongPress="()=>operateWork(item)"
         :onPlayWork="()=>playWork(item)"
         :onDownloadWork="()=>downloadWork(item)"
-        :onPurchaseWork="()=>purchaseWork(item)"
-        :onClickTag="()=>{tagAppear=true}"
-        :onShareWork="shareWork"
-        :onChangeWorkStatus="changeWorkStatus"
-        :onTapMask="cancelOperate"
         :onToggleLike="()=>toggleLike(item,'boardWorksObj')"
       />
     </div>
@@ -259,18 +316,98 @@ export default {
   position: absolute;
   height: 100%;
   width: 100%;
-  background-color: #404249;
+  background: linear-gradient(125deg, #464c8b, #39375e);
+  overflow-y: scroll;
+  #winner-sector {
+    position: relative;
+    z-index: 2;
+    margin: getRem(96) auto 0;
+    color: white;
+    width: getRem(452);
+    height: getRem(192);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-around;
+    .winner-avatar {
+      position: relative;
+    }
+    .name {
+      font-size: getRem(28);
+      color: #d0d1d3;
+    }
+    .avatar {
+      margin: 0 auto;
+      display: block;
+    }
+    .crown {
+      position: absolute;
+
+      left: 50%;
+      -webkit-transform: translateX(-50%);
+      transform: translateX(-50%);
+    }
+    #gold {
+      order: 2;
+      .crown {
+        width: getRem(44);
+        height: getRem(44);
+        top: -0.4rem;
+      }
+      .avatar {
+        position: relative;
+        width: getRem(122);
+        height: getRem(122);
+        border-radius: getRem(61);
+        margin-bottom: getRem(10);
+      }
+    }
+    #silver {
+      margin-top: getRem(20);
+      order: 1;
+      .crown {
+        width: getRem(36);
+        height: getRem(36);
+        top: -0.3rem;
+      }
+      .avatar {
+        width: getRem(100);
+        height: getRem(100);
+        border-radius: getRem(50);
+        margin-bottom: getRem(20);
+      }
+    }
+    #bronze {
+      margin-top: getRem(30);
+      order: 3;
+      .crown {
+        width: getRem(26);
+        height: getRem(26);
+        top: -0.2rem;
+      }
+      .avatar {
+        width: getRem(74);
+        height: getRem(74);
+        border-radius: getRem(37);
+        margin-bottom: getRem(30);
+      }
+    }
+  }
+  #specs {
+    position: relative;
+    opacity: 0.8;
+    color: white;
+    font-size: getRem(20);
+    padding: getRem(32);
+    text-align: left;
+  }
 }
 .worklist {
   position: relative;
-  height: 100%;
   display: flex;
   justify-content: space-between;
   align-content: flex-start;
   flex-wrap: wrap;
-  padding: getRem(20);
-  background-color: #404249;
-  overflow: scroll;
+  padding: getRem(32);
 }
 .hairline {
   height: 1px;

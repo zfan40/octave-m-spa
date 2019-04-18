@@ -252,21 +252,31 @@ export function preview(items, start) {
 
 export function previewMidi(url, start) {
   // TODO why so fucking tricky
-  if (!oncePlayed) {
-    console.log('ppp')
-    mbox.triggerAttack('E6', 0, 0);
-    oncePlayed = true;
-  }
-  console.log('midi---url', url)
-  MidiConvert.load(url, (midi) => {
-    console.log('dasdsad', midi)
-    const mergeNotes = midi.tracks.reduce((a, b) => a.concat(b.notes), []);
-    // alert(mergeNotes)
-    preview(mergeNotes, start)
-  });
+  return new Promise((resolve, reject) => {
+    if (start && !/.mid/.test(url)) { reject() }
+    else if (start) {
+      if (!oncePlayed) {
+        console.log('ppp')
+        mbox.triggerAttack('E6', 0, 0);
+        oncePlayed = true;
+      }
+      console.log('midi---url', url)
+      MidiConvert.load(url, (midi) => {
+        console.log('dasdsad', midi)
+        const mergeNotes = midi.tracks.reduce((a, b) => a.concat(b.notes), []);
+        preview(mergeNotes, start)
+      });
+      resolve()
+    } else {
+      Tone.Transport.stop(0);
+      resolve()
+    }
+
+  })
 }
 export function bounceAsWavBlob(url) {
   return new Promise((resolve, reject) => {
+    if (!/.mid/.test(url)) reject()
     MidiConvert.load(url, (midi) => {
       // https://github.com/Tonejs/Tone.js/issues/368
       function renderOffline(callback, duration) {

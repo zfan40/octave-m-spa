@@ -121,4 +121,23 @@ input:focus {
 /* .slide-fade-leave-active below version 2.1.8 */ {
   opacity: 0;
 }
+@keyframes marquee {
+  /* 0% {
+    transform: translate(10%, 0);
+  }
+
+  50% {
+    transform: translate(-70%, 0);
+  }
+
+  100% {
+    transform: translate(10%, 0);
+  } */
+  0% {
+    transform: translate(100%, 0);
+  }
+  100% {
+    transform: translate(-100%, 0);
+  }
+}
 </style>

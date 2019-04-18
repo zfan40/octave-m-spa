@@ -275,15 +275,12 @@ export function fetchStacks({ page, size }) {
   )
 }
 
-export function fetchSquareWorks({ page, size, category, orderCategory, id }) {
-  if (category && orderCategory) {
-    return axios.get(
-      `//api.octave-love.com/api/v1/home?page=${page}&size=${size}&category=${category}&orderCategory=${orderCategory}`,
-      reqConfig,
-    );
-  }
+export function fetchSquareWorks({ page, size, category, orderStrategy, id }) {
+  let reqUrl = `//api.octave-love.com/api/v1/home?page=${page}&size=${size}`
+  if (category) reqUrl += `&category=${category}`
+  if (orderStrategy) reqUrl += `&orderStrategy=${orderStrategy}`
   return axios.get(
-    `//api.octave-love.com/api/v1/home?page=${page}&size=${size}`,
+    reqUrl,
     reqConfig,
   );
 }

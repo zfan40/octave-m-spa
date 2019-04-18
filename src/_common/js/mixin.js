@@ -9,13 +9,18 @@ export const mbMixin = {
   },
   methods: {
     downloadWork(work) {
+      if (!work || !work.url) {
+        this.$toast('作品文件缺失')
+        return;
+      }
       this.$ga.event({
         eventCategory: "Download",
         eventAction: "tap",
         eventLabel: work.id,
         eventValue: ""
       });
-      this.$loading("下载中...");
+      this.$loading("为您生成wav文件中...");
+      Tone.Transport.stop(0);
       Magic.bounceAsWavBlob(work.url)
         .then(blob => {
           return Api.downloadAsWav(blob);
@@ -88,8 +93,9 @@ export const mbMixin = {
           eventValue: ""
         });
         this.playing = true;
-        Magic.previewMidi(work.url, this.playing);
-        this.$store.commit("PLAY_WORK", { work });
+        Magic.previewMidi(work.url, this.playing)
+          .then(() => this.$store.commit("PLAY_WORK", { work }))
+          .catch(() => { this.$toast('作品损坏，无法播放') });
       } else {
         //操作的同一个
         if (this.playing) {
@@ -101,8 +107,9 @@ export const mbMixin = {
             eventValue: ""
           });
           this.playing = false;
-          Magic.previewMidi(work.url, this.playing);
-          this.$store.commit("PLAY_WORK", { work: { id: -1 } });
+          Magic.previewMidi(work.url, this.playing)
+            .then(() => this.$store.commit("PLAY_WORK", { work: { id: -1 } }))
+            .catch(() => { this.$toast('作品损坏，无法播放') });
         } else {
           //这个已经被停了
           this.$ga.event({
@@ -112,8 +119,9 @@ export const mbMixin = {
             eventValue: ""
           });
           this.playing = true;
-          Magic.previewMidi(work.url, 1);
-          this.$store.commit("PLAY_WORK", { work });
+          Magic.previewMidi(work.url, this.playing)
+            .then(() => this.$store.commit("PLAY_WORK", { work }))
+            .catch(() => { this.$toast('作品损坏，无法播放') });
         }
       }
     },
