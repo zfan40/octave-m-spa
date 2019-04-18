@@ -318,6 +318,7 @@ export default {
   width: 100%;
   background: linear-gradient(125deg, #464c8b, #39375e);
   overflow-y: scroll;
+  overflow-x: hidden;
   #winner-sector {
     position: relative;
     z-index: 2;
@@ -334,6 +335,10 @@ export default {
     .name {
       font-size: getRem(28);
       color: #d0d1d3;
+      width: 2rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .avatar {
       margin: 0 auto;
