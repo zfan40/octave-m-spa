@@ -185,12 +185,7 @@ export default {
       console.log("work going to play: ", work);
       work.id = work.wid; //简单转换一下
       if (work.id != this.playingWorkId) {
-        this.$ga.event({
-          eventCategory: "Song",
-          eventAction: "play_20s",
-          eventLabel: work.id,
-          eventValue: ""
-        });
+        this.$ga.event("Song", "play_20s", `${work.id}`, "");
         this.playing = true;
         Magic.previewMidi(work.url, this.playing)
           .then(() => this.$store.commit("PLAY_WORK", { work }))
@@ -200,12 +195,7 @@ export default {
       } else {
         //操作的同一个
         if (this.playing) {
-          this.$ga.event({
-            eventCategory: "Song",
-            eventAction: "stop_20s",
-            eventLabel: work.id,
-            eventValue: ""
-          });
+          this.$ga.event("Song", "stop_20s", `${work.id}`, "");
           //正播着这个呢
           this.playing = false;
           Magic.previewMidi(work.url, this.playing)
@@ -214,12 +204,7 @@ export default {
               this.$toast("作品损坏，无法播放");
             });
         } else {
-          this.$ga.event({
-            eventCategory: "Song",
-            eventAction: "play_20s",
-            eventLabel: work.id,
-            eventValue: ""
-          });
+          this.$ga.event("Song", "play_20s", `${work.id}`, "");
           //这个已经被停了
           this.playing = true;
           Magic.previewMidi(work.url, this.playing)
@@ -311,9 +296,11 @@ export default {
   // width: 100%;
   // height: 100%;
   // background-color: $darker-gray;
-  position: absolute;
+  position: fixed;
   height: 100%;
   width: 100%;
+  top: 0;
+  left: 0;
   background-color: #404249;
 }
 .orderlist {

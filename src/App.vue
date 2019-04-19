@@ -97,16 +97,13 @@ input:focus {
   border: none !important;
 }
 #app {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  position: relative;
+  min-height: 100%;
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  /* color: #2c3e50; */
   user-select: none;
   overflow: hidden;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);

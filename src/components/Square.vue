@@ -165,9 +165,7 @@ export default {
 };
 </script>
 <template>
-  <div
-    style="position:relative;display:flex;flex-direction:column;justify-content:space-around;align-items:center;background:rgb(26, 28, 30);height:100%;"
-  >
+  <div class="container">
     <div id="swiper-container">
       <swiper :options="bigCardListOption" ref="bigCardList">
         <swiper-slide v-for="item in squareWorksObj.content" :key="item.id">
@@ -194,6 +192,18 @@ export default {
 @import "../_common/style/_variables.scss";
 @import "../_common/style/_mixins.scss";
 @import "../_common/style/_reboot.scss";
+.container {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  background: rgb(26, 28, 30);
+}
 #swiper-container {
   position: relative;
   width: 100%;

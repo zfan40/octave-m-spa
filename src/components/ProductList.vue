@@ -182,9 +182,11 @@ export default {
   background: #007aff;
 }
 .container {
-  position: absolute;
+  position: fixed;
   width: 100%;
   height: 100%;
+  top: 0;
+  left: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;

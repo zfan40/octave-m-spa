@@ -264,9 +264,11 @@ export default {
 @import "../_common/style/_reboot.scss";
 
 .container {
-  position: absolute;
+  position: fixed;
   height: 100%;
   width: 100%;
+  top: 0;
+  left: 0;
   background-color: #404249;
 }
 .worklist {

@@ -87,29 +87,14 @@ export default {
     },
     togglePlay() {
       this.playing
-        ? this.$ga.event({
-            eventCategory: "Song",
-            eventAction: "stop_20s",
-            eventLabel: this.projectInfo.id,
-            eventValue: ""
-          })
-        : this.$ga.event({
-            eventCategory: "Song",
-            eventAction: "play_20s",
-            eventLabel: this.projectInfo.id,
-            eventValue: ""
-          });
+        ? this.$ga.event("Song", "stop_20s", `${this.projectInfo.id}`, "")
+        : this.$ga.event("Song", "play_20s", `${this.projectInfo.id}`, "");
       Magic.preview(this.project, !this.playing);
       this.playing = !this.playing;
     },
     toggleFav() {
       if (!this.favStatus)
-        this.$ga.event({
-          eventCategory: "Song",
-          eventAction: "fav",
-          eventLabel: this.projectInfo.id,
-          eventValue: ""
-        });
+        this.$ga.event("Song", "fav", `${this.projectInfo.id}`, "");
       this.favStatus = +!this.favStatus;
       Api.toggleFavSong({
         workId: this.$store.state.route.query.id,
@@ -172,12 +157,7 @@ export default {
         });
     },
     redirectToMaker() {
-      this.$ga.event({
-        eventCategory: "Work",
-        eventAction: "create",
-        eventLabel: "fromSharePage",
-        eventValue: ""
-      });
+      this.$ga.event("Work", "create", "fromSharePage", "");
       this.$router.push({
         path: "/new-music-box-maker"
         // query: {
@@ -202,12 +182,7 @@ export default {
       window.scroll(0, 0);
     },
     purchaseItem() {
-      this.$ga.event({
-        eventCategory: "MakeMB",
-        eventAction: "tap",
-        eventLabel: this.projectInfo.id,
-        eventValue: ""
-      });
+      this.$ga.event("MakeMB", "tap", `${this.projectInfo.id}`, "");
       if (this.projectInfo.machineNum > 18) {
         this.$toast("该作品目前无法制作");
         return;

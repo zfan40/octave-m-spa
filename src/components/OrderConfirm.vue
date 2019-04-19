@@ -168,9 +168,11 @@ export default {
 @import "../_common/style/_mixins.scss";
 @import "../_common/style/_reboot.scss";
 .container {
-  position: absolute;
+  position: fixed;
   width: 100%;
   height: 100%;
+  top: 0;
+  left: 0;
   display: flex;
   flex-direction: column;
   overflow-y: scroll;

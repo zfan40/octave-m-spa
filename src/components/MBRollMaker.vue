@@ -668,7 +668,7 @@ export default {
 </script>
 
 <template>
-  <div class>
+  <div class="container">
     <div class="roll" v-bind:style="{width:controlWidth+'px'}">
       <div
         :style="{width:configKonva.width+'px'}"
@@ -804,6 +804,14 @@ export default {
 @import "../_common/style/_variables.scss";
 @import "../_common/style/_mixins.scss";
 @import "../_common/style/_reboot.scss";
+.container {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  background-color: #404249;
+}
 .roll {
   background-color: white;
   position: absolute;
