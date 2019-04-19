@@ -87,14 +87,14 @@ export default {
     },
     togglePlay() {
       this.playing
-        ? this.$ga.event("Song", "stop_20s", `${this.projectInfo.id}`, "")
-        : this.$ga.event("Song", "play_20s", `${this.projectInfo.id}`, "");
+        ? this.$ga.event("Song", "stop_20s", `${this.projectInfo.id}`)
+        : this.$ga.event("Song", "play_20s", `${this.projectInfo.id}`);
       Magic.preview(this.project, !this.playing);
       this.playing = !this.playing;
     },
     toggleFav() {
       if (!this.favStatus)
-        this.$ga.event("Song", "fav", `${this.projectInfo.id}`, "");
+        this.$ga.event("Song", "fav", `${this.projectInfo.id}`);
       this.favStatus = +!this.favStatus;
       Api.toggleFavSong({
         workId: this.$store.state.route.query.id,
@@ -157,7 +157,7 @@ export default {
         });
     },
     redirectToMaker() {
-      this.$ga.event("Work", "create", "fromSharePage", "");
+      this.$ga.event("Work", "create", "fromSharePage");
       this.$router.push({
         path: "/new-music-box-maker"
         // query: {
@@ -182,7 +182,7 @@ export default {
       window.scroll(0, 0);
     },
     purchaseItem() {
-      this.$ga.event("MakeMB", "tap", `${this.projectInfo.id}`, "");
+      this.$ga.event("MakeMB", "tap", `${this.projectInfo.id}`);
       if (this.projectInfo.machineNum > 18) {
         this.$toast("该作品目前无法制作");
         return;

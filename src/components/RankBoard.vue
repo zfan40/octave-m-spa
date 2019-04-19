@@ -281,7 +281,8 @@ export default {
         <img class="crown" src="../assets/crownbronze.png" alt>
       </div>
     </div>
-    <p id="specs">母亲节活动说明：
+    <p id="specs">
+      母亲节活动说明：
       <br>在5月14日14:00前，获赞排名前三的符合制作标准的八音盒，即可获赠对应乐曲的定制音乐盒，快来参加吧
     </p>
     <div class="worklist">
@@ -333,7 +334,7 @@ export default {
       position: relative;
     }
     .name {
-      font-size: getRem(28);
+      font-size: getRem(26);
       color: #d0d1d3;
       width: 2rem;
       white-space: nowrap;

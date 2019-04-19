@@ -67,6 +67,9 @@ export default {
     <div class="detail">
       <p class="title" @click="gotoWork(workInfo.id)">{{workInfo.title}}</p>
       <div ref="outsider" class="work-body-desc">
+        <div
+          style="position: absolute;right: -2rem;width: 4rem;background: linear-gradient(45deg, rgba(55, 60, 102, 0), rgba(55,60,102,60));height: 100%;z-index: 2;"
+        ></div>
         <p ref="insider" :style="marqueeStyle">{{workInfo.content}}</p>
       </div>
       <div class="detail-other">
