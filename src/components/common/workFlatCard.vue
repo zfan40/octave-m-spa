@@ -9,7 +9,6 @@ export default {
     },
     rank: { type: Number },
     onPlayWork: Function,
-    gotoWork: Function,
     onToggleLike: Function
   },
   data() {
@@ -17,7 +16,16 @@ export default {
       marqueeStyle: ""
     };
   },
-  methods: {},
+  methods: {
+    gotoWork(id) {
+      this.$router.push({
+        path: "/new-music-box-viewer",
+        query: {
+          id
+        }
+      });
+    }
+  },
   created() {},
   mounted() {
     this.marqueeStyle = "";

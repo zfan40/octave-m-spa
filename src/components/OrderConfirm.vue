@@ -101,7 +101,8 @@ export default {
     <div class="order-confirm">
       <div class="address" @click="editAddress">
         <div id="basic-info">收件人：</div>
-        <div id="address-info">收件地址：
+        <div id="address-info">
+          收件地址：
           <div class="address-underline" id="underline1"></div>
           <div class="address-underline" id="underline2"></div>
         </div>
@@ -148,7 +149,8 @@ export default {
         placeholder="默认祝福语：「在乐音相伴的梦里，世界一片白银」"
       >
     </div>
-    <div class="readme">购买说明
+    <div class="readme">
+      购买说明
       <ul>
         <li>· 此商品的制作周期约为2周，您可以在【我的-八音盒】页面查看进度</li>
         <li>· 定制商品在某些特定条件下无法制作，我们将在第一时间联系您并进行退款</li>
