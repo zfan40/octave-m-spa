@@ -1,5 +1,7 @@
 import * as Magic from "./magic";
 import * as Api from "./api";
+import * as WxShare from './wx_share';
+
 export const mbMixin = {
   data() {
     return {
@@ -14,22 +16,32 @@ export const mbMixin = {
         return;
       }
       this.$ga.event("Download", "tap", `${work.id}`);
-      this.$loading("为您生成wav文件中...");
-      Tone.Transport.stop(0);
-      Magic.bounceAsWavBlob(work.url)
-        .then(blob => {
-          return Api.downloadAsWav(blob);
-        })
-        .then(url => {
-          // this.$toast(`url is ${url}`);
-          this.$ga.event("Download", "success", `${work.id}`);
-          this.$loading.close();
-          location.href = url;
-        })
-        .catch(() => {
-          this.$loading.close();
-          this.$toast("下载失败请稍后再试");
-        });
+      // TODO, need check first
+      WxShare.makeWavWxOrder({ wid: work.id },
+        () => {
+          this.$toast("下单成功");
+          this.$loading("为您生成wav文件中...");
+          Tone.Transport.stop(0);
+          Magic.bounceAsWavBlob(work.url)
+            .then(blob => {
+              return Api.downloadAsWav(blob);
+            })
+            .then(url => {
+              // this.$toast(`url is ${url}`);
+              this.$ga.event("Download", "success", `${work.id}`);
+              this.$loading.close();
+              location.href = url;
+            })
+            .catch(() => {
+              this.$loading.close();
+              this.$toast("下载失败请稍后再试");
+            });
+        },
+        () => {
+          this.$toast("停止生成");
+        }
+      );
+
     },
     purchaseWork(work) {
       this.$ga.event("MakeMB", "tap", `${work.id}`);

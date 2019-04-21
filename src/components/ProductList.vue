@@ -127,7 +127,7 @@ export default {
         <div class="productPage" @click="viewProductDetail" v-bind:key="activeIndex">
           <div class="preview" :style="{background:`url()`}">
             <img
-              style="width:100%;height:100%;position:relative;display:block;border-radius: 20px 20px 0 0;background:black;"
+              style="width:100%;height:100%;position:relative;object-fit: cover;display:block;border-radius: 20px 20px 0 0;background:black;"
               :src="product.previewPic||'https://cdn4.buysellads.net/uu/1/3386/1525189887-61450.png'"
               alt
             >
@@ -149,7 +149,7 @@ export default {
     <swiper :options="productListOption" ref="productList">
       <swiper-slide v-for="(product,index) in productList" :key="product.id">
         <img
-          style="width:1rem;height:1rem;background:black;"
+          style="width:1rem;height:1rem;background:black;object-fit: cover;"
           :src="product.previewPic||'https://cdn4.buysellads.net/uu/1/3386/1525189887-61450.png'"
           :class="{ invalid: index!==activeIndex }"
           alt

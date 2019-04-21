@@ -131,6 +131,11 @@ export const makeWxOrder = async ({ pid, wid, amount, address, message }, succes
   //   }
   // });
 }
+export const makeWavWxOrder = async ({ wid }, successCallback, failCalback) => {
+  const res = await createOrder({ pid:7, wid })
+  const orderId = res.data.data;
+  payWxOrder({ orderId }, successCallback, failCalback)
+}
 export const payWxOrder = async ({ orderId }, successCallback, failCalback) => {
   const payResult = await payOrder({ orderId })
   // alert(JSON.stringify(res));

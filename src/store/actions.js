@@ -127,7 +127,7 @@ export default {
       // 获取某id的音乐盒音乐内容
       fetchProductList().then((products) => {
         console.log('product list: ', products.data.data.list);
-        commit('PUSH_PRODUCTLIST', { productList: products.data.data.list });
+        commit('PUSH_PRODUCTLIST', { productList: products.data.data.list.filter(item => item.category == 1) });
         resolve();
       });
     }),
