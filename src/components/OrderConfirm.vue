@@ -170,7 +170,7 @@ export default {
 @import "../_common/style/_mixins.scss";
 @import "../_common/style/_reboot.scss";
 .container {
-  position: fixed;
+  position: absolute;
   width: 100%;
   height: 100%;
   top: 0;

@@ -296,7 +296,7 @@ export default {
   // width: 100%;
   // height: 100%;
   // background-color: $darker-gray;
-  position: fixed;
+  position: absolute;
   height: 100%;
   width: 100%;
   top: 0;

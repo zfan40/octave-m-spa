@@ -264,7 +264,7 @@ export default {
 @import "../_common/style/_reboot.scss";
 
 .container {
-  position: fixed;
+  position: absolute;
   height: 100%;
   width: 100%;
   top: 0;

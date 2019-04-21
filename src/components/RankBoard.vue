@@ -244,10 +244,10 @@ export default {
     {{musixiserInfo.realname}}
     </div>-->
     <div
-      style="position:fixed; left:-1rem; top: -2.5rem;width:7rem;height:7rem;border-radius:3.5rem;background:linear-gradient(125deg, #7995EE, rgba(69,100,215,0));"
+      style="position:absolute; left:-1rem; top: -2.5rem;width:7rem;height:7rem;border-radius:3.5rem;background:linear-gradient(125deg, #7995EE, rgba(69,100,215,0));"
     ></div>
     <div
-      style="position:fixed; right:-.4rem; top: 4.5rem;width:4rem;height:4rem;border-radius:2rem;background:linear-gradient(-45deg, #7996EE, rgba(69,100,215,.7));"
+      style="position:absolute; right:-.4rem; top: 4.5rem;width:4rem;height:4rem;border-radius:2rem;background:linear-gradient(-45deg, #7996EE, rgba(69,100,215,.7));"
     ></div>
     <div id="winner-sector">
       <div class="winner-avatar" id="gold">
@@ -314,11 +314,11 @@ export default {
 @import "../_common/style/_reboot.scss";
 
 .container {
-  position: relative;
-  min-height: 100%;
+  position: absolute;
+  height: 100%;
   background: linear-gradient(125deg, #464c8b, #39375e);
-  // overflow-y: scroll;
-  // overflow-x: hidden;
+  overflow-y: scroll;
+  overflow-x: hidden;
   #winner-sector {
     position: relative;
     z-index: 2;
