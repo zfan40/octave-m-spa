@@ -318,6 +318,7 @@ export default {
   height: 100%;
   background: linear-gradient(125deg, #464c8b, #39375e);
   overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
   overflow-x: hidden;
   #winner-sector {
     position: relative;

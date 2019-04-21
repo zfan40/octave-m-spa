@@ -178,6 +178,7 @@ export default {
   display: flex;
   flex-direction: column;
   overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
   background-color: $darker-gray;
   padding-bottom: getRem(180);
 }

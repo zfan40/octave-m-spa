@@ -30,7 +30,8 @@ export default {
     >
       <div id="tag-spec">
         <div class="header">标记说明</div>
-        <div class="body">表示本作品当前可制作成实体八音盒。
+        <div class="body">
+          表示本作品当前可制作成实体八音盒。
           <br>能制作成八音盒的乐曲通常具备以下条件:
           <ul>
             <li>· 作品音符数量适中</li>
@@ -67,6 +68,7 @@ export default {
     color: white;
     height: getRem(390);
     overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
     text-align: left;
     ul {
       li {
