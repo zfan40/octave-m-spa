@@ -1,5 +1,6 @@
 <script>
 import "swiper/dist/css/swiper.css";
+
 import * as Util from "../_common/js/util";
 import * as Api from "../_common/js/api";
 import * as Cookies from "js-cookie";

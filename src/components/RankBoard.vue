@@ -111,6 +111,7 @@ export default {
       // alert(id)
       this.busy = true;
       console.log("1111111", this.boardWorksObj.current);
+      this.$loading("加载排行中");
       this.$store
         .dispatch("FETCH_BOARD_WORKS", {
           page: 1,
@@ -119,10 +120,15 @@ export default {
           orderStrategy: 2
         })
         .then(() => {
+          this.$loading.close();
           console.log("2222222", this.boardWorksObj);
           if (+this.boardWorksObj.content.length < +this.boardWorksObj.total) {
             this.busy = false;
           }
+        })
+        .catch(() => {
+          this.$loading.close();
+          this.$toast("加载失败,请稍后再试");
         });
     },
     operateWork(work) {
