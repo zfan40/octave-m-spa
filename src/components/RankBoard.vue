@@ -114,7 +114,7 @@ export default {
       this.$store
         .dispatch("FETCH_BOARD_WORKS", {
           page: 1,
-          size: 30,
+          size: 6,
           // category: 1,
           orderStrategy: 2
         })
@@ -134,22 +134,6 @@ export default {
     },
     shareWork() {
       console.log("share in");
-    },
-    changeWorkStatus(work, status) {
-      Api.updateWork({
-        id: work.id,
-        status: status
-      }).then(() => {
-        this.$toast(`已将作品${workStatusMap[status]}`);
-        this.cancelOperate();
-        this.$store.commit("LOCAL_UPDATE_LIST", {
-          type: "boardWorksObj",
-          item: {
-            id: work.id,
-            status
-          }
-        });
-      });
     }
   },
   beforeRouteLeave(to, from, next) {
@@ -254,48 +238,57 @@ export default {
         <img
           class="avatar"
           :src="playerGold.smallAvatar"
-          @error="playerGold.smallAvatar='//pic.xiami.net/images/default/xiami_7/avatar_new.png@!c-100-100'"
+          @error="
+            playerGold.smallAvatar =
+              '//pic.xiami.net/images/default/xiami_7/avatar_new.png@!c-100-100'
+          "
           alt
-        >
-        <p class="name">{{playerGold.realname}}</p>
-        <img class="crown" src="../assets/crowngold.png" alt>
+        />
+        <p class="name">{{ playerGold.realname }}</p>
+        <img class="crown" src="../assets/crowngold.png" alt />
       </div>
       <div class="winner-avatar" id="silver">
         <img
           class="avatar"
           :src="playerSilver.smallAvatar"
-          @error="playerSilver.smallAvatar='//pic.xiami.net/images/default/xiami_7/avatar_new.png@!c-100-100'"
+          @error="
+            playerSilver.smallAvatar =
+              '//pic.xiami.net/images/default/xiami_7/avatar_new.png@!c-100-100'
+          "
           alt
-        >
-        <p class="name">{{playerSilver.realname}}</p>
-        <img class="crown" src="../assets/crownsilver.png" alt>
+        />
+        <p class="name">{{ playerSilver.realname }}</p>
+        <img class="crown" src="../assets/crownsilver.png" alt />
       </div>
       <div class="winner-avatar" id="bronze">
         <img
           class="avatar"
           :src="playerBronze.smallAvatar"
-          @error="playerBronze.smallAvatar='//pic.xiami.net/images/default/xiami_7/avatar_new.png@!c-100-100'"
+          @error="
+            playerBronze.smallAvatar =
+              '//pic.xiami.net/images/default/xiami_7/avatar_new.png@!c-100-100'
+          "
           alt
-        >
-        <p class="name">{{playerBronze.realname}}</p>
-        <img class="crown" src="../assets/crownbronze.png" alt>
+        />
+        <p class="name">{{ playerBronze.realname }}</p>
+        <img class="crown" src="../assets/crownbronze.png" alt />
       </div>
     </div>
     <p id="specs">
       母亲节活动说明：
-      <br>在5月14日14:00前，获赞排名前三的符合制作标准的八音盒，即可获赠对应乐曲的定制音乐盒，快来参加吧
+      <br />在5月14日14:00前，获赞排名前三的符合制作标准的八音盒，即可获赠对应乐曲的定制音乐盒，快来参加吧
     </p>
     <div class="worklist">
       <work-card
-        v-for="(item,index) in boardWorksObj.content"
+        v-for="(item, index) in boardWorksObj.content"
         :workInfo="item"
         :key="item.id"
-        :rank="index+1"
-        :playingStatus="item.id==playingWorkId"
-        :maskOn="item.id==operatingWorkId"
-        :onPlayWork="()=>playWork(item)"
-        :onDownloadWork="()=>downloadWork(item)"
-        :onToggleLike="()=>toggleLike(item,'boardWorksObj')"
+        :rank="index + 1"
+        :playingStatus="item.id == playingWorkId"
+        :maskOn="item.id == operatingWorkId"
+        :onPlayWork="() => playWork(item)"
+        :onDownloadWork="() => downloadWork(item)"
+        :onToggleLike="() => toggleLike(item, 'boardWorksObj')"
       />
     </div>
     <!-- <div class="emptysection" v-show="!loading && musixiserWorksObj.content.length==0">
@@ -304,7 +297,14 @@ export default {
         <img src="../assets/oops.png" style="width:6rem;" alt>
       </div>
     </div>-->
-    <tag-dialog :appear="tagAppear" :handleClose="()=>{tagAppear=false}"/>
+    <tag-dialog
+      :appear="tagAppear"
+      :handleClose="
+        () => {
+          tagAppear = false;
+        }
+      "
+    />
   </div>
 </template>
 <style lang="scss" scoped>
