@@ -182,6 +182,10 @@ export default {
       );
     },
     playWork(work) {
+      if (!work.content) {
+        this.$toast("作品损坏，无法播放");
+        return;
+      }
       console.log("work going to play: ", work);
       work.id = work.wid; //简单转换一下
       if (work.id != this.playingWorkId) {
@@ -270,7 +274,7 @@ export default {
         v-for="(order,index) in orders.content"
         v-bind:info="order"
         v-bind:key="order.id"
-        :playingStatus="order.content.wid==playingWorkId"
+        :playingStatus="order.content?order.content.wid==playingWorkId:false"
         :onPlayWork="()=>playWork(order.content)"
         :onPayOrder="()=>payOrder(order.orderId)"
       ></order>

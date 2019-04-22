@@ -62,10 +62,10 @@ export default {
 </script>
 
 <template>
-  <div class="order-container">
+  <div v-if="info.content && info.content.product" class="order-container">
     <div class="preview-bg">
       <img class="cover" :src="info.content.product.previewPic" alt>
-      <div class="shipment">
+      <div v-if="info.content.product.category!==100" class="shipment">
         <img v-if="info.status===1" class="statusProcess" src="../../assets/123-0.png" alt>
         <p v-if="info.status===1" class="statusText" @click="onPayOrder">去支付</p>
         <img v-if="info.status===2" class="statusProcess" src="../../assets/123-1.png" alt>
@@ -74,6 +74,12 @@ export default {
         <p v-if="info.status===3" class="statusText">派送中🏍️</p>
         <img v-if="info.status===4" class="statusProcess" src="../../assets/123-3.png" alt>
         <p v-if="info.status===4" class="statusText">已收件🎁</p>
+      </div>
+      <div v-if="info.content.product.category===100" class="shipment">
+        <p v-if="info.status===1" class="statusText" @click="onPayOrder">去支付</p>
+        <p v-if="info.status===2" class="statusText">制作中👷</p>
+        <p v-if="info.status===3" class="statusText">派送中🏍️</p>
+        <p v-if="info.status===4" class="statusText">已下载🎁</p>
       </div>
     </div>
     <div class="detail">
@@ -118,7 +124,10 @@ export default {
       background-color: $img-mask;
       width: 100%;
       height: 100%;
-      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       .statusProcess {
         width: getRem(204);
         height: getRem(28);

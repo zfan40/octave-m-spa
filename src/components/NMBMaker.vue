@@ -224,12 +224,13 @@ export default {
       this.$set(this.activeNote, noteId, 0);
     },
     touchNoteStartHandler(e) {
-      console.log(e);
+      console.log(e.target.id);
       // 先存起来，防止在该键位touchmove重复
       touchIdKeyMap[e.changedTouches[0].identifier] = e.target.id; // TODO: 猜测 touchstart只会有一个changetouches///
       this.handleNoteStart(e.target.id);
     },
     touchNoteEndHandler(e) {
+      console.log(e.target.id);
       this.handleNoteEnd(e.target.id);
       this.handleNoteEnd(touchIdKeyMap[e.changedTouches[0].identifier]); // TODO: 猜测 touchend只会有一个changetouches,记录的正好是该停的
     },
@@ -712,7 +713,8 @@ export default {
       :class="['keys',tutorSession===8?'tutorial-highlight':'']"
       @touchmove="keng"
       @touchstart.stop.prevent="touchNoteStartHandler"
-      @touchend.stop.event="touchNoteEndHandler"
+      @touchend.stop="touchNoteEndHandler"
+      @touchcancel.stop="touchNoteEndHandler"
     >
       <!-- using sharp sign => '#' as object key cause syntax error... -->
       <!-- <div :class="['white', 'a', activeNote.A3?'active-note':'']" id="A3"></div>
@@ -1138,7 +1140,7 @@ export default {
   height: 100%;
   top: 0;
   left: 0;
-  background-color: rgb(19, 19, 21);
+  background-color: rgb(18, 18, 58);
 }
 h2 {
   font-size: 20px;

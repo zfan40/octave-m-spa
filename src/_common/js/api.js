@@ -13,7 +13,7 @@ const reqConfig = {
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',
-    // 'Authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjIzOSwic3ViIjoiMjM5IiwiZXhwIjoxNTU1MjIyNzcxLCJpYXQiOjE1NTI2MzA3NzEsImp0aSI6IjE1NTI2MzA3NzE2MzgifQ.J1WNccABxwadbcjF-GsCLUhBhyROpcxP52g6JXW0vKI'
+    // 'Authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjIzOSwic3ViIjoiMjM5IiwiZXhwIjoxNTU3NzE1OTE2LCJpYXQiOjE1NTUxMjM5MTYsImp0aSI6IjE1NTUxMjM5MTY5NTgifQ.39OgAcO1u--rnUMj1savYeFBzSWc_bDHUSfcEIR-o3M'
   },
 };
 // const tokenObj = { access_token: '' };

@@ -9,7 +9,6 @@ import {
   fetchFavWorks,
   fetchProductList,
   fetchOrders,
-  fetchStacks,
   fetchSquareWorks
 } from '../_common/js/api';
 /*

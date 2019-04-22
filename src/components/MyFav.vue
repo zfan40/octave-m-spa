@@ -271,6 +271,7 @@ export default {
   padding: getRem(20);
   background-color: #404249;
   overflow: scroll;
+  -webkit-overflow-scrolling: touch;
 }
 .hairline {
   height: 1px;

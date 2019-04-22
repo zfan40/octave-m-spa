@@ -187,7 +187,7 @@ export default {
     </div>
   </div>
 </template>
-<style lang="scss">
+<style lang="scss" scoped>
 @import "../_common/style/_functions.scss";
 @import "../_common/style/_variables.scss";
 @import "../_common/style/_mixins.scss";

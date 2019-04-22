@@ -15,10 +15,13 @@ export const mbMixin = {
         this.$toast('作品文件缺失')
         return;
       }
+      this.$toast()
       this.$ga.event("Download", "tap", `${work.id}`);
       // TODO, need check first
+      this.$loading("请稍后");
       WxShare.makeWavWxOrder({ wid: work.id },
         () => {
+          this.$loading.close();
           this.$toast("下单成功");
           this.$loading("为您生成wav文件中...");
           Tone.Transport.stop(0);
@@ -38,6 +41,7 @@ export const mbMixin = {
             });
         },
         () => {
+          this.$loading.close();
           this.$toast("停止生成");
         }
       );

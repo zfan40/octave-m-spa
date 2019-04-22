@@ -114,7 +114,7 @@ export default {
       this.$store
         .dispatch("FETCH_BOARD_WORKS", {
           page: 1,
-          size: 6,
+          size: 30,
           // category: 1,
           orderStrategy: 2
         })
@@ -228,6 +228,9 @@ export default {
     {{musixiserInfo.realname}}
     </div>-->
     <div
+      style="position:fixed;left:0;top:0;width:100%;height:100%;background: linear-gradient(125deg, #464c8b, #39375e);"
+    ></div>
+    <div
       style="position:absolute; left:-1rem; top: -2.5rem;width:7rem;height:7rem;border-radius:3.5rem;background:linear-gradient(125deg, #7995EE, rgba(69,100,215,0));"
     ></div>
     <div
@@ -243,9 +246,9 @@ export default {
               '//pic.xiami.net/images/default/xiami_7/avatar_new.png@!c-100-100'
           "
           alt
-        />
+        >
         <p class="name">{{ playerGold.realname }}</p>
-        <img class="crown" src="../assets/crowngold.png" alt />
+        <img class="crown" src="../assets/crowngold.png" alt>
       </div>
       <div class="winner-avatar" id="silver">
         <img
@@ -256,9 +259,9 @@ export default {
               '//pic.xiami.net/images/default/xiami_7/avatar_new.png@!c-100-100'
           "
           alt
-        />
+        >
         <p class="name">{{ playerSilver.realname }}</p>
-        <img class="crown" src="../assets/crownsilver.png" alt />
+        <img class="crown" src="../assets/crownsilver.png" alt>
       </div>
       <div class="winner-avatar" id="bronze">
         <img
@@ -269,14 +272,14 @@ export default {
               '//pic.xiami.net/images/default/xiami_7/avatar_new.png@!c-100-100'
           "
           alt
-        />
+        >
         <p class="name">{{ playerBronze.realname }}</p>
-        <img class="crown" src="../assets/crownbronze.png" alt />
+        <img class="crown" src="../assets/crownbronze.png" alt>
       </div>
     </div>
     <p id="specs">
       母亲节活动说明：
-      <br />在5月14日14:00前，获赞排名前三的符合制作标准的八音盒，即可获赠对应乐曲的定制音乐盒，快来参加吧
+      <br>在5月14日14:00前，获赞排名前三的符合制作标准的八音盒，即可获赠对应乐曲的定制音乐盒，快来参加吧
     </p>
     <div class="worklist">
       <work-card
