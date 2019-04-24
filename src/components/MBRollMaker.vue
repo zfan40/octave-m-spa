@@ -113,25 +113,41 @@ export default {
     },
     rectConfigArray() {
       const a = [];
-      const len = scales[this.keyboardMode].musicScale.length
-      for (
-        let i = 0;
-        i <= len - 1;
-        i++
-      ) {
+      const len = scales[this.keyboardMode].musicScale.length;
+
+      let fill = "";
+      let index = 0;
+      let withinDur = true;
+      // split NOTE_NUM_PER_SECTOR and this.NOTE_NUM_PER_SECTOR for ANIMATION!!!
+
+      for (let i = 0; i <= len - 1; i++) {
         a[i] = [];
         for (let j = 0; j <= this.ONE_PAGE_NOTE_NUM - 1; j++) {
-          // this.$set(this.rectConfigArray[i], j, {
-          //   ...this.noteRectConfig,
-          //   x: (i * this.configKonva.width) / this.NOTE_CATEGORY,
-          //   y: ((j - 1) * this.configKonva.height) / this.ONE_PAGE_NOTE_NUM,
-          //   fill: `rgba(0,0,0,${0.9 - (i * 0.22) / this.NOTE_CATEGORY})`
-          // });
+          index =
+            j +
+            (this.sector - 2) * NOTE_NUM_PER_SECTOR +
+            1 * this.NOTE_NUM_PER_SECTOR;
+          withinDur = (index * TIME_PER_NOTE * 120) / this.tempo < MB_DUR;
+          if (index == this.activeJ && this.rectArray[i][index]) {
+            // active current note: lighter color
+            fill = withinDur ? "#6477b1" : "#A9B9FF";
+          } else if (index == this.activeJ && !this.rectArray[i][index]) {
+            // inactive current light blue
+            fill = withinDur ? "#292B3A" : "#2B2E3D";
+          } else if (this.rectArray[i][index]) {
+            // active non-current note
+            fill = withinDur ? "#9FB2CF" : "#333740";
+          } else {
+            // incative non-current note
+            fill = withinDur
+              ? `rgba(0,0,0,${0.9 - (i * 0.22) / this.NOTE_CATEGORY})`
+              : "#131315";
+          }
           a[i][j] = {
             ...this.noteRectConfig,
             x: (i * this.configKonva.width) / this.NOTE_CATEGORY,
             y: (j * this.configKonva.height) / this.ONE_PAGE_NOTE_NUM,
-            fill: `rgba(0,0,0,${0.9 - (i * 0.22) / this.NOTE_CATEGORY})`
+            fill
           };
         }
       }
