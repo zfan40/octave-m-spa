@@ -111,6 +111,48 @@ export default {
       const k = 100 / (MAX_TEMPO - MIN_TEMPO);
       const b = -(MIN_TEMPO * k);
       return { height: `${k * this.tempo + b}%` };
+    },
+    rectConfigArray() {
+      const a = [];
+      const len = scales[this.keyboardMode].musicScale.length;
+
+      let fill = "";
+      let index = 0;
+      let withinDur = true;
+      // split NOTE_NUM_PER_SECTOR and this.NOTE_NUM_PER_SECTOR for ANIMATION!!!
+
+      for (let i = 0; i <= len - 1; i++) {
+        a[i] = [];
+        for (let j = 0; j <= this.ONE_PAGE_NOTE_NUM - 1; j++) {
+          index =
+            j +
+            (this.sector - 2) * NOTE_NUM_PER_SECTOR +
+            1 * this.NOTE_NUM_PER_SECTOR;
+          withinDur = (index * TIME_PER_NOTE * 120) / this.tempo < MB_DUR;
+          if (index == this.activeJ && this.rectArray[i][index]) {
+            // active current note: lighter color
+            fill = withinDur ? "#6477b1" : "#A9B9FF";
+          } else if (index == this.activeJ && !this.rectArray[i][index]) {
+            // inactive current light blue
+            fill = withinDur ? "#292B3A" : "#2B2E3D";
+          } else if (this.rectArray[i][index]) {
+            // active non-current note
+            fill = withinDur ? "#9FB2CF" : "#333740";
+          } else {
+            // incative non-current note
+            fill = withinDur
+              ? `rgba(0,0,0,${0.9 - (i * 0.22) / this.NOTE_CATEGORY})`
+              : "#131315";
+          }
+          a[i][j] = {
+            ...this.noteRectConfig,
+            x: (i * this.configKonva.width) / this.NOTE_CATEGORY,
+            y: (j * this.configKonva.height) / this.ONE_PAGE_NOTE_NUM,
+            fill
+          };
+        }
+      }
+      return a;
     }
   },
   methods: {
@@ -697,7 +739,7 @@ export default {
                 :key="`i${i}j${j}`"
                 @touchstart="handleTouchRect(i-1,j-1,sector)"
                 @touchmove="handleMoveRect(i-1,j-1,sector)"
-                :config="setupRect(i-1,j-1,sector)"
+                :config="rectConfigArray[i-1][j-1]"
               />
               <!-- quarter note line -->
               <!-- <v-rect
