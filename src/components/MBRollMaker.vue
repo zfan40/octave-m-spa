@@ -312,23 +312,26 @@ export default {
       };
     },
     initialRectSet() {
-      this.rectConfigArray = Array(
-        scales[this.keyboardMode].musicScale.length
-      ).fill([]);
+      const arr = [];
+      this.rectConfigArray = []; // don't use Array(18).fill([]), []is a reference
       console.log(this.configKonva.width);
-      for (let i = 0; i <= scales[this.keyboardMode].musicScale.length - 1; i++)
+      for (
+        let i = 0;
+        i <= scales[this.keyboardMode].musicScale.length - 1;
+        i++
+      ) {
+        this.rectConfigArray[i] = [];
         for (let j = 0; j <= FULL_NOTE_NUM - 1; j++) {
-          console.log((i * this.configKonva.width) / this.NOTE_CATEGORY);
+          // console.log((i * this.configKonva.width) / this.NOTE_CATEGORY);
           this.$set(this.rectConfigArray[i], j, {
             ...this.noteRectConfig,
             x: (i * this.configKonva.width) / this.NOTE_CATEGORY,
-            y: (j * this.configKonva.height) / this.ONE_PAGE_NOTE_NUM,
-            fill: "#9FB2CF"
+            y: ((j - 1) * this.configKonva.height) / this.ONE_PAGE_NOTE_NUM,
+            fill: `rgba(0,0,0,${0.9 - (i * 0.22) / this.NOTE_CATEGORY})`
           });
         }
-
-      console.log("111", this.rectConfigArray[0][5].x);
-      console.log("111", this.rectConfigArray[4][9].x);
+      }
+      // this.rectConfigArray = arr
     },
     handleTouchRect(i, j, sector) {
       // console.log(`trigger ${i},${j+(sector-1)*this.NOTE_NUM_PER_SECTOR}`)
@@ -344,7 +347,7 @@ export default {
       );
       // }, 0);
 
-      // this.rectArray[i][j] = !this.rectArray[i][j] // this is how to assign a two dim array in vue 2.0...
+      // this.rectArray[i][j] = !this.rectArray[i][j] // below is how to assign a two dim array in vue 2.0...
       const newRow = this.rectArray[i].slice(0);
       newRow[j + (sector - 1) * this.NOTE_NUM_PER_SECTOR] = !newRow[
         j + (sector - 1) * this.NOTE_NUM_PER_SECTOR
