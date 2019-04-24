@@ -699,15 +699,15 @@ export default {
                 @touchmove="handleMoveRect(i-1,j-1,sector)"
                 :config="setupRect(i-1,j-1,sector)"
               />
-              <!-- measure line -->
-              <v-rect
+              <!-- quarter note line -->
+              <!-- <v-rect
                 v-if="(j + (sector - 2) * CONST_NOTE_NUM_PER_SECTOR + 1 * NOTE_NUM_PER_SECTOR)%2===1"
                 :key="`halfi${i}j${j}`"
                 @touchstart="handleTouchRect(i-1,j-1,sector)"
                 @touchmove="handleMoveRect(i-1,j-1,sector)"
                 :config="setupHalf(i-1,j-1,sector)"
-              />
-              <!-- quarter note line -->
+              />-->
+              <!-- measure line -->
               <v-rect
                 v-if="(j + (sector - 2) * CONST_NOTE_NUM_PER_SECTOR + 1 * NOTE_NUM_PER_SECTOR)%beat===1"
                 :key="`borderi${i}j${j}`"
@@ -999,7 +999,7 @@ export default {
     width: 34px;
     height: 34px;
     border-radius: 0.56rem;
-    background: url("../assets/play.svg") 0.3rem 0.26rem no-repeat;
+    background: url("../assets/play.svg") center center no-repeat;
     background-size: 0.38rem;
     background-color: #456aff;
   }

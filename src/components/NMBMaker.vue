@@ -1058,7 +1058,7 @@ export default {
       width: 100%;
       height: 100%;
       border-radius: getRem(42);
-      background: url("../assets/play.svg") 55% 46% no-repeat;
+      background: url("../assets/play.svg") center center no-repeat;
       background-size: getRem(32);
       background-color: rgb(69, 106, 255);
     }
