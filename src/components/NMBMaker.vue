@@ -306,6 +306,13 @@ export default {
       }
       return true;
     },
+    finishProject() {
+      if (this.checkBouncibility()) {
+        this.bounceProject();
+      } else {
+        this.alertAppear = true;
+      }
+    },
     bounceProject() {
       this.confirmRecordPart(0);
       console.log(this);
@@ -888,7 +895,7 @@ export default {
     <transition name="slide">
       <div class="alert-mask" v-show="menuAppear" @click.self="menuAppear=false">
         <div class="menu">
-          <div @touchstart="bounceProject" class>完成作品</div>
+          <div @touchstart="finishProject" class>完成作品</div>
           <div @touchstart="menuAppear=false" class>退出</div>
         </div>
       </div>
@@ -1136,7 +1143,7 @@ export default {
 }
 
 #container {
-  position: absolute;
+  position: fixed;
   width: 100%;
   height: 100%;
   top: 0;
