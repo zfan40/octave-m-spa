@@ -80,6 +80,7 @@ export default {
       tutorClass: "", // hand positioning in different session
       menuAppear: false,
       fuckReady: false,
+      teethNum: 18,
       timelineConfig: {
         value: 0,
         width: 8,
@@ -254,7 +255,7 @@ export default {
         }
         tonepart[this.lastActivePartIndex] = new Tone.Part((time, value) => {
           // 不能老这new啊，要每次一个数组，每次改动最后一个
-          piano.triggerAttackRelease(value.note, "8n", time);
+          piano.triggerAttackRelease(value.note, "4n", time);
         }, this.recordPart).start(0);
         this.recordParts[this.lastActivePartIndex] = this.recordPart;
         this.recordPart = [];
@@ -304,10 +305,11 @@ export default {
         bouncepart.sort((a, b) => 0 + a.time - b.time);
         return Magic.RealMagic(bouncepart);
       }
-      return true;
+      return 0;
     },
     finishProject() {
-      if (this.checkBouncibility()) {
+      this.teethNum = this.checkBouncibility();
+      if (this.teethNum <= 18) {
         this.bounceProject();
       } else {
         this.alertAppear = true;
@@ -379,8 +381,17 @@ export default {
     },
     removeNoteInRecordPart(index, partIndex) {
       // console.log("dd");
-      if (partIndex === undefined) this.recordPart.splice(index, 1);
-      else this.recordParts[partIndex].splice(index, 1);
+      if (partIndex === undefined) {
+        this.recordPart.splice(index, 1);
+      } else {
+        this.recordParts[partIndex].splice(index, 1);
+        tonepart[partIndex].dispose();
+        tonepart[partIndex] = new Tone.Part((time, value) => {
+          // 不能老这new啊，要每次一个数组，每次改动最后一个
+          piano.triggerAttackRelease(value.note, "4n", time);
+        }, this.recordParts[partIndex]).start(0);
+      }
+      // this.confirmRecordPart(0);
     },
     keng(e) {
       // console.log(e)
@@ -851,17 +862,6 @@ export default {
         </div>-->
       </div>
     </div>
-    <transition name="fade">
-      <div class="alert-mask" v-show="alertAppear">
-        <div class="mb-dialog">
-          <div class="title">减少些音符才能做成音乐盒，是否继续上传</div>
-          <div class="btns">
-            <span class="btn cancel" @click="alertAppear=false">再调整</span>
-            <span class="btn confirm" @click="bounceProject">任性上传</span>
-          </div>
-        </div>
-      </div>
-    </transition>
     <!-- </v-touch> -->
     <div class="mask" v-show="bouncing">
       <p>存储中...</p>
@@ -897,6 +897,17 @@ export default {
         <div class="menu">
           <div @touchstart="finishProject" class>完成作品</div>
           <div @touchstart="menuAppear=false" class>退出</div>
+        </div>
+      </div>
+    </transition>
+    <transition name="fade">
+      <div class="alert-mask" v-show="alertAppear">
+        <div class="mb-dialog">
+          <div class="title">超了{{teethNum-18}}个音符，目前无法做成实体八音盒，是否继续上传</div>
+          <div class="btns">
+            <span class="btn cancel" @click="alertAppear=false">再调整</span>
+            <span class="btn confirm" @click="bounceProject">任性上传</span>
+          </div>
         </div>
       </div>
     </transition>

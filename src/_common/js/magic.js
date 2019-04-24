@@ -97,7 +97,7 @@ export function RealMagic(items) {
 
   if (taskTypes.length > 18) {
     console.log('音种类超过18个，这个做不了');
-    return false;
+    // return false;
   }
 
   taskTimeArraysCycle.forEach((timeArray) => {
@@ -156,9 +156,10 @@ export function RealMagic(items) {
     // machines is like ["1046", "1174", "1318", "1318", "1318", "1396", "1567"] of 18 length
   } else if (machines.length > 18) {
     console.log('所需音片儿超过18个');
-    return false;
+    // return false;
   }
-  return true;
+  // return true;
+  return machines.length
 }
 
 export function mapNoteTimeToColor(time) {

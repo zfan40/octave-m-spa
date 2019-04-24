@@ -93,7 +93,8 @@ export default {
       fullloop: true,
       beat: 8, // only 3 or 4, only for view
       keyboardMode: DEFAULT_KEYBOARD_MODE,
-      currentTime: 0
+      currentTime: 0,
+      teethNum: 18
     };
   },
   filters: {
@@ -564,7 +565,8 @@ export default {
         this.$toast("作品不能为空");
         return;
       }
-      if (this.checkBouncibility()) {
+      this.teethNum = this.checkBouncibility();
+      if (this.teethNum <= 18) {
         this.bounceProject();
       } else {
         this.alertAppear = true;
@@ -753,7 +755,7 @@ export default {
     <transition name="fade">
       <div class="alert-mask" v-show="alertAppear">
         <div class="mb-dialog">
-          <div class="title">作品音符太多啦，目前无法做成音乐盒，是否继续上传</div>
+          <div class="title">超了{{teethNum-18}}个音符，目前无法做成实体八音盒，是否继续上传</div>
           <div class="btns">
             <span class="btn cancel" @click="alertAppear=false">再调整</span>
             <span class="btn confirm" @click="bounceProject">任性上传</span>
