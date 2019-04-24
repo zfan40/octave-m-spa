@@ -84,7 +84,9 @@ export default {
       noteRectConfig: {},
       activeJ: -1, // highlight timeline
       sector: 1, // 2*4-1,可以滚动7次，营造处4页的氛围
-      rectArray: Array(18).fill([]),
+      rectArray: Array(scales[DEFAULT_KEYBOARD_MODE].musicScale.length)
+        .fill(1)
+        .map(i => []),
       alertAppear: false,
       alertAppear2: false,
       menuAppear: false,
@@ -467,9 +469,9 @@ export default {
       }
     },
     clearNotes() {
-      this.rectArray = Array(scales[this.keyboardMode].musicScale.length).fill(
-        []
-      );
+      this.rectArray = Array(scales[this.keyboardMode].musicScale.length)
+        .fill(1)
+        .map(i => []);
     },
     chooseKeyboard(keyboardMode) {
       if (this.keyboardMode == keyboardMode) return;
@@ -484,9 +486,9 @@ export default {
       //肯定是切换了嘛
       this.keyboardMode =
         this.keyboardMode == "whitekey" ? "fullkey" : "whitekey";
-      this.rectArray = Array(scales[this.keyboardMode].musicScale.length).fill(
-        []
-      );
+      this.rectArray = Array(scales[this.keyboardMode].musicScale.length)
+        .fill(1)
+        .map(i => []);
       this.NOTE_CATEGORY = scales[this.keyboardMode].musicScale.length;
       this.setupCanvas();
       this.alertAppear2 = false;
@@ -609,7 +611,11 @@ export default {
       const workInCookieObj = JSON.parse(workInCookie);
       this.keyboardMode = workInCookieObj.keyboardMode || "whitekey";
       this.tempo = workInCookieObj.tempo || 120;
-      this.rectArray = workInCookieObj.rectArray || Array(18).fill([]);
+      this.rectArray =
+        workInCookieObj.rectArray ||
+        Array(scales[this.keyboardMode].musicScale.length)
+          .fill(1)
+          .map(i => []);
       this.beat = workInCookieObj.beat || 8;
       this.scheduleCursor();
     }
