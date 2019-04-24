@@ -85,6 +85,7 @@ export default {
       activeJ: -1, // highlight timeline
       sector: 1, // 2*4-1,可以滚动7次，营造处4页的氛围
       rectArray: Array(18).fill([]),
+      rectConfigArray: [],
       alertAppear: false,
       alertAppear2: false,
       menuAppear: false,
@@ -310,6 +311,25 @@ export default {
         // dash: index % this.beat === 0 ? [0] : [0]
       };
     },
+    initialRectSet() {
+      this.rectConfigArray = Array(
+        scales[this.keyboardMode].musicScale.length
+      ).fill([]);
+      console.log(this.configKonva.width);
+      for (let i = 0; i <= scales[this.keyboardMode].musicScale.length - 1; i++)
+        for (let j = 0; j <= FULL_NOTE_NUM - 1; j++) {
+          console.log((i * this.configKonva.width) / this.NOTE_CATEGORY);
+          this.$set(this.rectConfigArray[i], j, {
+            ...this.noteRectConfig,
+            x: (i * this.configKonva.width) / this.NOTE_CATEGORY,
+            y: (j * this.configKonva.height) / this.ONE_PAGE_NOTE_NUM,
+            fill: "#9FB2CF"
+          });
+        }
+
+      console.log("111", this.rectConfigArray[0][5].x);
+      console.log("111", this.rectConfigArray[4][9].x);
+    },
     handleTouchRect(i, j, sector) {
       // console.log(`trigger ${i},${j+(sector-1)*this.NOTE_NUM_PER_SECTOR}`)
       // make sound
@@ -333,7 +353,7 @@ export default {
       // update last
       last_i = i;
       last_j = j;
-      this.saveProjectToLocaoStorage();
+      this.saveProjectToLocalStorage();
     },
     handleMoveRect(i, j, sector) {
       const fullJ = j + (sector - 1) * this.NOTE_NUM_PER_SECTOR;
@@ -473,11 +493,11 @@ export default {
     chooseKeyboard(keyboardMode) {
       if (this.keyboardMode == keyboardMode) return;
       this.alertAppear2 = true;
-      this.saveProjectToLocaoStorage();
+      this.saveProjectToLocalStorage();
     },
     updateBeat(newbeat) {
       this.beat = newbeat;
-      this.saveProjectToLocaoStorage();
+      this.saveProjectToLocalStorage();
     },
     updateKeyboard() {
       //肯定是切换了嘛
@@ -490,7 +510,7 @@ export default {
       this.setupCanvas();
       this.alertAppear2 = false;
       this.menuAppear = false;
-      this.saveProjectToLocaoStorage();
+      this.saveProjectToLocalStorage();
     },
     checkBouncibility() {
       const result = [];
@@ -573,7 +593,7 @@ export default {
     btnEnd(e) {
       this.toggleReplay();
     },
-    saveProjectToLocaoStorage() {
+    saveProjectToLocalStorage() {
       const work = {
         keyboardMode: this.keyboardMode,
         rectArray: this.rectArray,
@@ -611,6 +631,7 @@ export default {
       this.beat = workInCookieObj.beat || 8;
       this.scheduleCursor();
     }
+    this.initialRectSet();
     // regular setup
     const self = this;
     Tone.Transport.cancel();
@@ -689,24 +710,24 @@ export default {
                 :key="`i${i}j${j}`"
                 @touchstart="handleTouchRect(i-1,j-1,sector)"
                 @touchmove="handleMoveRect(i-1,j-1,sector)"
-                :config="setupRect(i-1,j-1,sector)"
+                :config="rectConfigArray[i-1][j + (sector - 2) * 10 + 1 * NOTE_NUM_PER_SECTOR]"
               />
               <!-- measure line -->
-              <v-rect
+              <!-- <v-rect
                 v-if="(j + (sector - 2) * CONST_NOTE_NUM_PER_SECTOR + 1 * NOTE_NUM_PER_SECTOR)%2===1"
                 :key="`halfi${i}j${j}`"
                 @touchstart="handleTouchRect(i-1,j-1,sector)"
                 @touchmove="handleMoveRect(i-1,j-1,sector)"
                 :config="setupHalf(i-1,j-1,sector)"
-              />
+              />-->
               <!-- quarter note line -->
-              <v-rect
+              <!-- <v-rect
                 v-if="(j + (sector - 2) * CONST_NOTE_NUM_PER_SECTOR + 1 * NOTE_NUM_PER_SECTOR)%beat===1"
                 :key="`borderi${i}j${j}`"
                 @touchstart="handleTouchRect(i-1,j-1,sector)"
                 @touchmove="handleMoveRect(i-1,j-1,sector)"
                 :config="setupBeat(i-1,j-1,sector)"
-              />
+              />-->
             </template>
             <!-- <v-text v-if="i%beat ==0" :key="`beat${i}`" :config="setupBeatText(i,sector)"/> -->
           </template>
