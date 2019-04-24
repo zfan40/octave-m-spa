@@ -1,4 +1,7 @@
 <script>
+// tonepart stores the parts of tone, currently, it's sync with UI by hand.
+// recordPart is the current playing session
+// recordParts stores the historic ones, recordPart will be merged into recordParts
 import "swiper/dist/css/swiper.css";
 
 import * as Util from "../_common/js/util";
