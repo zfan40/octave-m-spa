@@ -87,7 +87,6 @@ export default {
       rectArray: Array(18)
         .fill(1)
         .map(i => []),
-      rectConfigArray: [],
       alertAppear: false,
       alertAppear2: false,
       menuAppear: false,
@@ -111,6 +110,32 @@ export default {
       const k = 100 / (MAX_TEMPO - MIN_TEMPO);
       const b = -(MIN_TEMPO * k);
       return { height: `${k * this.tempo + b}%` };
+    },
+    rectConfigArray() {
+      const a = [];
+      const len = scales[this.keyboardMode].musicScale.length
+      for (
+        let i = 0;
+        i <= len - 1;
+        i++
+      ) {
+        a[i] = [];
+        for (let j = 0; j <= this.ONE_PAGE_NOTE_NUM - 1; j++) {
+          // this.$set(this.rectConfigArray[i], j, {
+          //   ...this.noteRectConfig,
+          //   x: (i * this.configKonva.width) / this.NOTE_CATEGORY,
+          //   y: ((j - 1) * this.configKonva.height) / this.ONE_PAGE_NOTE_NUM,
+          //   fill: `rgba(0,0,0,${0.9 - (i * 0.22) / this.NOTE_CATEGORY})`
+          // });
+          a[i][j] = {
+            ...this.noteRectConfig,
+            x: (i * this.configKonva.width) / this.NOTE_CATEGORY,
+            y: (j * this.configKonva.height) / this.ONE_PAGE_NOTE_NUM,
+            fill: `rgba(0,0,0,${0.9 - (i * 0.22) / this.NOTE_CATEGORY})`
+          };
+        }
+      }
+      return a;
     }
   },
   methods: {
@@ -314,7 +339,6 @@ export default {
       };
     },
     initialRectSet() {
-      const arr = [];
       this.rectConfigArray = Array(scales[this.keyboardMode].musicScale.length)
         .fill(1)
         .map(i => []); // don't use Array(18).fill([]), []is a reference
@@ -325,7 +349,7 @@ export default {
         i++
       ) {
         this.rectConfigArray[i] = [];
-        for (let j = 0; j <= FULL_NOTE_NUM - 1; j++) {
+        for (let j = 0; j <= this.ONE_PAGE_NOTE_NUM - 1; j++) {
           // console.log((i * this.configKonva.width) / this.NOTE_CATEGORY);
           this.$set(this.rectConfigArray[i], j, {
             ...this.noteRectConfig,
@@ -335,7 +359,6 @@ export default {
           });
         }
       }
-      // this.rectConfigArray = arr
     },
     handleTouchRect(i, j, sector) {
       // console.log(`trigger ${i},${j+(sector-1)*this.NOTE_NUM_PER_SECTOR}`)
@@ -642,7 +665,7 @@ export default {
       this.beat = workInCookieObj.beat || 8;
       this.scheduleCursor();
     }
-    this.initialRectSet();
+    // this.initialRectSet();
     // regular setup
     const self = this;
     Tone.Transport.cancel();
@@ -721,7 +744,7 @@ export default {
                 :key="`i${i}j${j}`"
                 @touchstart="handleTouchRect(i-1,j-1,sector)"
                 @touchmove="handleMoveRect(i-1,j-1,sector)"
-                :config="rectConfigArray[i-1][j + (sector - 2) * 10 + 1 * NOTE_NUM_PER_SECTOR]"
+                :config="rectConfigArray[i-1][j-1]"
               />
               <!-- measure line -->
               <!-- <v-rect
