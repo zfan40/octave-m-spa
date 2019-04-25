@@ -615,7 +615,7 @@ export default {
     },
     adjustWork() {
       this.$ga.event("RollMaker", "Overlimit", `adjust`);
-      alertAppear = false;
+      this.alertAppear = false;
     },
     bounceAnyway() {
       this.$ga.event("RollMaker", "Overlimit", `bounce`);

@@ -26,7 +26,7 @@ export default {
       userId: 0,
       bigCardListOption: [],
       activeIndex: 0,
-      everPlayFlag: false
+      autoplayFlag: false
     };
   },
   computed: {
@@ -88,7 +88,7 @@ export default {
           self.targetProduct = self.squareWorksObj.content[this.realIndex];
           self.activeIndex = this.realIndex;
           //TODO: first one need click, rest should be auto played.
-          if (self.everPlayFlag)
+          if (self.autoplayFlag)
             self.playWork(self.squareWorksObj.content[this.realIndex]);
           if (self.activeIndex >= (size * current - 1) / 2) {
             self.loadWorks();

@@ -389,7 +389,7 @@ export default {
       console.log(e);
     },
     removeNoteInRecordPart(index, partIndex) {
-      this.$ga.event("KeyMaker", "Track", "clearNote", trackNum);
+      this.$ga.event("KeyMaker", "Track", "clearNote", partIndex || 0);
       // console.log("dd");
       if (partIndex === undefined) {
         this.recordPart.splice(index, 1);
@@ -446,7 +446,7 @@ export default {
     },
     adjustWork() {
       this.$ga.event("KeyMaker", "OverLimit", `adjust`);
-      alertAppear = false;
+      this.alertAppear = false;
     },
     bounceAnyway() {
       this.$ga.event("KeyMaker", "OverLimit", `bounce`);
@@ -674,6 +674,7 @@ export default {
         transitionEnd(e) {
           console.log("3", this.activeIndex); // THIS!!! within swiper...scope.....
           self.activeSwiperIndex = this.activeIndex;
+          self.$ga.event("KeyMaker", "Track", "change", this.activeIndex);
           self.confirmRecordPart(!isLinger);
         }
       }

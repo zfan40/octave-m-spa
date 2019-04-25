@@ -166,6 +166,7 @@ export default {
       });
     },
     guideShare() {
+      this.$ga.event("MyWork", "DetailShare");
       this.$toast("作品取名后，点击右上角分享哦～");
     },
     redirectToMusixiser(id) {
@@ -178,11 +179,17 @@ export default {
         });
       }
     },
+    editWork() {
+      this.$ga.event("MyWork", "DetailEdit");
+      this.workUpdateAppear = true;
+    },
     positionWindow() {
       window.scroll(0, 0);
     },
     purchaseItem() {
       this.$ga.event("MakeMB", "tap", `${this.projectInfo.id}`);
+      this.$toast("该功能近期开放,敬请期待~");
+      return;
       if (this.projectInfo.machineNum > 18) {
         this.$toast("该作品目前无法制作");
         return;
@@ -250,6 +257,9 @@ export default {
             );
           }
           self.userId = res.data.data.userId;
+          if (self.uesrId == self.projectInfo.userId) {
+            self.$ga.event("MyWork", "DetailCheck");
+          }
           // alert(`welcome${res.data.data.realname}`)
           // if (!this.project) {
           self.loadMusicById();
@@ -339,7 +349,7 @@ export default {
           </span>
           <span>{{projectInfo.userVO.realname}}</span>
         </div>
-        <div v-if="userId === projectInfo.userId" id="edit-work" @click="workUpdateAppear=true"></div>
+        <div v-if="userId === projectInfo.userId" id="edit-work" @click="editWork"></div>
       </div>
     </transition>
     <transition name="bounce">

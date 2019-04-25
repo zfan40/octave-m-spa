@@ -5,7 +5,7 @@ import * as WxShare from './wx_share';
 export const mbMixin = {
   data() {
     return {
-      everPlayFlag: false,
+      autoplayFlag: false,
       playing: false,
     };
   },
@@ -40,13 +40,13 @@ export const mbMixin = {
       Api.checkOrder({ wid: work.id }).then(res => {
         if (res.data.data) {
           this.$loading.close();
-          this.genWav()
+          this.genWav(work)
         } else {
           WxShare.makeWavWxOrder({ wid: work.id },
             () => {
               this.$loading.close();
               this.$toast("下单成功");
-              this.genWav();
+              this.genWav(work);
             },
             () => {
               this.$loading.close();
@@ -61,6 +61,8 @@ export const mbMixin = {
     },
     purchaseWork(work) {
       this.$ga.event("MakeMB", "tap", `${work.id}`);
+      this.$toast("该功能近期开放,敬请期待~");
+      return;
       if (work.machineNum > 18) {
         this.$toast("该作品目前无法制作");
         return;
@@ -92,9 +94,10 @@ export const mbMixin = {
     },
     playWork(work) {
       if (!work) return
-      this.everPlayFlag = true;
+
       console.log("work going to play: ", work);
       if (work.id != this.playingWorkId) {
+        this.autoplayFlag = true;
         this.$ga.event("Song", "play_20s", `${work.id}`);
         this.playing = true;
         Magic.previewMidi(work.url, this.playing)
@@ -105,6 +108,7 @@ export const mbMixin = {
         if (this.playing) {
           //正播着这个呢
           this.$ga.event("Song", "stop_20s", `${work.id}`);
+          this.autoplayFlag = false;
           this.playing = false;
           Magic.previewMidi(work.url, this.playing)
             .then(() => this.$store.commit("PLAY_WORK", { work: { id: -1 } }))
@@ -112,6 +116,7 @@ export const mbMixin = {
         } else {
           //这个已经被停了
           this.$ga.event("Song", "play_20s", `${work.id}`);
+          this.autoplayFlag = true;
           this.playing = true;
           Magic.previewMidi(work.url, this.playing)
             .then(() => this.$store.commit("PLAY_WORK", { work }))

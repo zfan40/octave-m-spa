@@ -317,6 +317,7 @@ export default {
   padding: getRem(24);
   background-color: #404249;
   overflow: scroll;
+  -webkit-overflow-scrolling: touch;
 }
 .m-logo {
   position: absolute;

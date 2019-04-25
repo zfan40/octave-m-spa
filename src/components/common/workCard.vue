@@ -117,9 +117,12 @@ export default {
   <div class="work-container" v-longpress="onLongPress">
     <transition name="fade">
       <div v-show="maskOn" class="mask" @touchstart.self="onTapMask">
-        <div :class="['circle-btn',workInfo.machineNum>18?'gray':'pink']" @click="onPurchaseWork">购买</div>
+        <div
+          :class="['circle-btn',workInfo.machineNum>18?'gray':'pink']"
+          @touchstart="onPurchaseWork"
+        >购买</div>
         <!-- <div class="circle-btn purple" @click="onShareWork">分享</div> -->
-        <div :class="['circle-btn','purple']" @click="onDownloadWork">下载</div>
+        <div :class="['circle-btn','purple']" @touchstart="onDownloadWork">下载</div>
         <div
           v-if="isMine"
           class="circle-btn blue"
