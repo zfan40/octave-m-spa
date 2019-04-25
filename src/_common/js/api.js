@@ -268,11 +268,10 @@ export function fetchProductList() {
   )
 }
 
-export function fetchStacks({ page, size }) {
+export function checkOrder({ wid }) {
   return axios.get(
-    `//api.octave-love.com//api/v1/admin/works?page=${page}&size=${size}`,
-    reqConfig
-  )
+    `//api.octave-love.com/api/v1/shop/orders/purchaseCheck?pid=7&wid=${wid}`,
+    reqConfig)
 }
 
 export function fetchSquareWorks({ page, size, category, orderStrategy, id }) {

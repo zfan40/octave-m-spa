@@ -99,37 +99,6 @@ export const makeWxOrder = async ({ pid, wid, amount, address, message }, succes
 
   payWxOrder({ orderId }, successCallback, failCalback)
 
-  // const payResult = await payOrder({ orderId })
-  // // alert(JSON.stringify(res));
-  // const params = payResult.data.data;
-  // // alert(JSON.stringify(params));
-  // console.log(params.nonceStr);
-  // console.log(params.signType);
-  // console.log(params.package);
-  // console.log(params.timeStamp);
-  // console.log(params.appId);
-  // console.log(params.paySign);
-  // console.log('sdsd');
-  // wx.chooseWXPay({
-  //   // ...params,
-  //   appId: params.appId,
-  //   timestamp: params.timeStamp,
-  //   nonceStr: params.nonceStr,
-  //   package: params.package,
-  //   signType: params.signType,
-  //   paySign: params.paySign,
-  //   success(res) {
-  //     console.log(res);
-  //     // resolve(res);
-  //     successCallback(res)
-  //   },
-  //   fail() {
-  //     failCalback();
-  //   },
-  //   cancel() {
-  //     failCalback();
-  //   }
-  // });
 }
 export const makeWavWxOrder = async ({ wid }, successCallback, failCalback) => {
   const res = await createOrder({ pid: 7, wid, message: '' })
@@ -141,13 +110,13 @@ export const payWxOrder = async ({ orderId }, successCallback, failCalback) => {
   // alert(JSON.stringify(res));
   const params = payResult.data.data;
   // alert(JSON.stringify(params));
-  console.log(params.nonceStr);
-  console.log(params.signType);
-  console.log(params.package);
-  console.log(params.timeStamp);
-  console.log(params.appId);
-  console.log(params.paySign);
-  console.log('sdsd');
+  // console.log(params.nonceStr);
+  // console.log(params.signType);
+  // console.log(params.package);
+  // console.log(params.timeStamp);
+  // console.log(params.appId);
+  // console.log(params.paySign);
+  // console.log('sdsd');
   wx.chooseWXPay({
     // ...params,
     appId: params.appId,

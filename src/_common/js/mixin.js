@@ -10,6 +10,24 @@ export const mbMixin = {
     };
   },
   methods: {
+    genWav(work) {
+      this.$loading("为您生成wav文件中...");
+      Tone.Transport.stop(0);
+      Magic.bounceAsWavBlob(work.url)
+        .then(blob => {
+          return Api.downloadAsWav(blob);
+        })
+        .then(url => {
+          // this.$toast(`url is ${url}`);
+          this.$ga.event("Download", "success", `${work.id}`);
+          this.$loading.close();
+          location.href = url;
+        })
+        .catch(() => {
+          this.$loading.close();
+          this.$toast("下载失败请稍后再试");
+        });
+    },
     downloadWork(work) {
       if (!work || !work.url) {
         this.$toast('作品文件缺失')
@@ -19,33 +37,27 @@ export const mbMixin = {
       this.$ga.event("Download", "tap", `${work.id}`);
       // TODO, need check first
       this.$loading("请稍后");
-      WxShare.makeWavWxOrder({ wid: work.id },
-        () => {
+      Api.checkOrder({ wid: work.id }).then(res => {
+        if (res.data.data) {
           this.$loading.close();
-          this.$toast("下单成功");
-          this.$loading("为您生成wav文件中...");
-          Tone.Transport.stop(0);
-          Magic.bounceAsWavBlob(work.url)
-            .then(blob => {
-              return Api.downloadAsWav(blob);
-            })
-            .then(url => {
-              // this.$toast(`url is ${url}`);
-              this.$ga.event("Download", "success", `${work.id}`);
+          this.genWav()
+        } else {
+          WxShare.makeWavWxOrder({ wid: work.id },
+            () => {
               this.$loading.close();
-              location.href = url;
-            })
-            .catch(() => {
+              this.$toast("下单成功");
+              this.genWav();
+            },
+            () => {
               this.$loading.close();
-              this.$toast("下载失败请稍后再试");
-            });
-        },
-        () => {
-          this.$loading.close();
-          this.$toast("停止生成");
+              this.$toast("停止生成");
+            }
+          );
         }
-      );
-
+      }).catch(() => {
+        this.$loading.close();
+        // this.$toast("停止生成");
+      })
     },
     purchaseWork(work) {
       this.$ga.event("MakeMB", "tap", `${work.id}`);
