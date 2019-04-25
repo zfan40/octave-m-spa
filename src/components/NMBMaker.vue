@@ -171,8 +171,10 @@ export default {
     load() {},
     toggleReplay() {
       console.log(1);
+
       this.playing = !this.playing;
       if (this.playing) {
+        this.$ga.event("KeyMaker", "Play", "start");
         if (this.vuetimeline >= 2000) {
           this.vuetimeline = 0;
         }
@@ -185,6 +187,7 @@ export default {
         console.log(`activeOffsetTime${this.vuetimeline * 10}`);
         Tone.Transport.start("+0.01", (this.vuetimeline * 10) / 1000); // TODO:有问题in case < context.currentTime
       } else {
+        this.$ga.event("KeyMaker", "Play", "stop");
         console.log("播放停了");
         Tone.Transport.stop(0); // TODO：必须stop才能start。。。有没有自动stop啊..
         // recordStartTime = performance.now()
@@ -274,6 +277,7 @@ export default {
       isLinger = true;
     },
     clearRecordPart(trackNum) {
+      this.$ga.event("KeyMaker", "Track", "clearAll", trackNum);
       console.log(`cleaning track ${trackNum}`);
       if (this.activePartIndex === trackNum) {
         this.recordPart = [];
@@ -311,10 +315,12 @@ export default {
       return 0;
     },
     finishProject() {
+      this.$ga.event("KeyMaker", "Finish", `tap`);
       this.teethNum = this.checkBouncibility();
       if (this.teethNum <= 18) {
         this.bounceProject();
       } else {
+        this.$ga.event("KeyMaker", "Finish", `overLimit`);
         this.alertAppear = true;
       }
     },
@@ -383,6 +389,7 @@ export default {
       console.log(e);
     },
     removeNoteInRecordPart(index, partIndex) {
+      this.$ga.event("KeyMaker", "Track", "clearNote", trackNum);
       // console.log("dd");
       if (partIndex === undefined) {
         this.recordPart.splice(index, 1);
@@ -436,6 +443,14 @@ export default {
           touchIdKeyMap[e.changedTouches[i].identifier] = undefined;
         }
       }
+    },
+    adjustWork() {
+      this.$ga.event("KeyMaker", "OverLimit", `adjust`);
+      alertAppear = false;
+    },
+    bounceAnyway() {
+      this.$ga.event("KeyMaker", "OverLimit", `bounce`);
+      this.bounceProject();
     },
     // btnStart(e) {
     //   console.log(e);
@@ -908,8 +923,8 @@ export default {
         <div class="mb-dialog">
           <div class="title">超了{{teethNum-18}}个音符，目前无法做成实体八音盒，是否继续上传</div>
           <div class="btns">
-            <span class="btn cancel" @click="alertAppear=false">再调整</span>
-            <span class="btn confirm" @click="bounceProject">任性上传</span>
+            <span class="btn cancel" @click="adjustWork">再调整</span>
+            <span class="btn confirm" @click="bounceAnyway">任性上传</span>
           </div>
         </div>
       </div>

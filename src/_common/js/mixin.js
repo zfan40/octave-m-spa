@@ -62,8 +62,9 @@ export const mbMixin = {
     },
     toggleLike(work, type) {
       // console.log('current work info',work.favStatus)
-      if (!work.status)
+      if (!work.favStatus)
         this.$ga.event("Song", "fav", `${work.id}`);
+      else this.$ga.event("Song", "unfav", `${work.id}`);
       Api.toggleFavSong({
         workId: work.id,
         status: +!work.favStatus

@@ -378,7 +378,7 @@ export default {
       // update last
       last_i = i;
       last_j = j;
-      this.saveProjectToLocaoStorage();
+      this.saveProjectToLocalStorage();
     },
     handleMoveRect(i, j, sector) {
       const fullJ = j + (sector - 1) * this.NOTE_NUM_PER_SECTOR;
@@ -415,6 +415,7 @@ export default {
       }
     },
     startloop() {
+      this.$ga.event("RollMaker", "Play", "start");
       // start from the current sector start(start,offset)
       this.scheduleCursor(); //其实没什么用，只是为了更新下currentSector，翻页比较自然。。。其他没用
       console.log(this.rectArray);
@@ -434,6 +435,7 @@ export default {
       this.playing = true;
     },
     stoploop() {
+      this.$ga.event("RollMaker", "Play", "stop");
       Tone.Transport.stop();
       this.playing = false;
     },
@@ -442,6 +444,7 @@ export default {
       else this.startloop();
     },
     minusTempo() {
+      this.$ga.event("RollMaker", "Control", "minusTempo");
       if (this.tempo > MIN_TEMPO) {
         this.tempo -= 5;
         Tone.Transport.seconds =
@@ -454,6 +457,7 @@ export default {
       }
     },
     addTempo() {
+      this.$ga.event("RollMaker", "Control", "addTempo");
       if (this.tempo < MAX_TEMPO) {
         this.tempo += 5;
         Tone.Transport.seconds =
@@ -465,6 +469,7 @@ export default {
       }
     },
     scrolldown() {
+      this.$ga.event("RollMaker", "Control", "nextPage");
       // clearInterval(aInterval);
       // this.sector == FULL_NOTE_NUM / NOTE_NUM_PER_SECTOR - 1
       //   ? (this.NOTE_NUM_PER_SECTOR = NOTE_NUM_PER_SECTOR - 2)
@@ -481,6 +486,7 @@ export default {
       // }, 50);
     },
     scrollup() {
+      this.$ga.event("RollMaker", "Control", "lastPage");
       // clearInterval(aInterval);
       // this.sector == 1
       //   ? (this.NOTE_NUM_PER_SECTOR = NOTE_NUM_PER_SECTOR + 2)
@@ -495,6 +501,7 @@ export default {
       // }, 50);
     },
     scrollToBegin() {
+      this.$ga.event("RollMaker", "Control", "rewind");
       clearInterval(aInterval);
       this.sector = 1;
     },
@@ -504,6 +511,7 @@ export default {
     // }
     updateLoop() {
       this.fullloop = !this.fullloop;
+      this.$ga.event("RollMaker", "Control", "fullloop", this.fullloop ? 1 : 0);
       this.scheduleCursor();
       if (this.playing) {
         this.stoploop();
@@ -511,23 +519,27 @@ export default {
       }
     },
     clearNotes() {
+      this.$ga.event("RollMaker", "Control", "clear");
       this.rectArray = Array(scales[this.keyboardMode].musicScale.length)
         .fill(1)
         .map(i => []);
     },
     chooseKeyboard(keyboardMode) {
       if (this.keyboardMode == keyboardMode) return;
+      this.$ga.event("RollMaker", "UpdateKeyboard", "tap");
       this.alertAppear2 = true;
-      this.saveProjectToLocaoStorage();
+      this.saveProjectToLocalStorage();
     },
     updateBeat(newbeat) {
       this.beat = newbeat;
-      this.saveProjectToLocaoStorage();
+      this.$ga.event("RollMaker", "UpdateBeat", `${newbeat}`);
+      this.saveProjectToLocalStorage();
     },
     updateKeyboard() {
       //肯定是切换了嘛
       this.keyboardMode =
         this.keyboardMode == "whitekey" ? "fullkey" : "whitekey";
+      this.$ga.event("RollMaker", "UpdateKeyboard", this.keyboardMode);
       this.rectArray = Array(scales[this.keyboardMode].musicScale.length)
         .fill(1)
         .map(i => []);
@@ -535,7 +547,7 @@ export default {
       this.setupCanvas();
       this.alertAppear2 = false;
       this.menuAppear = false;
-      this.saveProjectToLocaoStorage();
+      this.saveProjectToLocalStorage();
     },
     checkBouncibility() {
       const result = [];
@@ -601,8 +613,17 @@ export default {
           this.$toast("非常抱歉，上传作品失败了");
         });
     },
+    adjustWork() {
+      this.$ga.event("RollMaker", "Overlimit", `adjust`);
+      alertAppear = false;
+    },
+    bounceAnyway() {
+      this.$ga.event("RollMaker", "Overlimit", `bounce`);
+      this.bounceProject();
+    },
     submitProject() {
       this.menuAppear = false;
+      this.$ga.event("RollMaker", "Finish", `tap`);
       if (
         this.rectArray.reduce((acc, val) => acc.concat(val), []).length === 0 //flat方法摩羯浏览器不支持
       ) {
@@ -613,13 +634,14 @@ export default {
       if (this.teethNum <= 18) {
         this.bounceProject();
       } else {
+        this.$ga.event("RollMaker", "Finish", `overLimit`);
         this.alertAppear = true;
       }
     },
     btnEnd(e) {
       this.toggleReplay();
     },
-    saveProjectToLocaoStorage() {
+    saveProjectToLocalStorage() {
       const work = {
         keyboardMode: this.keyboardMode,
         rectArray: this.rectArray,
@@ -805,8 +827,8 @@ export default {
         <div class="mb-dialog">
           <div class="title">超了{{teethNum-18}}个音符，目前无法做成实体八音盒，是否继续上传</div>
           <div class="btns">
-            <span class="btn cancel" @click="alertAppear=false">再调整</span>
-            <span class="btn confirm" @click="bounceProject">任性上传</span>
+            <span class="btn cancel" @click="adjustWork">再调整</span>
+            <span class="btn confirm" @click="bounceAnyway">任性上传</span>
           </div>
         </div>
       </div>

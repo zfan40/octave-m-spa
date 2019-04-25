@@ -152,7 +152,6 @@ export default {
   created() {
     //check cookie to get serviceToken first
     // if stoken not exist, go auth
-
     const self = this;
     this.busy = false;
     var docElem = document.documentElement;
@@ -165,18 +164,16 @@ export default {
       this.loadMore();
       return;
     }
-    const fullPath = `${location.origin}${location.pathname}#/my-fav?id=${
-      self.$store.state.route.query.id
-    }`;
-    // WxShare.prepareShareConfig().then(() => {
-    //   WxShare.prepareShareContent({
-    //     title: "MUSIXISE",
-    //     desc: "我的地盘你就dê听我的",
-    //     // fullPath:location.href.split('#')[0],
-    //     fullPath,
-    //     imgUrl: "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
-    //   });
-    // });
+    const fullPath = `${location.origin}${location.pathname}#/rank-board`;
+    WxShare.prepareShareConfig().then(() => {
+      WxShare.prepareShareContent({
+        title: "哎八音母亲节排行榜",
+        desc: "免费赠送定制音乐彩色八音盒哦～",
+        // fullPath:location.href.split('#')[0],
+        fullPath,
+        imgUrl: "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
+      });
+    });
     // alert(Cookies.get('serviceToken'))
     if (Util.getUrlParam("code") || Cookies.get("serviceToken")) {
       //TODO:ajax call to get info
