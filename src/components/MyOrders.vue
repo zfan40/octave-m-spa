@@ -3,12 +3,14 @@ import * as Util from "../_common/js/util";
 import * as Api from "../_common/js/api";
 import * as Cookies from "js-cookie";
 import order from "./common/Order";
+import { mbMixin } from "../_common/js/mixin.js";
 import infiniteScroll from "vue-infinite-scroll";
 import * as Magic from "../_common/js/magic";
 import * as WxShare from "../_common/js/wx_share";
 
 export default {
   name: "myorders",
+  mixins: [mbMixin],
   directives: {
     infiniteScroll
   },
@@ -278,6 +280,7 @@ export default {
         :playingStatus="order.content?order.content.wid==playingWorkId:false"
         :onPlayWork="()=>playWork(order.content)"
         :onPayOrder="()=>payOrder(order.orderId)"
+        :onDownloadWork="()=>downloadWork(order.content)"
       ></order>
     </div>
   </div>

@@ -43,7 +43,8 @@ export default {
       default: false
     },
     onPlayWork: Function,
-    onPayOrder: Function
+    onPayOrder: Function,
+    onDownloadWork: Function
   },
   computed: {},
   data() {
@@ -77,9 +78,9 @@ export default {
       </div>
       <div v-if="info.content.product.category===100" class="shipment">
         <p v-if="info.status===1" class="statusText" @click="onPayOrder">去支付</p>
-        <p v-if="info.status===2" class="statusText">制作中👷</p>
-        <p v-if="info.status===3" class="statusText">派送中🏍️</p>
-        <p v-if="info.status===4" class="statusText">已下载🎁</p>
+        <p v-if="info.status===2" class="statusText" @click="onDownloadWork">可下载🎁</p>
+        <p v-if="info.status===3" class="statusText" @click="onDownloadWork">可下载🎁</p>
+        <p v-if="info.status===4" class="statusText" @click="onDownloadWork">可下载🎁</p>
       </div>
     </div>
     <div class="detail">
