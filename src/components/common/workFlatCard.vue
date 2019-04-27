@@ -9,7 +9,8 @@ export default {
     },
     rank: { type: Number },
     onPlayWork: Function,
-    onToggleLike: Function
+    onToggleLike: Function,
+    onDownloadWork: Function
   },
   data() {
     return {
@@ -54,23 +55,11 @@ export default {
 <template>
   <div v-if="workInfo.id" class="info">
     <div class="rank" :id="`rank${rank}`">{{rank}}</div>
-    <div class="preview-bg">
+    <div class="preview-bg" @touchend="onPlayWork">
       <img v-if="workInfo.cover.indexOf('//')>=0" class="cover" :src="workInfo.cover" alt>
       <div v-if="workInfo.cover.indexOf('//')<0" class="dark-mask"></div>
-      <img
-        class="playBtn"
-        @touchend="onPlayWork"
-        v-if="!playingStatus"
-        src="../../assets/viewer/trans-play.png"
-        alt
-      >
-      <img
-        class="playBtn"
-        @touchend="onPlayWork"
-        v-if="playingStatus"
-        src="../../assets/stop.svg"
-        alt
-      >
+      <img class="playBtn" v-if="!playingStatus" src="../../assets/viewer/trans-play.png" alt>
+      <img class="playBtn" v-if="playingStatus" src="../../assets/stop.svg" alt>
     </div>
     <div class="detail">
       <p class="title" @click="gotoWork(workInfo.id)">{{workInfo.title}}</p>
@@ -81,14 +70,20 @@ export default {
         <p ref="insider" :style="marqueeStyle">{{workInfo.content}}</p>
       </div>
       <div class="detail-other">
-        <p class="song-title">
-          by {{workInfo.userVO.realname}}
+        <p class="user-detail">
+          by
+          <span class="name">{{workInfo.userVO.realname}}</span>
           <span>{{workInfo.lastModifiedDate|getDateDiff}}更新</span>
         </p>
         <div class="likes" @click="onToggleLike(workInfo)">
           <img v-if="!workInfo.favStatus" src="../../assets/heartstroke.svg" alt>
           <img v-if="workInfo.favStatus" src="../../assets/heartfill.svg" alt>
           {{workInfo.collectNum}}
+        </div>
+        <div class="likes" @click="onDownloadWork(workInfo)">
+          <img v-if="!workInfo.wavAccess" src="../../assets/download1.svg" alt>
+          <img v-if="workInfo.wavAccess" src="../../assets/download2.svg" alt>
+          <p>wav</p>
         </div>
       </div>
     </div>
@@ -212,6 +207,14 @@ export default {
       justify-content: space-between;
       // padding: 0 getRem(16);
       font-size: 10px;
+      .user-detail {
+        width: 3.6rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        .name {
+        }
+      }
       .likes {
         display: flex;
         align-items: center;

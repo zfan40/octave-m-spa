@@ -11,7 +11,7 @@ export const mbMixin = {
   },
   methods: {
     genWav(work) {
-      this.$loading("为您生成wav文件中...");
+      this.$loading("正在生成..请耐心等待40秒");
       Tone.Transport.stop(0);
       Magic.bounceAsWavBlob(work.url)
         .then(blob => {

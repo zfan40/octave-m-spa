@@ -116,7 +116,7 @@ export default {
         .dispatch("FETCH_BOARD_WORKS", {
           page: 1,
           size: 30,
-          // category: 1,
+          category: 1,
           orderStrategy: 2
         })
         .then(() => {

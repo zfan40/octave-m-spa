@@ -230,6 +230,7 @@ export default {
       this.busy = false;
       return;
     }
+    WxShare.prepareShareConfig();
     document.title = "我的订单";
     if (Util.getUrlParam("code") || Cookies.get("serviceToken")) {
       //TODO:ajax call to get info

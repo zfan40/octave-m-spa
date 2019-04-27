@@ -137,23 +137,11 @@ export default {
       src="../../assets/mb-tag.svg"
       @click="onClickTag"
     >
-    <div class="preview-bg">
+    <div class="preview-bg" @touchend="onPlayWork">
       <img v-if="workInfo.cover.indexOf('//')>=0" class="cover" :src="workInfo.cover" alt>
       <div v-if="workInfo.cover.indexOf('//')<0" class="dark-mask"></div>
-      <img
-        class="playBtn"
-        @touchend="onPlayWork"
-        v-if="!playingStatus"
-        src="../../assets/viewer/trans-play.png"
-        alt
-      >
-      <img
-        class="playBtn"
-        @touchend="onPlayWork"
-        v-if="playingStatus"
-        src="../../assets/stop.svg"
-        alt
-      >
+      <img class="playBtn" v-if="!playingStatus" src="../../assets/viewer/trans-play.png" alt>
+      <img class="playBtn" v-if="playingStatus" src="../../assets/stop.svg" alt>
     </div>
     <div class="detail">
       <p class="title" @click="gotoWork(workInfo.id)">{{workInfo.title}}</p>
