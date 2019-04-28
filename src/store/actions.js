@@ -100,6 +100,35 @@ export default {
     new Promise((resolve, reject) => {
       fetchSquareWorks({ page, size, category, orderStrategy }).then((works) => {
         console.log('works list: ', works.data.data);
+
+        // 前端特殊处理一下， 规则是前三不能重，且能做成八音盒
+        /****** page == 1 的情况 ***/
+        if (page == 1) {
+          const winnerList = []
+          const winnerIdList = []
+          let count = 0
+          while (winnerList.length < 3 && count < works.data.data.list.length) {
+            if (!winnerIdList.includes(works.data.data.list[count].userId) && works.data.data.list[count].machineNum && works.data.data.list[count].machineNum <= 18) { //获奖者不能重
+              console.log(works.data.data.list[count].userId)
+              winnerIdList.push(works.data.data.list[count].userId)
+              winnerList.push(works.data.data.list.splice(count, 1)[0])
+              count -= 1
+            }
+            count += 1
+          }
+          while (winnerList.length < 3) {
+            // 补成长度为3
+            // winnerList.push({ "id": 250, "title": "xxx", "cover": "//img.musixise.com/LV39yVJ4_h32Ti71ZPpfzOKa6APTv4myG0QiIL_oONE791TTq7Pg6SMoKMKyYnYT_95ctDRho.jpg", "content": "#母亲节 观后感火锅", "url": "//audio.musixise.com/cT45Sf8H_output.mid", "favStatus": 0, "createdDate": "2019-04-27 15:25:46", "userId": 259, "collectNum": 2, "lastModifiedDate": "2019-04-27 15:27:13", "fileHash": "aa1c4c6b3b59799ea9a40cc5d4165dcd", "userVO": { "id": 128, "username": null, "realname": "Ziyu", "tel": "", "email": "wechat_oazyg5_wyrjKDS-I9s_PT173Q6w8@musixise.com", "birth": "2000-01-01", "gender": "", "smallAvatar": "//thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTIPfibuvpgFicz4TqibGrAZ1ZiacJTnicVNbTmJw4ibc9XoYadV5wkGLJ5GFtAiaaZwA0MT06bI1HbdzHfDQ/132", "largeAvatar": "//thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTIPfibuvpgFicz4TqibGrAZ1ZiacJTnicVNbTmJw4ibc9XoYadV5wkGLJ5GFtAiaaZwA0MT06bI1HbdzHfDQ/132", "nation": "", "isMaster": 0, "brief": null, "followStatus": 0, "followNum": 0, "fansNum": 0, "songNum": 1, "userId": 259, "createdDate": "2019-04-27 15:25:46" }, "machineNum": 17, "pv": 0, "status": 0, "category": 1 })
+            winnerList.push({})
+          }
+          console.log('--------')
+          console.log(winnerList)
+          works.data.data.list = winnerList.concat(works.data.data.list)
+
+          console.log(works.data.data.list)
+        }
+
+        /****** */
         commit('PUSH_BOARD_WORKS', { boardWorksObj: works.data.data });
         resolve();
       });

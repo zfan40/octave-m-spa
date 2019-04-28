@@ -44,27 +44,30 @@ export default {
     },
     boardWorksObj() {
       const a = this.$store.state.boardWorksObj;
-      this.playerGold = a.content[0]
-        ? a.content[0].userVO
-        : {
-            smallAvatar:
-              "//pic.xiami.net/images/default/xiami_7/avatar_new.png@!c-100-100",
-            realname: "虚位以待"
-          };
-      this.playerSilver = a.content[1]
-        ? a.content[1].userVO
-        : {
-            smallAvatar:
-              "//pic.xiami.net/images/default/xiami_7/avatar_new.png@!c-100-100",
-            realname: "虚位以待"
-          };
-      this.playerBronze = a.content[2]
-        ? a.content[2].userVO
-        : {
-            smallAvatar:
-              "//pic.xiami.net/images/default/xiami_7/avatar_new.png@!c-100-100",
-            realname: "虚位以待"
-          };
+      this.playerGold =
+        a.content[0] && a.content[0].userVO
+          ? a.content[0].userVO
+          : {
+              smallAvatar:
+                "//pic.xiami.net/images/default/xiami_7/avatar_new.png@!c-100-100",
+              realname: "虚位以待"
+            };
+      this.playerSilver =
+        a.content[1] && a.content[1].userVO
+          ? a.content[1].userVO
+          : {
+              smallAvatar:
+                "//pic.xiami.net/images/default/xiami_7/avatar_new.png@!c-100-100",
+              realname: "虚位以待"
+            };
+      this.playerBronze =
+        a.content[2] && a.content[2].userVO
+          ? a.content[2].userVO
+          : {
+              smallAvatar:
+                "//pic.xiami.net/images/default/xiami_7/avatar_new.png@!c-100-100",
+              realname: "虚位以待"
+            };
       return a;
     },
     operatingWorkId() {
