@@ -128,7 +128,7 @@ export default {
           class="circle-btn blue"
           @click="onChangeWorkStatus(workInfo,workInfo.status==0?1:0)"
         >{{workInfo.status==0?workStatusMap[1]:workStatusMap[0]}}</div>
-        <div v-if="isMine" class="circle-btn gray" @click="onChangeWorkStatus(workInfo,2)">删除</div>
+        <div v-if="isMine" class="circle-btn gray" @touchstart="onChangeWorkStatus(workInfo,2)">删除</div>
       </div>
     </transition>
     <img
@@ -137,7 +137,7 @@ export default {
       src="../../assets/mb-tag.svg"
       @click="onClickTag"
     >
-    <div class="preview-bg" @touchend="onPlayWork">
+    <div class="preview-bg" @click="onPlayWork">
       <img v-if="workInfo.cover.indexOf('//')>=0" class="cover" :src="workInfo.cover" alt>
       <div v-if="workInfo.cover.indexOf('//')<0" class="dark-mask"></div>
       <img class="playBtn" v-if="!playingStatus" src="../../assets/viewer/trans-play.png" alt>
