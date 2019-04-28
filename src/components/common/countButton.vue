@@ -104,13 +104,13 @@ export default {
     align-items: center;
     justify-content: space-around;
     .heart {
-      width: getRem(56);
-      height: getRem(50);
+      width: getRem(50);
+      height: getRem(46);
     }
     p {
       font-size: getRem(36);
       // margin: 0 0 0.1rem 0;
-      color: #707baa;
+      color: #8c8c91;
     }
   }
   .inactive {
@@ -133,7 +133,7 @@ export default {
     p {
       font-size: getRem(36);
       // margin: 0 0 0.1rem 0;
-      color: #7d839e;
+      color: #8c8c91;
     }
   }
 }

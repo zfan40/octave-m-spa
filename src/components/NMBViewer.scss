@@ -377,6 +377,17 @@
         margin: 0 0.3rem 0 0.3rem;
       }
     }
+    .work-body-desc {
+      font-size: getRem(24);
+      width: 5rem;
+      height: 0.8rem;
+      overflow: hidden;
+      position: relative;
+      p {
+        position: absolute;
+        white-space: nowrap;
+      }
+    }
     #edit-work {
       position: absolute;
       width: getRem(28);
@@ -401,6 +412,7 @@
       justify-content: space-between;
       // padding: getRem(40) getRem(16);
       padding-right: getRem(40);
+      padding-top: .1rem;
       font-size: 10px;
       .likes {
         display: flex;

@@ -29,11 +29,12 @@ export const mbMixin = {
         });
     },
     downloadWork(work) {
+      if (!work.id) work.id = work.wid //说明是从订单过来的，订单的作品id是wid不是id
       if (!work || !work.url) {
         this.$toast('作品文件缺失')
         return;
       }
-      this.$toast()
+
       this.$ga.event("Download", "tap", `${work.id}`);
       // TODO, need check first
       this.$loading("请稍后");

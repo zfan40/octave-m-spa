@@ -106,12 +106,16 @@ export default {
         });
     },
     uploadPic() {
+      this.$loading("正在上传图片");
       WxShare.selectAndUploadImage(
         imgUrl => {
-          console.log("url:", imgUrl);
+          this.$loading.close();
+          // console.log("url:", imgUrl);
           this.newCover = imgUrl;
         },
         () => {
+          this.$loading.close();
+          this.$toast("上传失败");
           // alert("mayemeigan");
         }
       );
@@ -291,6 +295,25 @@ export default {
     }, 2000);
     setTimeout(() => {
       this.workIntroAppear = true;
+      this.marqueeStyle = "";
+      if (
+        this.$refs.insider &&
+        this.$refs.outsider &&
+        this.$refs.insider.offsetWidth > this.$refs.outsider.offsetWidth
+      ) {
+        var t = this.$refs.insider.offsetWidth / MARQUEE_SPEED + "s;";
+        this.marqueeStyle +=
+          "-webkit-animation:marquee linear infinite;-o-animation:marquee linear infinite;animation:  marquee linear infinite;-webkit-animation-duration:" +
+          t +
+          "-o-animation-duration:" +
+          t +
+          "animation-duration:" +
+          t +
+          ";";
+      } else {
+        this.marqueeStyle += "";
+        console.log(this.$refs.insider.offsetWidth);
+      }
     }, 4500);
     setTimeout(() => {
       this.controlPanalAppear = true;
@@ -349,6 +372,12 @@ export default {
           </span>
           <span>{{projectInfo.userVO.realname}}</span>
         </div>
+        <div ref="outsider" class="work-body-desc">
+          <div
+            style="position: absolute;right: -2rem;width: 4rem;background: linear-gradient(45deg, rgba(55, 60, 102, 0), rgba(55,60,102,60));height: 100%;z-index: 2;"
+          ></div>
+          <p ref="insider" :style="marqueeStyle">{{finalNewWorkContent||projectInfo.content}}</p>
+        </div>
         <div v-if="userId === projectInfo.userId" id="edit-work" @click="editWork"></div>
       </div>
     </transition>
@@ -375,7 +404,7 @@ export default {
           <div class="likes" @click="downloadWork(projectInfo)">
             <img v-if="!projectInfo.wavAccess" src="../assets/download1.svg" alt>
             <img v-if="projectInfo.wavAccess" src="../assets/download2.svg" alt>
-            <p>.wav</p>
+            <!-- <p>.wav</p> -->
           </div>
         </div>
         <div class="button_group">
@@ -413,7 +442,12 @@ export default {
           <div class="dialog-sector">
             <div class="title">留言</div>
             <div class="input">
-              <input v-model="newMessage" @blur="positionWindow" type="text" placeholder="留言">
+              <input
+                v-model="newMessage"
+                @blur="positionWindow"
+                type="text"
+                placeholder="参加活动请以「#母亲节」开头"
+              >
             </div>
           </div>
           <div class="splitter"></div>

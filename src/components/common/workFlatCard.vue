@@ -46,7 +46,7 @@ export default {
         ";";
     } else {
       this.marqueeStyle += "";
-      console.log(this.$refs.insider.offsetWidth);
+      // console.log(this.$refs.insider.offsetWidth);
     }
   }
 };
@@ -71,19 +71,22 @@ export default {
       </div>
       <div class="detail-other">
         <p class="user-detail">
-          by
-          <span class="name">{{workInfo.userVO.realname}}</span>
-          <span>{{workInfo.lastModifiedDate|getDateDiff}}更新</span>
+          by&nbsp;
+          <span>
+            <img class="avatar" :src="workInfo.userVO.smallAvatar" alt>
+          </span>
+          <span class="name">&nbsp;{{workInfo.userVO.realname}}</span>
+          <span>&nbsp;·{{workInfo.lastModifiedDate|getDateDiff}}</span>
         </p>
+        <div class="likes" @click="onDownloadWork(workInfo)">
+          <img v-if="!workInfo.wavAccess" src="../../assets/download1.svg" alt>
+          <img v-if="workInfo.wavAccess" src="../../assets/download2.svg" alt>
+          <!-- <p>wav</p> -->
+        </div>
         <div class="likes" @click="onToggleLike(workInfo)">
           <img v-if="!workInfo.favStatus" src="../../assets/heartstroke.svg" alt>
           <img v-if="workInfo.favStatus" src="../../assets/heartfill.svg" alt>
           {{workInfo.collectNum}}
-        </div>
-        <div class="likes" @click="onDownloadWork(workInfo)">
-          <img v-if="!workInfo.wavAccess" src="../../assets/download1.svg" alt>
-          <img v-if="workInfo.wavAccess" src="../../assets/download2.svg" alt>
-          <p>wav</p>
         </div>
       </div>
     </div>
@@ -208,16 +211,24 @@ export default {
       // padding: 0 getRem(16);
       font-size: 10px;
       .user-detail {
-        width: 3.6rem;
+        display: flex;
+        align-items: center;
+        flex: 1;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        .avatar {
+          width: 0.4rem;
+          height: 0.4rem;
+          border-radius: 0.2rem;
+        }
         .name {
         }
       }
       .likes {
         display: flex;
         align-items: center;
+        padding-left: 0.25rem;
         img {
           width: getRem(26);
           height: getRem(22);

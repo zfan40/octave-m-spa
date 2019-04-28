@@ -184,7 +184,7 @@ export default {
       );
     },
     playWork(work) {
-      if (!work.content) {
+      if (!work.url) {
         this.$toast("作品损坏，无法播放");
         return;
       }
