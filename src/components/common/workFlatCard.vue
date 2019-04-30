@@ -10,7 +10,8 @@ export default {
     rank: { type: Number },
     onPlayWork: Function,
     onToggleLike: Function,
-    onDownloadWork: Function
+    onDownloadWork: Function,
+    onClickTag: Function
   },
   data() {
     return {
@@ -62,6 +63,12 @@ export default {
       <img class="playBtn" v-if="playingStatus" src="../../assets/stop.svg" alt>
     </div>
     <div class="detail">
+      <img
+        v-if="workInfo.machineNum<=18"
+        class="mb-tag"
+        src="../../assets/mb-tag.svg"
+        @click="onClickTag"
+      >
       <p class="title" @click="gotoWork(workInfo.id)">{{workInfo.title}}</p>
       <div ref="outsider" class="work-body-desc">
         <div
@@ -189,6 +196,13 @@ export default {
         position: absolute;
         white-space: nowrap;
       }
+    }
+    .mb-tag {
+      position: absolute;
+      width: getRem(70);
+      top: 0;
+      right: 0;
+      z-index: 1;
     }
     .user {
       display: flex;

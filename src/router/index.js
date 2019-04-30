@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import HelloWorld from '@/components/HelloWorld';
+// import HelloWorld from '@/components/HelloWorld';
 import Square from '@/components/Square';
 // import MBMaker from '@/components/MBMaker';
 
@@ -22,11 +22,11 @@ Vue.use(Router);
 export default new Router({
   // mode: 'history', // avoid hash in url
   routes: [
-    {
-      path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld,
-    },
+    // {
+    //   path: '/',
+    //   name: 'HelloWorld',
+    //   component: HelloWorld,
+    // },
     {
       path: '/square',
       name: 'Square',

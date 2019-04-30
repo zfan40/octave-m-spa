@@ -286,6 +286,7 @@ export default {
     <p id="specs">
       母亲节活动说明：
       <br>在5月14日14:00前，获赞排名前三的符合制作标准的八音盒，即可获赠对应乐曲的定制音乐盒，快来参加吧
+      <br>同一用户最多只有一件作品进入前三，系统自动判断为可制作的八音盒才能排进前三名
     </p>
     <div class="worklist">
       <work-card
@@ -298,6 +299,7 @@ export default {
         :onPlayWork="() => playWork(item)"
         :onDownloadWork="() => downloadWork(item)"
         :onToggleLike="() => toggleLike(item, 'boardWorksObj')"
+        :onClickTag="()=>{tagAppear=true}"
       />
     </div>
     <!-- <div class="emptysection" v-show="!loading && musixiserWorksObj.content.length==0">
@@ -306,14 +308,7 @@ export default {
         <img src="../assets/oops.png" style="width:6rem;" alt>
       </div>
     </div>-->
-    <tag-dialog
-      :appear="tagAppear"
-      :handleClose="
-        () => {
-          tagAppear = false;
-        }
-      "
-    />
+    <tag-dialog :appear="tagAppear" :handleClose="()=>{tagAppear=false}"/>
   </div>
 </template>
 <style lang="scss" scoped>
