@@ -7,7 +7,7 @@ import * as Magic from "../_common/js/magic";
 import { mbMixin } from "../_common/js/mixin.js";
 import CountButton from "./common/countButton";
 import * as WxShare from "../_common/js/wx_share";
-
+const MARQUEE_SPEED = 40;
 // const musicPart;
 
 export default {
@@ -28,7 +28,9 @@ export default {
       newWorkTitle: "",
       newMessage: "",
       newCover: "",
-      finalNewWorkTitle: ""
+      finalNewWorkTitle: "",
+      finalNewMessage: "",
+      marqueeStyle: ""
     };
   },
   computed: {
@@ -136,6 +138,28 @@ export default {
             this.$toast("作品更新成功");
             this.workUpdateAppear = false;
             this.finalNewWorkTitle = this.newWorkTitle;
+            this.finalNewMessage = this.newMessage;
+            this.$nextTick(function() {
+              // update message section
+              this.marqueeStyle = "";
+              if (
+                this.$refs.insider &&
+                this.$refs.outsider &&
+                this.$refs.insider.offsetWidth > this.$refs.outsider.offsetWidth
+              ) {
+                var t = this.$refs.insider.offsetWidth / MARQUEE_SPEED + "s;";
+                this.marqueeStyle +=
+                  "-webkit-animation:marquee linear infinite;-o-animation:marquee linear infinite;animation:  marquee linear infinite;-webkit-animation-duration:" +
+                  t +
+                  "-o-animation-duration:" +
+                  t +
+                  "animation-duration:" +
+                  t +
+                  ";";
+              } else {
+                this.marqueeStyle += "";
+              }
+            });
             document.title = this.finalNewWorkTitle;
             const fullPath = `${location.origin}${
               location.pathname
@@ -295,25 +319,27 @@ export default {
     }, 2000);
     setTimeout(() => {
       this.workIntroAppear = true;
-      this.marqueeStyle = "";
-      if (
-        this.$refs.insider &&
-        this.$refs.outsider &&
-        this.$refs.insider.offsetWidth > this.$refs.outsider.offsetWidth
-      ) {
-        var t = this.$refs.insider.offsetWidth / MARQUEE_SPEED + "s;";
-        this.marqueeStyle +=
-          "-webkit-animation:marquee linear infinite;-o-animation:marquee linear infinite;animation:  marquee linear infinite;-webkit-animation-duration:" +
-          t +
-          "-o-animation-duration:" +
-          t +
-          "animation-duration:" +
-          t +
-          ";";
-      } else {
-        this.marqueeStyle += "";
-        console.log(this.$refs.insider.offsetWidth);
-      }
+      this.$nextTick(function() {
+        // DOM updated
+        this.marqueeStyle = "";
+        if (
+          this.$refs.insider &&
+          this.$refs.outsider &&
+          this.$refs.insider.offsetWidth > this.$refs.outsider.offsetWidth
+        ) {
+          var t = this.$refs.insider.offsetWidth / MARQUEE_SPEED + "s;";
+          this.marqueeStyle +=
+            "-webkit-animation:marquee linear infinite;-o-animation:marquee linear infinite;animation:  marquee linear infinite;-webkit-animation-duration:" +
+            t +
+            "-o-animation-duration:" +
+            t +
+            "animation-duration:" +
+            t +
+            ";";
+        } else {
+          this.marqueeStyle += "";
+        }
+      });
     }, 4500);
     setTimeout(() => {
       this.controlPanalAppear = true;
@@ -373,10 +399,10 @@ export default {
           <span>{{projectInfo.userVO.realname}}</span>
         </div>
         <div ref="outsider" class="work-body-desc">
-          <div
-            style="position: absolute;right: -2rem;width: 4rem;background: linear-gradient(45deg, rgba(55, 60, 102, 0), rgba(55,60,102,60));height: 100%;z-index: 2;"
-          ></div>
-          <p ref="insider" :style="marqueeStyle">{{finalNewWorkContent||projectInfo.content}}</p>
+          <!-- <div
+            style="position: absolute;right: -2rem;width: 6rem;background: linear-gradient(45deg, rgba(225,236,237, 0), rgba(225,236,237,60));height: 100%;z-index: 2;"
+          ></div>-->
+          <p ref="insider" :style="marqueeStyle">{{finalNewMessage||projectInfo.content}}</p>
         </div>
         <div v-if="userId === projectInfo.userId" id="edit-work" @click="editWork"></div>
       </div>

@@ -908,7 +908,7 @@ export default {
         <p>清空轨道</p>
       </div>
     </div>
-    <div id="tutorhand" :class="[tutorClass]" v-show="handClass!='hidehand'">
+    <div id="tutorhand" :class="[tutorClass]" v-if="handClass!='hidehand'">
       <div :class="[handClass]"></div>
     </div>
     <transition name="slide">

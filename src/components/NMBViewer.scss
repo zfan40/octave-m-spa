@@ -366,6 +366,7 @@
     .subtitle {
       display: flex;
       height: getRem(60);
+      justify-content: flex-end;
       font-size: 0.4rem;
       align-items: center;
       color: #7d839e;
@@ -378,14 +379,18 @@
       }
     }
     .work-body-desc {
-      font-size: getRem(24);
+      font-size: getRem(28);
       width: 5rem;
       height: 0.8rem;
       overflow: hidden;
       position: relative;
+      display:flex;
+      justify-content: flex-end;
       p {
         position: absolute;
+        line-height:.8rem;
         white-space: nowrap;
+        color: #7d839e;
       }
     }
     #edit-work {
