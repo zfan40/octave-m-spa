@@ -262,11 +262,11 @@ export default {
     }#/new-music-box-viewer?id=${self.$store.state.route.query.id}`;
     WxShare.prepareShareConfig().then(() => {
       WxShare.prepareShareContent({
-        title: "MUSIXISE",
+        title: "哎八音",
         desc: "分享一个八音盒",
         // fullPath:location.href.split('#')[0],
         fullPath,
-        imgUrl: "https://img.musixise.com/Ocrg2srw_icon33@2x.png"
+        imgUrl: "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
       });
     });
     // alert(Cookies.get('serviceToken'))

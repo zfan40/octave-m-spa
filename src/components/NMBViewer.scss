@@ -642,6 +642,7 @@
       justify-content: space-between;
       align-items:center;
       .work-cover {
+        object-fit: cover;
         width: getRem(128);
         height:getRem(128);
         margin-bottom:getRem(34);

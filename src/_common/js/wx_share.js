@@ -59,7 +59,7 @@ export const prepareShareContent = ({ title, desc, fullPath, imgUrl }) => {
   wx.onMenuShareTimeline({
     title,
     link,
-    imgUrl,
+    imgUrl: imgUrl.replace(/^https:\/\//i, "http://"),
     success() { },
     cancel() { },
   });
@@ -67,7 +67,7 @@ export const prepareShareContent = ({ title, desc, fullPath, imgUrl }) => {
     title,
     desc,
     link,
-    imgUrl,
+    imgUrl: imgUrl.replace(/^https:\/\//i, "http://"),
     success() { },
     cancel() { },
   });

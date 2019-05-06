@@ -117,6 +117,8 @@ export default {
   .rank {
     position: relative;
     width: getRem(40);
+    font-weight: 400;
+    color: rgba(26, 28, 30, 0.6);
     background-color: #6f737b;
     font-size: 16px;
     display: flex;

@@ -684,7 +684,7 @@ export default {
     // alert(Cookies.get('serviceToken'))
     WxShare.prepareShareConfig().then(() => {
       WxShare.prepareShareContent({
-        title: "MUSIXISE",
+        title: "哎八音-键盘编辑器",
         desc: "寻找你自己的八音盒",
         fullPath: `${location.origin}${location.pathname}#/new-music-box-maker`,
         imgUrl: "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
