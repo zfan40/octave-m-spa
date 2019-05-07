@@ -11,7 +11,7 @@ export const mbMixin = {
   },
   methods: {
     genWav(work) {
-      this.$loading("正在生成..请耐心等待40秒");
+      this.$loading("正在生成..请耐心等待40秒,下单后可重复下载");
       Tone.Transport.stop(0);
       Magic.bounceAsWavBlob(work.url)
         .then(blob => {

@@ -272,7 +272,6 @@ export function previewMidi(url, start) {
       Tone.Transport.stop(0);
       resolve()
     }
-
   })
 }
 export function bounceAsWavBlob(url) {

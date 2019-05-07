@@ -315,6 +315,7 @@ export default {
       return 0;
     },
     finishProject() {
+      if (this.tutorSession > 0) return;
       this.$ga.event("KeyMaker", "Finish", `tap`);
       this.teethNum = this.checkBouncibility();
       if (this.teethNum <= 18) {
@@ -949,12 +950,12 @@ export default {
   transition: background 0.05s ease, transform 1s linear;
   &.tutor2start {
     top: 1.4rem;
-    right: 0.8rem;
+    right: 1.55rem;
     transition: none;
   }
   &.tutor2end {
     top: 1.4rem;
-    right: 0.8rem;
+    right: 1.5rem;
     transform: translateY(5rem);
   }
   &.tutor3start {

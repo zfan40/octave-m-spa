@@ -64,16 +64,18 @@ export default {
           const fullPath = `${location.origin}${
             location.pathname
           }#/new-music-box-viewer?id=${this.$store.state.route.query.id}`;
-          WxShare.prepareShareContent({
-            title: `${this.projectInfo.userVO.realname}做了个八音盒-${
-              this.projectInfo.title
-            }`,
-            desc: "一般人儿我不告诉TA",
-            // fullPath:location.href.split('#')[0],
-            fullPath,
-            imgUrl:
-              this.projectInfo.cover ||
-              "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
+          WxShare.prepareShareConfig().then(() => {
+            WxShare.prepareShareContent({
+              title: `${this.projectInfo.userVO.realname}做了个八音盒-${
+                this.projectInfo.title
+              }`,
+              desc: "一般人儿我不告诉TA",
+              // fullPath:location.href.split('#')[0],
+              fullPath,
+              imgUrl:
+                this.projectInfo.cover ||
+                "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
+            });
           });
         });
       } else {
@@ -108,7 +110,6 @@ export default {
         });
     },
     uploadPic() {
-      this.$loading("正在上传图片");
       WxShare.selectAndUploadImage(
         imgUrl => {
           this.$loading.close();
@@ -119,6 +120,9 @@ export default {
           this.$loading.close();
           this.$toast("上传失败");
           // alert("mayemeigan");
+        },
+        () => {
+          this.$loading("正在上传图片");
         }
       );
     },
@@ -260,15 +264,15 @@ export default {
     const fullPath = `${location.origin}${
       location.pathname
     }#/new-music-box-viewer?id=${self.$store.state.route.query.id}`;
-    WxShare.prepareShareConfig().then(() => {
-      WxShare.prepareShareContent({
-        title: "哎八音",
-        desc: "分享一个八音盒",
-        // fullPath:location.href.split('#')[0],
-        fullPath,
-        imgUrl: "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
-      });
-    });
+    // WxShare.prepareShareConfig().then(() => {
+    //   WxShare.prepareShareContent({
+    //     title: "哎八音",
+    //     desc: "分享一个八音盒",
+    //     // fullPath:location.href.split('#')[0],
+    //     fullPath,
+    //     imgUrl: "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
+    //   });
+    // });
     // alert(Cookies.get('serviceToken'))
     if (Util.getUrlParam("code") || Cookies.get("serviceToken")) {
       // TODO:ajax call to get info
@@ -436,7 +440,7 @@ export default {
         <div class="button_group">
           <button v-if="userId !== projectInfo.userId" @click="redirectToMaker">我来试试</button>
           <button v-if="userId === projectInfo.userId" @click="guideShare">分享</button>
-          <button :class="[projectInfo.machineNum>18?'':'']" @click="purchaseItem">制作八音盒</button>
+          <button :class="[projectInfo.machineNum>18?'':'']" @click="purchaseItem">制成礼物</button>
         </div>
         <!-- <div
           :class="['purchaseBtn',projectInfo.machineNum>18?'disabled':'']"

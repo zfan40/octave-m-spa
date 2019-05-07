@@ -266,6 +266,9 @@ export default {
       font-size: getRem(28);
       line-height: getRem(40);
       color: #8c8c92;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .user {
       display: flex;

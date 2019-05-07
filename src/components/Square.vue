@@ -183,7 +183,7 @@ export default {
     <div class="button_group">
       <button @click="redirectToMaker">我来试试</button>
       <!-- FUTURE WORK: not all work can be built, disabled here on condition -->
-      <button @click="purchaseWork(squareWorksObj.content[activeIndex])">制作八音盒</button>
+      <button @click="purchaseWork(squareWorksObj.content[activeIndex])">制成礼物</button>
     </div>
   </div>
 </template>

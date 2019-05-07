@@ -59,7 +59,7 @@ export const prepareShareContent = ({ title, desc, fullPath, imgUrl }) => {
   wx.onMenuShareTimeline({
     title,
     link,
-    imgUrl: imgUrl.replace(/^https:\/\//i, "http://"),
+    imgUrl: imgUrl.replace(/^(https:)?\/\//i, "http://"),
     success() { },
     cancel() { },
   });
@@ -67,7 +67,7 @@ export const prepareShareContent = ({ title, desc, fullPath, imgUrl }) => {
     title,
     desc,
     link,
-    imgUrl: imgUrl.replace(/^https:\/\//i, "http://"),
+    imgUrl: imgUrl.replace(/^(https:)?\/\//i, "http://"),
     success() { },
     cancel() { },
   });
@@ -96,12 +96,10 @@ export const makeWxOrder = async ({ pid, wid, amount, address, message }, succes
   // 得到返回的支付参数
   // alert(JSON.stringify(res));
   const orderId = res.data.data;
-
   payWxOrder({ orderId }, successCallback, failCalback)
-
 }
 export const makeWavWxOrder = async ({ wid }, successCallback, failCalback) => {
-  const res = await createOrder({ pid: 7, wid, message: '' })
+  const res = await createOrder({ pid: 1, wid, message: '' })
   const orderId = res.data.data;
   payWxOrder({ orderId }, successCallback, failCalback)
 }
@@ -214,13 +212,14 @@ export const createAddress = (cb1, cb2) => {
 //   console.warn(err);
 // });
 
-export const selectAndUploadImage = (cb1, cb2) => {
+export const selectAndUploadImage = (cb1, cb2, cb3) => {
   wx.chooseImage({
     count: 1,
     sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
     sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
     success: function (res) {
       const localId = res.localIds[0]; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+      cb3();
       wx.uploadImage({
         localId, // 需要上传的图片的本地ID，由chooseImage接口获得
         isShowProgressTips: 1, // 默认为1，显示进度提示
@@ -235,6 +234,6 @@ export const selectAndUploadImage = (cb1, cb2) => {
           cb2()
         }
       });
-    }
+    },
   });
 }

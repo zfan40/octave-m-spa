@@ -48,24 +48,21 @@ export default {
         a.content[0] && a.content[0].userVO
           ? a.content[0].userVO
           : {
-              smallAvatar:
-                "//pic.xiami.net/images/default/xiami_7/avatar_new.png@!c-100-100",
+              smallAvatar: "//cdn.cnbj1.fds.api.mi-img.com/mbox/avatar.jpeg",
               realname: "虚位以待"
             };
       this.playerSilver =
         a.content[1] && a.content[1].userVO
           ? a.content[1].userVO
           : {
-              smallAvatar:
-                "//pic.xiami.net/images/default/xiami_7/avatar_new.png@!c-100-100",
+              smallAvatar: "//cdn.cnbj1.fds.api.mi-img.com/mbox/avatar.jpeg",
               realname: "虚位以待"
             };
       this.playerBronze =
         a.content[2] && a.content[2].userVO
           ? a.content[2].userVO
           : {
-              smallAvatar:
-                "//pic.xiami.net/images/default/xiami_7/avatar_new.png@!c-100-100",
+              smallAvatar: "//cdn.cnbj1.fds.api.mi-img.com/mbox/avatar.jpeg",
               realname: "虚位以待"
             };
       return a;
@@ -285,7 +282,7 @@ export default {
     </div>
     <p id="specs">
       母亲节活动说明：
-      <br>在5月14日14:00前，作品获赞排名前三且符合制作标准，即可获赠对应音乐的定制音乐盒
+      <br>在5月13日12:00前，作品获赞排名前三且符合制作标准，即可获赠对应音乐的定制音乐盒
       <br>同一用户最多只有一件作品进入前三名，提交作品通过系统判断可制成实体八音盒才能进入前三名
     </p>
     <div class="worklist">

@@ -270,7 +270,7 @@ export function fetchProductList() {
 
 export function checkOrder({ wid }) {
   return axios.get(
-    `//api.octave-love.com/api/v1/shop/orders/purchaseCheck?pid=7&wid=${wid}`,
+    `//api.octave-love.com/api/v1/shop/orders/purchaseCheck?pid=1&wid=${wid}`,
     reqConfig)
 }
 
