@@ -273,7 +273,7 @@ export default {
       align-items: center;
       justify-content: space-between;
       .title {
-        width: 3rem;
+        flex: 1;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;

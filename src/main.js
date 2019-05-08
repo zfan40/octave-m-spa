@@ -13,6 +13,19 @@ import { getDateDiff } from './_common/js/filters';
 import { longpress } from './_common/js/directives';
 import VueAnalytics from 'vue-analytics'
 
+import * as Sentry from '@sentry/browser';
+import * as Integrations from '@sentry/integrations';
+
+Sentry.init({
+  dsn: 'https://86039b25a68a419b85c64bd61c77f4e7@sentry.io/1455098',
+  integrations: [
+    new Integrations.Vue({
+      Vue,
+      attachProps: true,
+    }),
+  ],
+});
+
 // Vue.use(VueTouch, { name: 'v-touch' });
 Vue.use(VueAnalytics, {
   id: 'UA-138246971-1',
