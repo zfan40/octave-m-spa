@@ -144,7 +144,10 @@ export default {
       <img class="playBtn" v-if="playingStatus" src="../../assets/stop.svg" alt>
     </div>
     <div class="detail">
-      <p class="title" @click="gotoWork(workInfo.id)">{{workInfo.title}}</p>
+      <div class="title-section" @click="gotoWork(workInfo.id)">
+        <p class="title">{{workInfo.title}}</p>
+        <span class="check">查看</span>
+      </div>
       <div class="user" @click="gotoMusixiser(workInfo.userId)">
         <img class="avatar" :src="workInfo.userVO.smallAvatar" alt>
         <p class="song-title">{{workInfo.userVO.realname}}</p>
@@ -262,13 +265,27 @@ export default {
     background-color: $dark-gray;
     color: $gray-text;
     text-align: left;
-    .title {
+    .title-section {
       font-size: getRem(28);
       line-height: getRem(40);
       color: #8c8c92;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      .title {
+        width: 3rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .check {
+        font-size: 12px;
+        /* border: 1px solid; */
+        box-sizing: border-box;
+        border: 1px solid;
+        padding: 0 0.2rem;
+        border-radius: 4px;
+      }
     }
     .user {
       display: flex;
