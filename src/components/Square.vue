@@ -108,7 +108,7 @@ export default {
 
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase());
     this.userId = 239;
-
+    this.$toast("向右滑动浏览");
     if (!inWechat) {
       self.loadWorks();
       return;

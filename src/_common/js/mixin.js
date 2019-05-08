@@ -11,7 +11,7 @@ export const mbMixin = {
   },
   methods: {
     genWav(work) {
-      this.$loading("正在生成..请耐心等待40秒,下单后可重复下载");
+      this.$loading("正在生成..请耐心等待,下单后可重复下载");
       Tone.Transport.stop(0);
       Magic.bounceAsWavBlob(work.url)
         .then(blob => {
@@ -34,7 +34,6 @@ export const mbMixin = {
         this.$toast('作品文件缺失')
         return;
       }
-
       this.$ga.event("Download", "tap", `${work.id}`);
       // TODO, need check first
       this.$loading("请稍后");

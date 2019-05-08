@@ -3,7 +3,7 @@ import * as Cookies from 'js-cookie';
 const axios = require('axios');
 
 axios.interceptors.response.use((res) => {
-  if (res.data.errcode !== '0') {
+  if (res.data.errcode && res.data.errcode !== '0') { //自家接口约定。。
     alert(res.data.resmsg);
     return Promise.reject(res);
   }
@@ -14,6 +14,7 @@ const reqConfig = {
     Accept: 'application/json',
     'Content-Type': 'application/json',
     // 'Authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjIzOSwic3ViIjoiMjM5IiwiZXhwIjoxNTU3NzE1OTE2LCJpYXQiOjE1NTUxMjM5MTYsImp0aSI6IjE1NTUxMjM5MTY5NTgifQ.39OgAcO1u--rnUMj1savYeFBzSWc_bDHUSfcEIR-o3M'
+    //'Authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjEsInN1YiI6IjEiLCJleHAiOjE1NTk5MDA0NTQsImlhdCI6MTU1NzMwODQ1NCwianRpIjoiMTU1NzMwODQ1NDg4MCJ9.vyl1a64ewRQWCjFVK98-M_ljXroBK5SpG0zxXEjtI-o'
   },
 };
 // const tokenObj = { access_token: '' };
@@ -154,13 +155,25 @@ export function downloadAsWav(blob) {
   };
   return new Promise(async (resolve, reject) => {
     const fd = new FormData();
-    fd.append('files', blob)
+
+
     try {
-      // important, othereise dispatch won't be stoped here...
-      const postFix = await axios.post('//api.octave-love.com/api/v1/picture/uploadPic', fd, formReqConfig);
-      const wavURL = `${postFix.data.data}`;
-      console.log(wavURL);
-      resolve(wavURL)
+      // important, othereise dispatch won't be stoped here...\
+      const fname = `${Math.floor(Math.random() * 10000000)}.wav`
+      const qiniuTokenObj = await axios.post(
+        `//api.octave-love.com/api/v1/getToken?fname=${fname}`,
+        JSON.stringify({ fname }),
+        reqConfig);
+      fd.append('file', blob)
+      fd.append('token', qiniuTokenObj.data.data.token);
+      // fd.append('key', fname)
+      await axios.post('//upload.qiniup.com/', fd, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Access-Control-Allow-Origin': '*'
+        },
+      });
+      resolve(qiniuTokenObj.data.data.url)
     } catch (e) {
       console.log(e);
       reject(e);
