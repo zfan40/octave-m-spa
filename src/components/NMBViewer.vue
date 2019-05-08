@@ -53,6 +53,9 @@ export default {
         this.$store.dispatch("FETCH_MBOX", { id }).then(() => {
           console.log("workPart", this.project);
           console.log("work info", this.projectInfo);
+          if (this.userId === projectInfo.userId) {
+            this.workUpdateAppear = true;
+          }
           this.favStatus = this.projectInfo.favStatus;
           this.newWorkTitle =
             this.projectInfo.title === "尚未起名" ? "" : this.projectInfo.title;
