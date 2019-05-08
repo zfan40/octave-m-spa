@@ -22,6 +22,7 @@ export default {
       workIntroAppear: false,
       controlPanalAppear: false,
       workUpdateAppear: false,
+      handAppear: false,
       playing: false,
       userId: 0,
       favStatus: false,
@@ -44,7 +45,6 @@ export default {
   methods: {
     load() {},
     loadMusicById() {
-      // alert(2);
       console.log("hehe", this.$store.state);
       const { id } = this.$store.state.route.query;
       if (id) {
@@ -53,7 +53,7 @@ export default {
         this.$store.dispatch("FETCH_MBOX", { id }).then(() => {
           console.log("workPart", this.project);
           console.log("work info", this.projectInfo);
-          if (this.userId === projectInfo.userId) {
+          if (this.userId === this.projectInfo.userId) {
             this.workUpdateAppear = true;
           }
           this.favStatus = this.projectInfo.favStatus;
@@ -93,6 +93,7 @@ export default {
       }
     },
     togglePlay() {
+      this.handAppear = false;
       this.playing
         ? this.$ga.event("Song", "stop_20s", `${this.projectInfo.id}`)
         : this.$ga.event("Song", "play_20s", `${this.projectInfo.id}`);
@@ -358,6 +359,7 @@ export default {
     }, 4500);
     setTimeout(() => {
       this.controlPanalAppear = true;
+      this.handAppear = true;
     }, 5500);
     // setTimeout(()=>{this.playing = true},6000)
   },
@@ -383,6 +385,7 @@ export default {
       </div>
       <div id="mb-shiner" :class="[playing?'':'not-playing']"></div>
     </div>
+    <img id="hand" v-if="handAppear" src="../assets/anotherhand.svg">
     <transition name="fade">
       <div id="music-aurora" v-show="playing"></div>
     </transition>

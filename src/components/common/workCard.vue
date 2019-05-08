@@ -173,7 +173,7 @@ export default {
   display: inline-block;
   position: relative;
   width: getRem(342);
-  height: getRem(372);
+  height: getRem(382);
   margin-bottom: getRem(16);
   padding: getRem(16);
   background-color: $dark-gray;

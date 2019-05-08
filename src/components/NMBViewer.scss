@@ -80,6 +80,15 @@
   .not-playing {
     animation: box-shine 1s linear infinite;
   }
+  #hand {
+    position: absolute;
+    width: 1rem;
+    z-index: 1;
+    bottom: 3.6rem;
+    left: 3.1rem;
+    pointer-events: none;
+    animation: hand-hint 1s linear infinite;
+  }
   #mb {
     will-change: transform;
     transition: transform 4.5s ease-out;
@@ -617,6 +626,17 @@
   }
   100% {
     box-shadow: 0px 0px 0px 0px rgba(252, 245, 141, 1);
+  }
+}
+@keyframes hand-hint {
+  0% {
+    opacity: .6
+  }
+  50% {
+    opacity: 1
+  }
+  100% {
+    opacity: .6
   }
 }
 #work-update-mask {
