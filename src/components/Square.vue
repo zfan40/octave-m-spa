@@ -118,11 +118,11 @@ export default {
     }#/new-music-box-viewer?id=${self.$store.state.route.query.id}`;
     WxShare.prepareShareConfig().then(() => {
       WxShare.prepareShareContent({
-        title: "ai",
-        desc: "我的地盘你就dê听我的",
+        title: "哎八音推荐广场",
+        desc: "｡:.ﾟヽ(*´∀`)ﾉﾟ.:｡",
         // fullPath:location.href.split('#')[0],
         fullPath,
-        imgUrl: "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
+        imgUrl: "http://cdn.cnbj1.fds.api.mi-img.com/mbox/aby.jpg"
       });
     });
     // alert(Cookies.get('serviceToken'))
