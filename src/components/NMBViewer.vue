@@ -131,6 +131,14 @@ export default {
         this.$toast("作品名称不能为空");
         return;
       }
+      if (this.newWorkTitle.length > 30) {
+        this.$toast("作品名称过长");
+        return;
+      }
+      if (this.newMessage && this.newMessage.length > 30) {
+        this.$toast("作品留言过长");
+        return;
+      }
       Api.updateWork({
         id: this.$store.state.route.query.id,
         title: this.newWorkTitle,

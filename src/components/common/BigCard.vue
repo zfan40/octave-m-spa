@@ -233,6 +233,10 @@ export default {
       font-size: getRem(32);
       color: #8c8c92;
       margin-bottom: getRem(16);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 5rem;
     }
     .basic-info {
       flex: 1;
