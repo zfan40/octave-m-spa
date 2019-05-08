@@ -168,7 +168,7 @@ export default {
     WxShare.prepareShareConfig().then(() => {
       WxShare.prepareShareContent({
         title: "哎八音母亲节排行榜",
-        desc: "免费赠送定制音乐彩色八音盒哦～",
+        desc: "免费赠送定制音乐康乃馨色八音盒～",
         // fullPath:location.href.split('#')[0],
         fullPath,
         imgUrl: "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
