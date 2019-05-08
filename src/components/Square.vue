@@ -56,7 +56,8 @@ export default {
           page: this.squareWorksObj.current
             ? this.squareWorksObj.current + 1
             : 1,
-          size: 10
+          size: 10,
+          orderStrategy: 2
         })
         .then(() => {
           if (

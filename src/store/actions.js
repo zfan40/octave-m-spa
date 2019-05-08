@@ -88,9 +88,9 @@ export default {
         resolve();
       });
     }),
-  FETCH_SQUARE_WORKS: ({ commit, state }, { page, size }) =>
+  FETCH_SQUARE_WORKS: ({ commit, state }, { page, size, orderStrategy }) =>
     new Promise((resolve, reject) => {
-      fetchSquareWorks({ page, size }).then((works) => {
+      fetchSquareWorks({ page, size, orderStrategy }).then((works) => {
         console.log('works list: ', works.data.data);
         commit('PUSH_SQUARE_WORKS', { squareWorksObj: works.data.data });
         resolve();
