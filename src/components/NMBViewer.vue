@@ -432,9 +432,9 @@ export default {
         <div class="subtitle">
           <span>by</span>
           <span @click="redirectToMusixiser(projectInfo.userVO.userId)">
-            <img :src="projectInfo.userVO.smallAvatar" alt>
+            <img :src="projectInfo.userVO&&projectInfo.userVO.smallAvatar" alt>
           </span>
-          <span>{{projectInfo.userVO.realname}}</span>
+          <span>{{projectInfo.userVO&&projectInfo.userVO.realname}}</span>
         </div>
         <div ref="outsider" class="work-body-desc">
           <!-- <div

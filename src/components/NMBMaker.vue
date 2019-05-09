@@ -413,7 +413,11 @@ export default {
           e.changedTouches[i].clientX,
           e.changedTouches[i].clientY
         );
-        if (a.classList.contains("white") || a.classList.contains("black")) {
+        if (
+          a &&
+          a.classList &&
+          (a.classList.contains("white") || a.classList.contains("black"))
+        ) {
           if (
             touchIdKeyMap[e.changedTouches[i].identifier] &&
             touchIdKeyMap[e.changedTouches[i].identifier] !=

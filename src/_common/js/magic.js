@@ -239,7 +239,7 @@ export function preview(items, start) {
     musicPreview.loop = true;
 
     const lastNote = items[items.length - 1]
-    if (lastNote.time >= 20) {
+    if (lastNote && lastNote.time > 20) {
       musicPreview.loopEnd = lastNote.time + lastNote.duration + 2
     } else {
       musicPreview.loopEnd = 20; // 20s的作品，以前21秒，现在就20正好，弄啥样啥样，所听即所得
