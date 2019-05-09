@@ -71,8 +71,13 @@ export default {
 <template>
   <div class="card">
     <div class="preview-bg">
-      <img v-if="workInfo.cover.indexOf('//')>=0" class="cover" :src="workInfo.cover" alt>
-      <div v-if="workInfo.cover.indexOf('//')<0" class="dark-mask"></div>
+      <img
+        v-if="workInfo.cover && workInfo.cover.indexOf('//')>=0"
+        class="cover"
+        :src="workInfo.cover"
+        alt
+      >
+      <div v-if="!workInfo.cover || workInfo.cover.indexOf('//')<0" class="dark-mask"></div>
       <p class="work-content">{{workInfo.content}}</p>
       <img
         class="playBtn"

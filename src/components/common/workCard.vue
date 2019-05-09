@@ -138,8 +138,13 @@ export default {
       @click="onClickTag"
     >
     <div class="preview-bg" @click="onPlayWork">
-      <img v-if="workInfo.cover.indexOf('//')>=0" class="cover" :src="workInfo.cover" alt>
-      <div v-if="workInfo.cover.indexOf('//')<0" class="dark-mask"></div>
+      <img
+        v-if="workInfo.cover && workInfo.cover.indexOf('//')>=0"
+        class="cover"
+        :src="workInfo.cover"
+        alt
+      >
+      <div v-if="!workInfo.cover || workInfo.cover.indexOf('//')<0" class="dark-mask"></div>
       <img class="playBtn" v-if="!playingStatus" src="../../assets/viewer/trans-play.png" alt>
       <img class="playBtn" v-if="playingStatus" src="../../assets/stop.svg" alt>
     </div>
