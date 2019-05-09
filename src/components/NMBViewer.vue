@@ -201,6 +201,10 @@ export default {
           this.$toast("作品更新失败");
         });
     },
+    redirectToAccount() {
+      window.location.href =
+        "https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=Mzg4NjAzODEyMw==&scene=126&bizpsid=0&sharer_username=gh_b74c934625cb&subscene=0&clicktime=1557398370#wechat_redirect";
+    },
     redirectToMaker() {
       this.composeAppear = true;
       this.$ga.event("Work", "create", "fromSharePage");
@@ -377,10 +381,12 @@ export default {
 
 <template>
   <div :class="['container', loading?'loading':'']">
-    <div id="broadcast">
+    <div id="broadcast" @click="redirectToAccount">
       <p>
-        母亲节活动进行中! 创作作品
-        <a href="/#/rank-board">收藏数前三名</a>可免费赢得该曲定制八音盒，更多信息请关注公众号「哎八音」
+        母亲节活动进行中! 创作作品收藏数前三名可免费赢得该曲定制八音盒，
+        <a
+          href="https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=Mzg4NjAzODEyMw==&scene=126&bizpsid=0&sharer_username=gh_b74c934625cb&subscene=0&clicktime=1557398370#wechat_redirect"
+        >更多信息</a>请关注公众号「哎八音」
       </p>
     </div>
     <div id="ground"></div>
