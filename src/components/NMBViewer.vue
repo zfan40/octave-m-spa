@@ -23,6 +23,7 @@ export default {
       controlPanalAppear: false,
       workUpdateAppear: false,
       handAppear: false,
+      composeAppear: false,
       playing: false,
       userId: 0,
       favStatus: false,
@@ -201,12 +202,19 @@ export default {
         });
     },
     redirectToMaker() {
+      this.composeAppear = true;
       this.$ga.event("Work", "create", "fromSharePage");
+    },
+    toKeyMaker() {
+      this.$ga.event("Work", "create", "byKeyboard");
       this.$router.push({
         path: "/new-music-box-maker"
-        // query: {
-        //   id
-        // }
+      });
+    },
+    toSeqMaker() {
+      this.$ga.event("Work", "create", "bySeq");
+      this.$router.push({
+        path: "/new-music-box-roll"
       });
     },
     guideShare() {
@@ -369,6 +377,12 @@ export default {
 
 <template>
   <div :class="['container', loading?'loading':'']">
+    <div id="broadcast">
+      <p>
+        母亲节活动正在进行, 期间创作
+        <a href="/#/rank-board">收藏数前三名</a>可免费获得以该曲定制的八音盒，更多信息请关注公众号「哎八音」
+      </p>
+    </div>
     <div id="ground"></div>
     <div id="spirit">
       <div class="spirit-part" id="spirit-body"></div>
@@ -497,6 +511,17 @@ export default {
           <div class="splitter"></div>
         </div>
         <div class="confirm-btn" @click="updateWork">保存</div>
+      </div>
+    </transition>
+    <transition name="fade">
+      <div id="compose-mask" v-show="composeAppear" @click.self="composeAppear=false">
+        <div id="compose-pick-container">
+          <p>编曲模式</p>
+          <div class="main">
+            <img src="../assets/keystyle.png" @click="toKeyMaker">
+            <img src="../assets/seqstyle.png" @click="toSeqMaker">
+          </div>
+        </div>
       </div>
     </transition>
   </div>
