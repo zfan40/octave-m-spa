@@ -379,8 +379,8 @@ export default {
   <div :class="['container', loading?'loading':'']">
     <div id="broadcast">
       <p>
-        母亲节活动正在进行, 期间创作
-        <a href="/#/rank-board">收藏数前三名</a>可免费获得以该曲定制的八音盒，更多信息请关注公众号「哎八音」
+        母亲节活动进行中! 创作作品
+        <a href="/#/rank-board">收藏数前三名</a>可免费赢得该曲定制八音盒，更多信息请关注公众号「哎八音」
       </p>
     </div>
     <div id="ground"></div>
