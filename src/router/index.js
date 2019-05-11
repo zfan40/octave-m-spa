@@ -16,7 +16,7 @@ import ProductList from '@/components/ProductList';
 import OrderConfirm from '@/components/OrderConfirm';
 import MyOrders from '@/components/MyOrders';
 import RankBoard from '@/components/RankBoard';
-
+import NewbieMaker from '@/components/newbieMaker';
 Vue.use(Router);
 
 export default new Router({
@@ -27,6 +27,11 @@ export default new Router({
     //   name: 'HelloWorld',
     //   component: HelloWorld,
     // },
+    {
+      path: '/newbie-maker',
+      name: 'NB',
+      component: NewbieMaker,
+    },
     {
       path: '/square',
       name: 'Square',
