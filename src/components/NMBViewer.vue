@@ -70,10 +70,10 @@ export default {
           }#/new-music-box-viewer?id=${this.$store.state.route.query.id}`;
           WxShare.prepareShareConfig().then(() => {
             WxShare.prepareShareContent({
-              title: `${this.projectInfo.userVO.realname}做了个八音盒-${
+              title: `${this.projectInfo.userVO.realname}给妈妈做了个八音盒-${
                 this.projectInfo.title
               }`,
-              desc: "一般人儿我不告诉TA",
+              desc: "只花1分钟,你也可以喔～",
               // fullPath:location.href.split('#')[0],
               fullPath,
               imgUrl:
@@ -148,7 +148,7 @@ export default {
         id: this.$store.state.route.query.id,
         title: this.newWorkTitle,
         cover: this.newCover,
-        content: this.newMessage
+        content: this.newMessage || "#母亲节"
       })
         .then(
           () => {
@@ -182,14 +182,14 @@ export default {
               location.pathname
             }#/new-music-box-viewer?id=${this.$store.state.route.query.id}`;
             WxShare.prepareShareContent({
-              title: `${this.projectInfo.userVO.realname}做了个八音盒-${
+              title: `${this.projectInfo.userVO.realname}给妈妈做了个八音盒-${
                 this.newWorkTitle
               }`,
-              desc: "一般人儿我不告诉TA",
+              desc: "只花1分钟,你也可以喔～",
               // fullPath:location.href.split('#')[0],
               fullPath,
               imgUrl:
-                this.projectInfo.cover ||
+                this.newCover ||
                 "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
             });
           },
@@ -202,17 +202,19 @@ export default {
         });
     },
     redirectToAccount() {
-      window.location.href =
-        "https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=Mzg4NjAzODEyMw==&scene=126&bizpsid=0&sharer_username=gh_b74c934625cb&subscene=0&clicktime=1557398370#wechat_redirect";
+      // window.location.href =
+      //   "https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=Mzg4NjAzODEyMw==&scene=126&bizpsid=0&sharer_username=gh_b74c934625cb&subscene=0&clicktime=1557398370#wechat_redirect";
     },
     redirectToMaker() {
-      this.composeAppear = true;
-      this.$ga.event("Work", "create", "fromSharePage");
+      // this.composeAppear = true;
+      // this.$ga.event("Work", "create", "fromSharePage");
+      //directly to keymaker
+      this.toKeyMaker();
     },
     toKeyMaker() {
       this.$ga.event("Work", "create", "byKeyboard");
       this.$router.push({
-        path: "/new-music-box-maker"
+        path: "/newbie-maker"
       });
     },
     toSeqMaker() {
@@ -382,12 +384,7 @@ export default {
 <template>
   <div :class="['container', loading?'loading':'']">
     <div id="broadcast" @click="redirectToAccount">
-      <p>
-        母亲节活动进行中! 创作作品收藏数前三名可免费赢得该曲定制八音盒，
-        <a
-          href="https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=Mzg4NjAzODEyMw==&scene=126&bizpsid=0&sharer_username=gh_b74c934625cb&subscene=0&clicktime=1557398370#wechat_redirect"
-        >更多信息</a>请关注公众号「哎八音」
-      </p>
+      <p>母亲节活动进行中! 创作作品收藏数前三名可免费赢得该曲定制八音盒，更多信息请关注公众号「哎八音」</p>
     </div>
     <div id="ground"></div>
     <div id="spirit">

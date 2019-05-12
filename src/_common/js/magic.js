@@ -215,6 +215,7 @@ export function clearTone(parts) {
   }
 }
 export function preview(items, start) {
+  clearTone()
   console.log('current state', Tone.Transport.state);
   // if (Tone.Transport.state === 'stopped') {
   if (start) {

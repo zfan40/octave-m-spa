@@ -11,6 +11,7 @@ import * as Magic from "../_common/js/magic";
 import * as WxShare from "../_common/js/wx_share";
 import vueSlider from "vue-slider-component";
 import { swiper, swiperSlide } from "vue-awesome-swiper";
+import * as KeyDemo from "../_common/js/keydemo";
 
 const Tone = require("tone");
 const touchIdKeyMap = {}; // touch move can have several threads, each thread only activate one note at most
@@ -84,6 +85,13 @@ export default {
       menuAppear: false,
       fuckReady: false,
       teethNum: 18,
+      KeyDemo,
+      songListAppear: false,
+      firstTimeSucceed: true,
+      notesWaitingList: [[]],
+      currentSongIndex: -1,
+      hintToastType: -1,
+      hintToastAppear: false,
       timelineConfig: {
         value: 0,
         width: 8,
@@ -137,6 +145,7 @@ export default {
   watch: {
     playing(val) {
       console.log("playing status", val);
+      console.log("1", this.hintToastAppear);
       if (val) {
         //start progress bar
         replayInterval = setInterval(() => {
@@ -144,6 +153,19 @@ export default {
           if (this.vuetimeline >= 2000) {
             this.toggleReplay();
             this.vuetimeline = 0;
+            if (
+              this.currentSongIndex >= 0 &&
+              this.notesWaitingList[0].length > 0
+            ) {
+              this.hintToastType = 1;
+              this.hintToastAppear = true;
+              setTimeout(() => {
+                this.redoProject();
+              }, 800);
+              setTimeout(() => {
+                this.hintToastAppear = false;
+              }, 5000);
+            }
           }
         }, PROGRESS_INTERVAL_TIME * 1000);
       } else {
@@ -199,7 +221,29 @@ export default {
       piano.triggerAttack(noteId);
       // console.log('midi no. :', Tone.Frequency(noteId).toMidi())
       this.$set(this.activeNote, noteId, 1);
-
+      if (this.notesWaitingList[0].includes(noteId)) {
+        console.log(111);
+        this.notesWaitingList[0] = this.notesWaitingList[0].filter(
+          a => a != noteId
+        );
+      }
+      if (
+        this.notesWaitingList[0].length == 0 &&
+        this.notesWaitingList.length > 1
+      ) {
+        // keep it as [[]]
+        this.notesWaitingList.shift();
+      }
+      if (this.notesWaitingList[0].length == 0) {
+        if (this.firstTimeSucceed) {
+          this.hintToastType = 2;
+          this.hintToastAppear = true;
+          setTimeout(() => {
+            this.hintToastAppear = false;
+          }, 5000);
+          this.firstTimeSucceed = false;
+        }
+      }
       if (!this.playing) {
         if (isLinger) {
           recordStartTime = performance.now();
@@ -325,6 +369,28 @@ export default {
         this.alertAppear = true;
       }
     },
+    showPickSong() {
+      this.$ga.event("KeyMaker", "ChooseSong");
+      this.menuAppear = false;
+      this.songListAppear = true;
+    },
+    pickSong(index) {
+      this.$ga.event("KeyMaker", "ChooseSong", `${index}`);
+      this.clearRecordPart(0);
+      this.clearRecordPart(1);
+      this.clearRecordPart(2);
+      this.firstTimeSucceed = true;
+      this.currentSongIndex = index;
+      this.notesWaitingList = [...KeyDemo.works[index].notes]; //shallow copy
+      console.log(JSON.stringify(this.notesWaitingList));
+      this.menuAppear = false;
+      this.songListAppear = false;
+    },
+    redoProject() {
+      this.$ga.event("KeyMaker", "Redo");
+      if (this.currentSongIndex >= 0) this.pickSong(this.currentSongIndex);
+      this.menuAppear = false;
+    },
     bounceProject() {
       this.confirmRecordPart(0);
       console.log(this);
@@ -360,6 +426,7 @@ export default {
                 id
               }
             });
+            // location.href = `#/new-music-box-viewer?id=${id}`;
           })
           .catch(err => {
             this.bouncing = false;
@@ -456,7 +523,7 @@ export default {
     bounceAnyway() {
       this.$ga.event("KeyMaker", "OverLimit", `bounce`);
       this.bounceProject();
-    },
+    }
     // btnStart(e) {
     //   console.log(e);
     //   this.showExtendBtns = false;
@@ -492,164 +559,12 @@ export default {
     //     this.showExtendBtns = false;
     //   }
     // },
-    tutorStart() {
-      // 0未开始，1黑屏,2键盘，3track，4时间线，5播放,
-      this.tutorSession = 1;
-      this.$toast("请锁住竖屏使用");
-      tutorOnceEnter = setTimeout(this.tutorProgress, 3000);
-      // setTimeout(()=>{this.tutorSession=2},3000)
-      // setTimeout(()=>{this.tutorSession=3;this.swiper.slidePrev()},5000)
-      // setTimeout(()=>{this.swiper.slideNext()},7000)
-      // setTimeout(()=>{this.tutorSession=4},8500)
-      // setTimeout(()=>{this.vuetimeline=120},9500)
-      // setTimeout(()=>{this.vuetimeline=0},10500)
-      // setTimeout(()=>{this.tutorSession=5},12000)
-      // setTimeout(()=>{this.showExtendBtns = true},13000)
-      // setTimeout(()=>{this.showExtendBtns=false},15000)
-      // setTimeout(()=>{this.tutorSession=0},16000)
-    },
-    tutorProgress() {
-      clearTimeout(tutorOnceEnter);
-      console.log("??????????");
-      this.tutorSession += 1;
-      console.log(this.tutorSession);
-      switch (this.tutorSession) {
-        case 1:
-          this.clearTutorTimeout();
-          this.$toast("请锁住竖屏使用,长按播放按钮保存作品");
-          break;
-        case 2:
-          this.clearTutorTimeout();
-          this.handClass = "hand"; // clickhand
-          this.tutorClass = "tutor2start";
-          tutorTimeout.push(
-            setTimeout(() => {
-              this.handClass = "clickhand"; // clickhand
-              this.tutorClass = "tutor2end";
-            }, 500)
-          );
-          tutorTimeout.push(
-            setTimeout(() => {
-              this.vuetimeline = 700;
-              this.handClass = "hand";
-            }, 1500)
-          );
-          tutorTimeout.push(
-            setTimeout(() => {
-              this.vuetimeline = 0;
-              this.handClass = "hidehand";
-            }, 2500)
-          );
-          break;
-        case 3:
-          this.clearTutorTimeout();
-          this.handClass = "hand"; // clickhand
-          this.tutorClass = "tutor3start";
-          tutorTimeout.push(
-            setTimeout(() => {
-              this.handClass = "clickhand"; // clickhand
-              this.tutorClass = "tutor3end";
-            }, 500)
-          );
-          tutorTimeout.push(
-            setTimeout(() => {
-              this.handClass = "hand"; // clickhand
-              this.tutorClass = "tutor3end";
-            }, 800)
-          );
-          tutorTimeout.push(
-            setTimeout(() => {
-              this.handClass = "hidehand";
-            }, 1000)
-          );
-          break;
-        case 4:
-          this.clearTutorTimeout();
-          this.handClass = "hand"; // clickhand
-          this.tutorClass = "tutor4start";
-          tutorTimeout.push(
-            setTimeout(() => {
-              this.handClass = "clickhand"; // clickhand
-              this.tutorClass = "tutor4end";
-            }, 500)
-          );
-          tutorTimeout.push(
-            setTimeout(() => {
-              this.handClass = "hand"; // clickhand
-              this.tutorClass = "tutor4start";
-              this.menuAppear = true;
-            }, 1500)
-          );
-          tutorTimeout.push(
-            setTimeout(() => {
-              this.handClass = "hidehand";
-            }, 2500)
-          );
-          tutorTimeout.push(
-            setTimeout(() => {
-              this.menuAppear = false;
-            }, 3000)
-          );
-          break;
-        case 5:
-          this.clearTutorTimeout();
-          this.handClass = "hand"; // clickhand
-          this.tutorClass = "tutor5start";
-          tutorTimeout.push(
-            setTimeout(() => {
-              this.handClass = "clickhand"; // clickhand
-              this.tutorClass = "tutor5end";
-            }, 1200)
-          );
-          tutorTimeout.push(
-            setTimeout(() => {
-              this.swiper.slidePrev();
-            }, 1500)
-          );
-          tutorTimeout.push(
-            setTimeout(() => {
-              this.swiper.slideNext();
-              this.handClass = "hidehand";
-            }, 2500)
-          );
-          break;
-        case 6:
-          this.clearTutorTimeout();
-          this.handClass = "hand"; // clickhand
-          this.tutorClass = "tutor6start";
-          tutorTimeout.push(
-            setTimeout(() => {
-              this.handClass = "clickhand"; // clickhand
-              this.tutorClass = "tutor6end";
-            }, 500)
-          );
-          tutorTimeout.push(
-            setTimeout(() => {
-              this.handClass = "hand"; // clickhand
-              this.tutorClass = "tutor6end";
-            }, 800)
-          );
-          tutorTimeout.push(
-            setTimeout(() => {
-              this.handClass = "hidehand";
-            }, 1500)
-          );
-          break;
-        default:
-          this.tutorSession = 0;
-          break;
-      }
-    },
-    clearTutorTimeout() {
-      this.showExtendBtns = false;
-      tutorTimeout.forEach(v => clearTimeout(v));
-      tutorTimeout = [];
-    }
   },
   created() {
     // check cookie to get serviceToken first
     // if stoken not exist, go auth
     const self = this;
+
     setTimeout(() => {
       //ineresting... due to sb wechat webpage
       // alert(window.innerHeight);
@@ -684,6 +599,8 @@ export default {
         }
       }
     };
+    this.songListAppear = true;
+    this.$toast("请选择一首歌");
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase());
     if (!inWechat) return;
     // alert(Cookies.get('serviceToken'))
@@ -691,7 +608,7 @@ export default {
       WxShare.prepareShareContent({
         title: "哎八音-键盘编辑器",
         desc: "寻找你自己的八音盒",
-        fullPath: `${location.origin}${location.pathname}#/new-music-box-maker`,
+        fullPath: `${location.origin}${location.pathname}#/newbie-maker`,
         imgUrl: "http://img.musixise.com/Ocrg2srw_icon33@2x.png"
       });
     });
@@ -707,7 +624,7 @@ export default {
               // 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx353a60a8b049d366&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect'
               // `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx353a60a8b049d366&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
               `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx353a60a8b049d366&redirect_uri=${encodeURIComponent(
-                `${location.origin + location.pathname}#/new-music-box-maker`
+                `${location.origin + location.pathname}#/newbie-maker`
               )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
             );
           }
@@ -720,7 +637,7 @@ export default {
             // 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx353a60a8b049d366&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect'
             // `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx353a60a8b049d366&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
             `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx353a60a8b049d366&redirect_uri=${encodeURIComponent(
-              `${location.origin + location.pathname}#/new-music-box-maker`
+              `${location.origin + location.pathname}#/newbie-maker`
             )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
           );
         });
@@ -730,21 +647,19 @@ export default {
         // 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx353a60a8b049d366&redirect_uri=http://m.musixise.com/music-box&response_type=code&scope=snsapi_userinfo&state=type&quan,url=http://m.musixise.com/music-box&connect_redirect=1#wechat_redirect'
         // `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx353a60a8b049d366&redirect_uri=${location.href}&response_type=code&scope=snsapi_userinfo&state=type&quan,url=${location.href}&connect_redirect=1#wechat_redirect`
         `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx353a60a8b049d366&redirect_uri=${encodeURIComponent(
-          `${location.origin + location.pathname}#/new-music-box-maker`
+          `${location.origin + location.pathname}#/newbie-maker`
         )}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
       );
     }
   },
   beforeRouteLeave(to, from, next) {
+    this.clearRecordPart(0);
+    this.clearRecordPart(1);
+    this.clearRecordPart(2);
     Magic.clearTone(tonepart);
     next();
   },
-  mounted() {
-    // this.startRecord();
-    // pointer events以后可以使用
-    if (!Cookies.get("serviceToken")) this.tutorStart();
-    // this.$refs.timeline.refresh();
-  },
+  mounted() {},
   updated() {}
 };
 </script>
@@ -759,40 +674,126 @@ export default {
       @touchend.stop="touchNoteEndHandler"
       @touchcancel.stop="touchNoteEndHandler"
     >
-      <!-- using sharp sign => '#' as object key cause syntax error... -->
-      <!-- <div :class="['white', 'a', activeNote.A3?'active-note':'']" id="A3"></div>
-      <div :class="['black', 'b-minor', activeNote.Bb3?'active-note':'']" id="Bb3"></div>
-      <div :class="['white', 'b', activeNote.B3?'active-note':'']" id="B3"></div>-->
-      <div :class="['white', 'c', activeNote.C4?'active-note':'']" id="C4"></div>
-      <div :class="['black', 'd-minor', activeNote.Db4?'active-note':'']" id="Db4"></div>
-      <div :class="['white', 'd', activeNote.D4?'active-note':'']" id="D4"></div>
-      <div :class="['black', 'e-minor', activeNote.Eb4?'active-note':'']" id="Eb4"></div>
-      <div :class="['white', 'e', activeNote.E4?'active-note':'']" id="E4"></div>
-      <div :class="['white', 'f', activeNote.F4?'active-note':'']" id="F4"></div>
-      <div :class="['black', 'f-sharp', activeNote.Gb4?'active-note':'']" id="Gb4"></div>
-      <div :class="['white', 'g', activeNote.G4?'active-note':'']" id="G4"></div>
-      <div :class="['black', 'a-minor', activeNote.Ab4?'active-note':'']" id="Ab4"></div>
-      <div :class="['white', 'a', activeNote.A4?'active-note':'']" id="A4"></div>
-      <div :class="['black', 'b-minor', activeNote.Bb4?'active-note':'']" id="Bb4"></div>
-      <div :class="['white', 'b', activeNote.B4?'active-note':'']" id="B4"></div>
-      <div :class="['white', 'c', activeNote.C5?'active-note':'']" id="C5"></div>
-      <div :class="['black', 'd-minor', activeNote.Db5?'active-note':'']" id="Db5"></div>
-      <div :class="['white', 'd', activeNote.D5?'active-note':'']" id="D5"></div>
-      <div :class="['black', 'e-minor', activeNote.Eb5?'active-note':'']" id="Eb5"></div>
-      <div :class="['white', 'e', activeNote.E5?'active-note':'']" id="E5"></div>
-      <div :class="['white', 'f', activeNote.F5?'active-note':'']" id="F5"></div>
-      <div :class="['black', 'f-sharp', activeNote.Gb5?'active-note':'']" id="Gb5"></div>
-      <div :class="['white', 'g', activeNote.G5?'active-note':'']" id="G5"></div>
-      <div :class="['black', 'a-minor', activeNote.Ab5?'active-note':'']" id="Ab5"></div>
-      <div :class="['white', 'a', activeNote.A5?'active-note':'']" id="A5"></div>
-      <div :class="['black', 'b-minor', activeNote.Bb5?'active-note':'']" id="Bb5"></div>
-      <div :class="['white', 'b', activeNote.B5?'active-note':'']" id="B5"></div>
-      <div :class="['white', 'c', activeNote.C6?'active-note':'']" id="C6"></div>
-      <div :class="['black', 'd-minor', activeNote.Db6?'active-note':'']" id="Db6"></div>
-      <div :class="['white', 'd', activeNote.D6?'active-note':'']" id="D6"></div>
-      <div :class="['black', 'e-minor', activeNote.Eb6?'active-note':'']" id="Eb6"></div>
-      <div :class="['white', 'e', activeNote.E6?'active-note':'']" id="E6"></div>
-      <div :class="['white', 'f', activeNote.F6?'active-note':'']" id="F6"></div>
+      <div
+        :class="['white', 'c', notesWaitingList[0].includes('C4')?'hl-note':'',activeNote.C4?'active-note':'']"
+        id="C4"
+      ></div>
+      <div
+        :class="['black', 'd-minor', notesWaitingList[0].includes('Db4')?'hl-note':'',activeNote.Db4?'active-note':'']"
+        id="Db4"
+      ></div>
+      <div
+        :class="['white', 'd', notesWaitingList[0].includes('D4')?'hl-note':'',activeNote.D4?'active-note':'']"
+        id="D4"
+      ></div>
+      <div
+        :class="['black', 'e-minor', notesWaitingList[0].includes('Eb4')?'hl-note':'',activeNote.Eb4?'active-note':'']"
+        id="Eb4"
+      ></div>
+      <div
+        :class="['white', 'e', notesWaitingList[0].includes('E4')?'hl-note':'',activeNote.E4?'active-note':'']"
+        id="E4"
+      ></div>
+      <div
+        :class="['white', 'f', notesWaitingList[0].includes('F4')?'hl-note':'',activeNote.F4?'active-note':'']"
+        id="F4"
+      ></div>
+      <div
+        :class="['black', 'f-sharp', notesWaitingList[0].includes('Gb4')?'hl-note':'',activeNote.Gb4?'active-note':'']"
+        id="Gb4"
+      ></div>
+      <div
+        :class="['white', 'g', notesWaitingList[0].includes('G4')?'hl-note':'',activeNote.G4?'active-note':'']"
+        id="G4"
+      ></div>
+      <div
+        :class="['black', 'a-minor', notesWaitingList[0].includes('Ab4')?'hl-note':'',activeNote.Ab4?'active-note':'']"
+        id="Ab4"
+      ></div>
+      <div
+        :class="['white', 'a', notesWaitingList[0].includes('A4')?'hl-note':'',activeNote.A4?'active-note':'']"
+        id="A4"
+      ></div>
+      <div
+        :class="['black', 'b-minor', notesWaitingList[0].includes('Bb4')?'hl-note':'',activeNote.Bb4?'active-note':'']"
+        id="Bb4"
+      ></div>
+      <div
+        :class="['white', 'b', notesWaitingList[0].includes('B4')?'hl-note':'',activeNote.B4?'active-note':'']"
+        id="B4"
+      ></div>
+      <div
+        :class="['white', 'c', notesWaitingList[0].includes('C5')?'hl-note':'',activeNote.C5?'active-note':'']"
+        id="C5"
+      ></div>
+      <div
+        :class="['black', 'd-minor', notesWaitingList[0].includes('Db5')?'hl-note':'',activeNote.Db5?'active-note':'']"
+        id="Db5"
+      ></div>
+      <div
+        :class="['white', 'd', notesWaitingList[0].includes('D5')?'hl-note':'',activeNote.D5?'active-note':'']"
+        id="D5"
+      ></div>
+      <div
+        :class="['black', 'e-minor', notesWaitingList[0].includes('Eb5')?'hl-note':'',activeNote.Eb5?'active-note':'']"
+        id="Eb5"
+      ></div>
+      <div
+        :class="['white', 'e', notesWaitingList[0].includes('E5')?'hl-note':'',activeNote.E5?'active-note':'']"
+        id="E5"
+      ></div>
+      <div
+        :class="['white', 'f', notesWaitingList[0].includes('F5')?'hl-note':'',activeNote.F5?'active-note':'']"
+        id="F5"
+      ></div>
+      <div
+        :class="['black', 'f-sharp', notesWaitingList[0].includes('Gb5')?'hl-note':'',activeNote.Gb5?'active-note':'']"
+        id="Gb5"
+      ></div>
+      <div
+        :class="['white', 'g', notesWaitingList[0].includes('G5')?'hl-note':'',activeNote.G5?'active-note':'']"
+        id="G5"
+      ></div>
+      <div
+        :class="['black', 'a-minor', notesWaitingList[0].includes('Ab5')?'hl-note':'',activeNote.Ab5?'active-note':'']"
+        id="Ab5"
+      ></div>
+      <div
+        :class="['white', 'a', notesWaitingList[0].includes('A5')?'hl-note':'',activeNote.A5?'active-note':'']"
+        id="A5"
+      ></div>
+      <div
+        :class="['black', 'b-minor', notesWaitingList[0].includes('Bb5')?'hl-note':'',activeNote.Bb5?'active-note':'']"
+        id="Bb5"
+      ></div>
+      <div
+        :class="['white', 'b', notesWaitingList[0].includes('B5')?'hl-note':'',activeNote.B5?'active-note':'']"
+        id="B5"
+      ></div>
+      <div
+        :class="['white', 'c', notesWaitingList[0].includes('C6')?'hl-note':'',activeNote.C6?'active-note':'']"
+        id="C6"
+      ></div>
+      <div
+        :class="['black', 'd-minor', notesWaitingList[0].includes('Db6')?'hl-note':'',activeNote.Db6?'active-note':'']"
+        id="Db6"
+      ></div>
+      <div
+        :class="['white', 'd', notesWaitingList[0].includes('D6')?'hl-note':'',activeNote.D6?'active-note':'']"
+        id="D6"
+      ></div>
+      <div
+        :class="['black', 'e-minor', notesWaitingList[0].includes('Eb6')?'hl-note':'',activeNote.Eb6?'active-note':'']"
+        id="Eb6"
+      ></div>
+      <div
+        :class="['white', 'e', notesWaitingList[0].includes('E6')?'hl-note':'',activeNote.E6?'active-note':'']"
+        id="E6"
+      ></div>
+      <div
+        :class="['white', 'f', notesWaitingList[0].includes('F6')?'hl-note':'',activeNote.F6?'active-note':'']"
+        id="F6"
+      ></div>
     </div>
     <div :class="['keyshadow',tutorSession===8?'tutorial-highlight':'']"></div>
     <div class="scroll-container"></div>
@@ -890,37 +891,42 @@ export default {
     <div class="mask" v-show="bouncing">
       <p>存储中...</p>
     </div>
-    <div class="hint-mask" id="tutorial-mask" v-show="tutorSession>0" @touchend="tutorProgress">
-      <!-- <transition name="tutor1"><div></div></transition> -->
-      <div v-show="tutorSession===2" class="hint-text" id="timeline-hint">
-        <h3>进度条</h3>
-        <p>拖动原点改变时间</p>
-      </div>
-      <div v-show="tutorSession===3" class="hint-text" id="play-hint">
-        <h3>功能按钮</h3>
-        <p>点击播放/暂停</p>
-      </div>
-      <div v-show="tutorSession===4" class="hint-text" id="longpress-hint">
-        <h3>功能按钮</h3>
-        <p>点击后点击：保存/取消</p>
-      </div>
-      <div v-show="tutorSession===5" class="hint-text" id="swipe-hint">
-        <h3>多轨编曲</h3>
-        <p>上下滑动切换轨道编曲</p>
-      </div>
-      <div v-show="tutorSession===6" class="hint-text" id="clear-hint">
-        <h3>多轨编曲</h3>
-        <p>清空轨道</p>
-      </div>
-    </div>
-    <div id="tutorhand" :class="[tutorClass]" v-if="handClass&&handClass!='hidehand'">
-      <div :class="[handClass]"></div>
-    </div>
+
     <transition name="slide">
       <div class="alert-mask" v-show="menuAppear" @click.self="menuAppear=false">
         <div class="menu">
-          <div @touchstart="finishProject" class>完成作品</div>
+          <div @touchstart="finishProject" class>保存作品</div>
+          <div @touchstart="redoProject" class>再来一遍</div>
+          <div @touchstart="showPickSong" class>重选歌曲</div>
           <div @touchstart="menuAppear=false" class>退出</div>
+        </div>
+      </div>
+    </transition>
+    <transition name="slide">
+      <div class="alert-mask" v-show="songListAppear" @touchstart.self="songListAppear=false">
+        <div class="picker">
+          <div
+            v-bind:key="item.name"
+            v-for="(item,index) in KeyDemo.works"
+            @touchstart="pickSong(index)"
+          >{{item.name}}</div>
+        </div>
+      </div>
+    </transition>
+    <transition name="fade">
+      <div class="hintToast" v-show="hintToastAppear">
+        <div v-if="hintToastType == 1">还不太熟练，再试一次吧</div>
+        <div v-if="hintToastType == 2">
+          <p>
+            好棒～点击左上角菜单栏
+            <span>
+              <img
+                style="width:.5rem;height:.5rem;vertical-align:middle;position:relative;bottom:.05rem;"
+                src="../assets/menu.png"
+                alt
+              >
+            </span> 选择保存作品
+          </p>不满意还可以再来一遍
         </div>
       </div>
     </transition>
@@ -943,63 +949,6 @@ export default {
 @import "../_common/style/_variables.scss";
 @import "../_common/style/_mixins.scss";
 @import "../_common/style/_reboot.scss";
-
-#tutorhand {
-  position: absolute;
-  width: getRem(96);
-  height: getRem(98);
-  // transform:rotate(90deg);
-  // background-color:white;
-  z-index: 500;
-  transition: background 0.05s ease, transform 1s linear;
-  &.tutor2start {
-    top: 1.4rem;
-    right: 1.55rem;
-    transition: none;
-  }
-  &.tutor2end {
-    top: 1.4rem;
-    right: 1.5rem;
-    transform: translateY(5rem);
-  }
-  &.tutor3start {
-    bottom: 0.1rem;
-    right: 0.6rem;
-    transition: none;
-  }
-  &.tutor3end {
-    bottom: 0.1rem;
-    right: 0.6rem;
-  }
-  &.tutor4start {
-    top: 0.1rem;
-    right: 0.6rem;
-    transition: none;
-  }
-  &.tutor4end {
-    top: 0.1rem;
-    right: 0.6rem;
-  }
-  &.tutor5start {
-    top: 2rem;
-    right: 3.5rem;
-    transition: none;
-  }
-  &.tutor5end {
-    top: 2rem;
-    right: 3.5rem;
-    transform: translateX(1rem);
-  }
-  &.tutor6start {
-    bottom: 0.1rem;
-    right: 3.5rem;
-    transition: none;
-  }
-  &.tutor6end {
-    bottom: 0.1rem;
-    right: 3.5rem;
-  }
-}
 // .longclickhand {transform:rotate(90deg) translateY(1rem);background:url('../assets/tutorial/handlongclick.svg') no-repeat;background-size:contain}
 .hand {
   position: absolute;
@@ -1066,6 +1015,7 @@ export default {
     background: url("../assets/menu.png") center center no-repeat;
     background-size: cover;
     margin: 6px 0 10px 0;
+    z-index: 2;
   }
   .btnContainer {
     position: absolute;
@@ -1352,6 +1302,9 @@ h2 {
     // background: linear-gradient(to left, #555 0%, #ddd 40%, #eee 100%);
     background: linear-gradient(to left, white, rgb(236, 236, 236));
   }
+  &.hl-note {
+    background-color: #bbede7;
+  }
 }
 
 .black {
@@ -1376,6 +1329,9 @@ h2 {
     background: url("../assets/blackkeydown.png") center center no-repeat;
     background-size: cover;
   }
+  &.hl-note {
+    background: linear-gradient(to bottom, #bbede7, #bbede7);
+  }
 }
 
 /* mask layout */
@@ -1394,54 +1350,6 @@ h2 {
     font-size: 0.57rem;
     font-weight: 200;
     transform: rotate(90deg);
-  }
-}
-.hint-mask {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  .hint-text {
-    transform: rotate(90deg);
-    text-align: right;
-  }
-  p {
-    font-size: 0.43rem;
-    font-weight: 200;
-  }
-  h3 {
-    font-size: 0.57rem;
-    font-weight: 400;
-  }
-  #timeline-hint {
-    position: absolute;
-    top: 2rem;
-    right: 1rem;
-  }
-  #play-hint {
-    position: absolute;
-    bottom: 2rem;
-    right: 1rem;
-  }
-  #longpress-hint {
-    position: absolute;
-    top: 3rem;
-    right: -1rem;
-  }
-  #swipe-hint {
-    position: absolute;
-    top: 2rem;
-    right: 4rem;
-  }
-  #clear-hint {
-    position: absolute;
-    bottom: 2rem;
-    right: 4rem;
   }
 }
 .fadein {
@@ -1478,6 +1386,25 @@ h2 {
 
 .rotate {
   transform: rotate(90deg);
+}
+.hintToast {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  position: relative;
+  padding: getRem(40);
+  left: 50%;
+  top: 50%;
+  font-size: 0.45rem;
+  width: getRem(360 * 2);
+  height: getRem(100 * 2);
+  border-radius: getRem(20);
+  background-color: $dark-gray;
+  color: white;
+  z-index: 5;
+  // important rotate
+  transform: translate(-20%, -50%) rotate(90deg);
 }
 .alert-mask {
   position: absolute;
@@ -1613,6 +1540,31 @@ h2 {
       width: 100%;
       height: 100%;
       background-color: $dark-gray;
+    }
+  }
+  .picker {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    position: relative;
+    // padding: getRem(40);
+    font-size: 0.5rem;
+    width: getRem(280 * 2);
+    height: getRem(325 * 2);
+    border-radius: getRem(20);
+    background-color: $dark-gray;
+    color: white;
+    // important rotate
+    transform: rotate(90deg);
+    > div {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      background-color: $dark-gray;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     }
   }
 }

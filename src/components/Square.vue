@@ -46,7 +46,7 @@ export default {
   methods: {
     redirectToMaker() {
       this.$router.push({
-        path: "/new-music-box-maker",
+        path: "/newbie-maker",
         query: {}
       });
     },
