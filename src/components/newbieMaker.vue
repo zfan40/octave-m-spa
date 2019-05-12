@@ -157,6 +157,7 @@ export default {
               this.currentSongIndex >= 0 &&
               this.notesWaitingList[0].length > 0
             ) {
+              this.$ga.event("KeyMaker", "Song", "unfinish");
               this.hintToastType = 1;
               this.hintToastAppear = true;
               setTimeout(() => {
@@ -915,7 +916,7 @@ export default {
     </transition>
     <transition name="fade">
       <div class="hintToast" v-show="hintToastAppear">
-        <div v-if="hintToastType == 1">还不太熟练，再试一次吧</div>
+        <div v-if="hintToastType == 1">没有在20s完成，再试一次吧～</div>
         <div v-if="hintToastType == 2">
           <p>
             好棒～点击左上角菜单栏

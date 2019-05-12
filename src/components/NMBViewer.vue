@@ -73,7 +73,7 @@ export default {
               title: `${this.projectInfo.userVO.realname}给妈妈做了个八音盒-${
                 this.projectInfo.title
               }`,
-              desc: "只花1分钟,你也可以喔～",
+              desc: "3分钟会创作,你也可以喔～",
               // fullPath:location.href.split('#')[0],
               fullPath,
               imgUrl:
@@ -185,7 +185,7 @@ export default {
               title: `${this.projectInfo.userVO.realname}给妈妈做了个八音盒-${
                 this.newWorkTitle
               }`,
-              desc: "只花1分钟,你也可以喔～",
+              desc: "3分钟会创作,你也可以喔～",
               // fullPath:location.href.split('#')[0],
               fullPath,
               imgUrl:
