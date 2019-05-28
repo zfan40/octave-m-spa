@@ -161,7 +161,17 @@ export function RealMagic(items) {
   // return true;
   return machines.length
 }
-
+export function linearMap(x, xRange, yRange) {
+  /*  x is a number
+      xRange is [a,b]
+      yRange is [a',b']
+      return value would be a number
+  */
+  // this will return corresponding y
+  const k = (yRange[1] - yRange[0]) / (xRange[1] - xRange[0])
+  const b = yRange[0] - k * xRange[0]
+  return k * x + b
+}
 export function mapNoteTimeToColor(time) {
   const COLOR1 = [151, 255, 241];
   const COLOR2 = [137, 228, 217];
@@ -359,6 +369,16 @@ export function bounceAsWavBlob(url) {
   });
 }
 
+export function fetchNotesFromUrl(url) {
+  if (!url) url = '//img.musixise.com/7LewRhWr_qqsxbaisuzhen.mid'
+  return new Promise((resolve, reject) => {
+    if (!/.mid/.test(url)) { reject() }
+    MidiConvert.load(url, (midi) => {
+      const mergeNotes = midi.tracks.reduce((a, b) => a.concat(b.notes), []);
+      resolve(mergeNotes)
+    });
+  })
+}
 export function canMakePaper30(items) {
   const paper30Notes = [48, 50, 55, 57, 59, 60, 62, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 86, 88]
   return items.every(item => paper30Notes.indexOf(item) >= 0)

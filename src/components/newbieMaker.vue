@@ -236,7 +236,7 @@ export default {
         this.notesWaitingList.shift();
       }
       if (this.notesWaitingList[0].length == 0) {
-        if (this.firstTimeSucceed) {
+        if (this.firstTimeSucceed && this.currentSongIndex >= 0) {
           this.hintToastType = 2;
           this.hintToastAppear = true;
           setTimeout(() => {

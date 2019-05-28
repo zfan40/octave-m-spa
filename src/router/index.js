@@ -17,6 +17,8 @@ import OrderConfirm from '@/components/OrderConfirm';
 import MyOrders from '@/components/MyOrders';
 import RankBoard from '@/components/RankBoard';
 import NewbieMaker from '@/components/newbieMaker';
+import MagicPiano from '@/components/MagicPiano';
+
 Vue.use(Router);
 
 export default new Router({
@@ -41,6 +43,11 @@ export default new Router({
       path: '/new-music-box-maker',
       name: 'NMBMaker',
       component: NMBMaker,
+    },
+    {
+      path: '/magic-piano',
+      name: 'MagicPiano',
+      component: MagicPiano,
     },
     {
       path: '/new-music-box-roll',
