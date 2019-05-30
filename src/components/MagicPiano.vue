@@ -33,11 +33,12 @@ import * as Cookies from "js-cookie";
 import * as Magic from "../_common/js/magic";
 import Vue from "vue";
 import VueKonva from "vue-konva";
+
 Vue.use(VueKonva);
 window.Tone = require("tone");
 let tweens = [];
 const windowWidth = document.documentElement.getBoundingClientRect().width;
-
+let lastTouchTime = 0;
 let piano = new Tone.Sampler(
   {
     C4: "C4.[mp3|ogg]",
@@ -65,7 +66,8 @@ export default {
       msg: "Welcome to Your Vue.js App",
       OFFSET_Y: window.innerHeight - 150 + 75, //底部150px的操作区域
       DIST_PER_SEC: 200,
-      step: -1 // will go till length of notes
+      step: -1, // will go till length of notes
+      actualInterval: 0 // touch interval
     };
   },
   methods: {
@@ -86,29 +88,36 @@ export default {
     scheduleNext() {
       //TODO: 双音处理，从midi数据那就需要洗数据吧
       // duration:interval要考虑当前速度变化
+
       this.step += 1;
-      let interval;
+      let desiredInterval;
+      const now = window.performance.now();
+      this.actualInterval = now - lastTouchTime;
+      lastTouchTime = now;
       if (this.step >= 1) {
         this.makeSound(this.notes[this.step - 1]);
         if (this.step < this.notes.length) {
           console.log(this.step);
-          interval =
+          desiredInterval =
             this.notes[this.step].time - this.notes[this.step - 1].time;
           console.log(11111);
-          console.log(interval);
-          this.makeSound(this.notes[this.step - 1]);
+          console.log(desiredInterval);
         }
       } else {
-        interval = this.notes[this.step].time;
+        // first note
+        desiredInterval = this.notes[this.step].time;
       }
-      // tweens.forEach(tween => tween.destroy());
-      tweens.forEach(tween => tween.finish());
+      tweens.forEach(tween => {
+        tween.pause();
+        tween.finish();
+        // tween.destroy();
+      });
       tweens = this.noteNodes.map(
         noteNode =>
           new Konva.Tween({
             node: noteNode,
             offsetY: -(this.DIST_PER_SEC * this.notes[this.step].time),
-            duration: interval
+            duration: desiredInterval
             // easing: Konva.Easings.EaseInOut
           })
       );
