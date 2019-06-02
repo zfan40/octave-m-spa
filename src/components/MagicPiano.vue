@@ -1,22 +1,24 @@
 <template>
   <div class="container">
-    <v-stage :config="configKonva" @touchstart="scheduleNext">
-      <v-layer>
-        <v-circle
-          v-for="(note, index) in notes"
-          :ref="`note${index}`"
-          :key="index"
-          :config="{
-            x: calcNoteX(note.midi),
-            y: -note.time * DIST_PER_SEC + OFFSET_Y,
-            radius: 10,
-            width: 20,
-            height: 20,
-            fill: 'green'
-          }"
-        />
-      </v-layer>
-    </v-stage>
+    <div
+      style="position:absolute;overflow:hidden;width:100%;height:100%;"
+      @click="scheduleNext"
+    >
+      <div
+        v-for="(note, index) in notes"
+        :key="index"
+        style="position:absolute;width:20px;height:20px;border-radius:10px;background-color:green;transition: transform 0.3s ease;"
+        :style="{
+          left: `${calcNoteX(note.midi)}px`,
+          top: `${-note.time * DIST_PER_SEC + OFFSET_Y}px`,
+          transform:
+            step == -1
+              ? 'translateY(0px)'
+              : `translateY(${DIST_PER_SEC * notes[step].time}px)`,
+          'transition-duration': desiredInterval
+        }"
+      />
+    </div>
     <div
       style="background-color:rgba(0,0,0,.2);position:absolute;bottom:150px;height:100%;width:100%;"
     ></div>
@@ -88,8 +90,8 @@ export default {
     scheduleNext() {
       //TODO: 双音处理，从midi数据那就需要洗数据吧
       // duration:interval要考虑当前速度变化
-
       this.step += 1;
+
       let desiredInterval;
       const now = window.performance.now();
       this.actualInterval = now - lastTouchTime;
@@ -107,21 +109,23 @@ export default {
         // first note
         desiredInterval = this.notes[this.step].time;
       }
-      tweens.forEach(tween => {
-        tween.pause();
-        tween.finish();
-        // tween.destroy();
-      });
-      tweens = this.noteNodes.map(
-        noteNode =>
-          new Konva.Tween({
-            node: noteNode,
-            offsetY: -(this.DIST_PER_SEC * this.notes[this.step].time),
-            duration: desiredInterval
-            // easing: Konva.Easings.EaseInOut
-          })
-      );
-      tweens.forEach(tween => tween.play());
+      this.desiredInterval = `${desiredInterval}s`;
+      // tweens.forEach(tween => {
+      //   tween.pause();
+
+      //   // tween.finish();
+      //   // tween.destroy();
+      // });
+      // tweens = this.noteNodes.map(
+      //   noteNode =>
+      //     new Konva.Tween({
+      //       node: noteNode,
+      //       offsetY: -(this.DIST_PER_SEC * this.notes[this.step].time),
+      //       duration: desiredInterval
+      //       // easing: Konva.Easings.EaseInOut
+      //     })
+      // );
+      // tweens.forEach(tween => tween.play());
     },
     redirectTo(path) {
       this.$router.push(path);
